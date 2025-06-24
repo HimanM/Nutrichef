@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { HiOutlineUser, HiOutlineMail, HiOutlineLockClosed, HiOutlineArrowRight, HiOutlineSparkles } from 'react-icons/hi';
+import { HiOutlineUser, HiOutlineMail, HiOutlineLockClosed, HiOutlineArrowRight, HiOutlineSparkles, HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
 
 const UserRegistration = () => {
     const [name, setName] = useState('');
@@ -10,6 +10,8 @@ const UserRegistration = () => {
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -139,15 +141,31 @@ const UserRegistration = () => {
                                 <input 
                                     id="password" 
                                     name="password" 
-                                    type="password" 
+                                    type={showPassword ? "text" : "password"}
                                     autoComplete="new-password" 
                                     required 
                                     value={password} 
                                     onChange={(e) => setPassword(e.target.value)} 
                                     disabled={isLoading} 
-                                    className="form-input pl-12" 
+                                    className="form-input pl-12 pr-12" 
                                     placeholder="Create a strong password"
                                 />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                                    onMouseDown={() => setShowPassword(true)}
+                                    onMouseUp={() => setShowPassword(false)}
+                                    onMouseLeave={() => setShowPassword(false)}
+                                    onTouchStart={() => setShowPassword(true)}
+                                    onTouchEnd={() => setShowPassword(false)}
+                                    disabled={isLoading}
+                                >
+                                    {showPassword ? (
+                                        <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                                    ) : (
+                                        <HiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                                    )}
+                                </button>
                             </div>
                         </div>
 
@@ -160,15 +178,31 @@ const UserRegistration = () => {
                                 <input 
                                     id="confirmPassword" 
                                     name="confirmPassword" 
-                                    type="password" 
+                                    type={showConfirmPassword ? "text" : "password"}
                                     autoComplete="new-password" 
                                     required 
                                     value={confirmPassword} 
                                     onChange={(e) => setConfirmPassword(e.target.value)} 
                                     disabled={isLoading} 
-                                    className="form-input pl-12" 
+                                    className="form-input pl-12 pr-12" 
                                     placeholder="Confirm your password"
                                 />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                                    onMouseDown={() => setShowConfirmPassword(true)}
+                                    onMouseUp={() => setShowConfirmPassword(false)}
+                                    onMouseLeave={() => setShowConfirmPassword(false)}
+                                    onTouchStart={() => setShowConfirmPassword(true)}
+                                    onTouchEnd={() => setShowConfirmPassword(false)}
+                                    disabled={isLoading}
+                                >
+                                    {showConfirmPassword ? (
+                                        <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                                    ) : (
+                                        <HiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                                    )}
+                                </button>
                             </div>
                         </div>
 

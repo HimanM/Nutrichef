@@ -19,8 +19,11 @@ import {
     MenuItem,
     InputLabel,
     FormControl,
-    Chip
+    Chip,
+    InputAdornment,
+    IconButton
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const UserSettings = () => {
     // Password State
@@ -28,6 +31,9 @@ const UserSettings = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState(''); // New state for confirm password
     const [passwordMessage, setPasswordMessage] = useState({ text: '', type: 'info' }); // Updated state for typed messages
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     // Allergies State
     const [allAllergies, setAllAllergies] = useState([]); // Stores all available allergies from API
@@ -325,7 +331,7 @@ const UserSettings = () => {
                 </Typography>
                 <Box component="form" onSubmit={handleChangePassword} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <TextField
-                        type="password"
+                        type={showCurrentPassword ? "text" : "password"}
                         label="Current Password"
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
@@ -334,9 +340,26 @@ const UserSettings = () => {
                         variant="outlined"
                         error={passwordMessage.type === 'error' && passwordMessage.text.toLowerCase().includes("current password")} // Example more specific error
                         helperText={passwordMessage.type === 'error' && passwordMessage.text.toLowerCase().includes("current password") ? passwordMessage.text : ''}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle current password visibility"
+                                        onMouseDown={() => setShowCurrentPassword(true)}
+                                        onMouseUp={() => setShowCurrentPassword(false)}
+                                        onMouseLeave={() => setShowCurrentPassword(false)}
+                                        onTouchStart={() => setShowCurrentPassword(true)}
+                                        onTouchEnd={() => setShowCurrentPassword(false)}
+                                        edge="end"
+                                    >
+                                        {showCurrentPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                     <TextField
-                        type="password"
+                        type={showNewPassword ? "text" : "password"}
                         label="New Password"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
@@ -344,10 +367,26 @@ const UserSettings = () => {
                         fullWidth
                         variant="outlined"
                         error={passwordMessage.type === 'error'}
-
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle new password visibility"
+                                        onMouseDown={() => setShowNewPassword(true)}
+                                        onMouseUp={() => setShowNewPassword(false)}
+                                        onMouseLeave={() => setShowNewPassword(false)}
+                                        onTouchStart={() => setShowNewPassword(true)}
+                                        onTouchEnd={() => setShowNewPassword(false)}
+                                        edge="end"
+                                    >
+                                        {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                     <TextField
-                        type="password"
+                        type={showConfirmPassword ? "text" : "password"}
                         label="Confirm New Password"
                         value={confirmNewPassword}
                         onChange={(e) => setConfirmNewPassword(e.target.value)}
@@ -356,6 +395,23 @@ const UserSettings = () => {
                         variant="outlined"
                         error={passwordMessage.type === 'error' && passwordMessage.text.includes("match")}
                         helperText={passwordMessage.type === 'error' && passwordMessage.text.includes("match") ? passwordMessage.text : ''}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle confirm password visibility"
+                                        onMouseDown={() => setShowConfirmPassword(true)}
+                                        onMouseUp={() => setShowConfirmPassword(false)}
+                                        onMouseLeave={() => setShowConfirmPassword(false)}
+                                        onTouchStart={() => setShowConfirmPassword(true)}
+                                        onTouchEnd={() => setShowConfirmPassword(false)}
+                                        edge="end"
+                                    >
+                                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                     <Button variant="contained" type="submit" sx={{ alignSelf: 'flex-start' }}>
                         Change Password

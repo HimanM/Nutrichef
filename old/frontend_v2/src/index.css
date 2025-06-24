@@ -1,0 +1,259 @@
+@import "tailwindcss";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* color-scheme: light dark; */ /* Removed to enforce light theme */
+  /* color: #1f2937; */ /* gray-800 - Overridden by body for dark theme */
+  /* background-color: #f3f4f6; */ /* gray-100 - Overridden by body for dark theme */
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  @apply text-blue-500 hover:text-blue-400; /* Adjusted for dark theme visibility */
+  text-decoration: inherit;
+}
+/* a:hover already handled by @apply */
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #111827; /* Tailwind's bg-gray-900 */
+  color: #f9fafb; /* Tailwind's text-gray-50 or similar light color */
+}
+
+/* Remove or update old h1 style if any, prompt provides new ones */
+/* h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+} */
+
+/* Global utility classes */
+.page-container {
+  @apply container mx-auto px-6 py-8 rounded-lg; /* removed bg-gray-800 */
+}
+
+.auth-page-card {
+  @apply bg-gray-800 rounded-lg shadow-xl;
+}
+
+.gradient-button {
+  @apply bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-semibold py-2 px-6 rounded-lg text-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-lg;
+}
+
+.animated-gradient-button {
+  @apply px-3 py-2 rounded-md text-sm font-medium flex items-center;
+  color: theme('colors.blue.600'); /* Default color changed */
+  @apply bg-transparent; /* Default: no specific background */
+  border: 1px solid transparent; /* Placeholder for border */
+  background-size: 200% auto; /* For gradient animation */
+  background-position: left center; /* Initial position for gradient animation */
+  background-image: none; /* Explicitly no gradient by default */
+  /* Transitions should cover background-image, background-position, box-shadow, color */
+  transition: background-image 0.3s ease-in-out, background-position 0.4s ease-in-out, box-shadow 0.3s ease-in-out, color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.animated-gradient-button:hover {
+  @apply bg-gradient-to-r from-green-400 to-blue-500 text-white; /* Gradient appears on hover, text white */
+  background-position: right center; /* Animates the gradient by shifting its position */
+  /* No border on hover */
+  box-shadow: none; /* Ensure no box-shadow from other states bleeds into hover unless intended */
+}
+
+.animated-gradient-button:active,
+.animated-gradient-button:focus {
+  @apply bg-gradient-to-r from-green-400 to-blue-500 text-white; /* Gradient persists, text white */
+  background-position: right center; /* Keep gradient visible and shifted */
+  box-shadow: 0 0 0 2px theme('colors.green.400'); /* Border appears on click/focus */
+  outline: none;
+}
+
+.animated-gradient-button:active:hover,
+.animated-gradient-button:focus:hover {
+  @apply bg-gradient-to-r from-green-500 to-blue-600 text-white; /* Gradient colors change, text white */
+  background-position: right center; 
+  box-shadow: 0 0 0 2px theme('colors.blue.600'); /* Border color changes to match new gradient */
+}
+
+/* Profile Gradient Button */
+.profile-gradient-button {
+  @apply px-3 py-2 rounded-md text-sm font-medium flex items-center;
+  color: theme('colors.blue.600');
+  @apply bg-transparent;
+  border: 1px solid transparent;
+  background-size: 200% auto;
+  background-position: left center;
+  background-image: none;
+  transition: background-image 0.3s ease-in-out, background-position 0.4s ease-in-out, box-shadow 0.3s ease-in-out, color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.profile-gradient-button:hover {
+  @apply bg-gradient-to-r from-indigo-500 to-purple-600 text-white;
+  background-position: right center;
+  box-shadow: none;
+}
+
+.profile-gradient-button:active,
+.profile-gradient-button:focus {
+  @apply bg-gradient-to-r from-indigo-500 to-purple-600 text-white;
+  background-position: right center;
+  box-shadow: 0 0 0 2px theme('colors.indigo.500');
+  outline: none;
+}
+
+.profile-gradient-button:active:hover,
+.profile-gradient-button:focus:hover {
+  @apply bg-gradient-to-r from-indigo-600 to-purple-700 text-white;
+  background-position: right center;
+  box-shadow: 0 0 0 2px theme('colors.purple.600'); /* Adjusted to match one of the hover gradient colors */
+}
+
+/* Admin Action Gradient Button */
+.admin-action-gradient-button {
+  @apply px-3 py-2 rounded-md text-sm font-medium flex items-center;
+  color: theme('colors.blue.600');
+  @apply bg-transparent;
+  border: 1px solid transparent;
+  background-size: 200% auto;
+  background-position: left center;
+  background-image: none;
+  transition: background-image 0.3s ease-in-out, background-position 0.4s ease-in-out, box-shadow 0.3s ease-in-out, color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.admin-action-gradient-button:hover {
+  @apply bg-gradient-to-r from-red-500 to-orange-500 text-white;
+  background-position: right center;
+  box-shadow: none;
+}
+
+.admin-action-gradient-button:active,
+.admin-action-gradient-button:focus {
+  @apply bg-gradient-to-r from-red-500 to-orange-500 text-white;
+  background-position: right center;
+  box-shadow: 0 0 0 2px theme('colors.red.500');
+  outline: none;
+}
+
+.admin-action-gradient-button:active:hover,
+.admin-action-gradient-button:focus:hover {
+  @apply bg-gradient-to-r from-red-600 to-orange-600 text-white;
+  background-position: right center;
+  box-shadow: 0 0 0 2px theme('colors.orange.500'); /* Adjusted to match one of the hover gradient colors */
+}
+
+.gradient-button-no-format {
+  @apply bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-semibold rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-lg;
+}
+
+.gradient-box{
+  @apply bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600
+}
+
+.nav-item-style {
+  @apply px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 flex items-center;
+}
+
+
+.grey-blue-box {
+  @apply bg-gray-800  p-6 shadow-md; /* Tailwind's gray-800/50 */
+}
+/* Base heading styles */
+h1, h2, h3, h4, h5, h6 {
+  @apply text-white; /* Default white color for headings */
+}
+
+/* More specific heading styles if needed, can be adjusted per component too */
+h1 {
+  @apply text-4xl font-bold mb-6; /* Example, can be customized */
+}
+
+h2 {
+  @apply text-3xl font-semibold mb-4; /* Example, can be customized */
+}
+
+h3 {
+  @apply text-2xl font-semibold mb-3; /* Example, can be customized */
+}
+
+/* Button styles from original file - commented out as per prompt,
+   can be replaced by Tailwind component classes or .gradient-button */
+/*
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+*/
+
+/* Media query for color scheme - commented out to enforce dark theme */
+/*
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+*/
+@keyframes scroll-left-hover {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(calc(-100% + 100%));
+  }
+}
+
+.scrollable-title {
+  white-space: nowrap;
+  display: inline-block;
+  overflow: hidden;
+  position: relative;
+}
+
+.scrollable-title:hover {
+  animation: scroll-left-hover 6s linear infinite;
+}
+
+.container-middle {
+  @apply max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 6s linear infinite;
+  white-space: nowrap;
+}

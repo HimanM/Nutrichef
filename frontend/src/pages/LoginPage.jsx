@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link as RouterLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { HiOutlineLockClosed, HiOutlineMail, HiOutlineArrowRight, HiOutlineSparkles } from 'react-icons/hi';
+import { HiOutlineLockClosed, HiOutlineMail, HiOutlineArrowRight, HiOutlineSparkles, HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [formError, setFormError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEmailNotVerified, setShowEmailNotVerified] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -150,15 +151,31 @@ export default function LoginPage() {
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={authLoading || isSubmitting}
-                  className="form-input pl-12"
+                  className="form-input pl-12 pr-12"
                   placeholder="Enter your password"
                 />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                  onMouseDown={() => setShowPassword(true)}
+                  onMouseUp={() => setShowPassword(false)}
+                  onMouseLeave={() => setShowPassword(false)}
+                  onTouchStart={() => setShowPassword(true)}
+                  onTouchEnd={() => setShowPassword(false)}
+                  disabled={authLoading || isSubmitting}
+                >
+                  {showPassword ? (
+                    <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                  ) : (
+                    <HiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                  )}
+                </button>
               </div>
             </div>
 

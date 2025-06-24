@@ -63,20 +63,51 @@ function ShoppingBasketPage() {
         setBasketItems(prev => prev.map(item => item.id === itemIdToUpdate ? { ...item, quantity: '' } : item));
         return;
     }
-    const newQuantity = parseInt(newQuantityStr, 10);
+
+    // Handle fractional values like "1/2", "1/4", "3/4", etc.
+    const fractionPattern = /^(\d+)\/(\d+)$/;
+    const fractionMatch = newQuantityStr.match(fractionPattern);
+    
+    if (fractionMatch) {
+      const numerator = parseInt(fractionMatch[1], 10);
+      const denominator = parseInt(fractionMatch[2], 10);
+      
+      if (denominator === 0) {
+        showModal('alert', 'Invalid Fraction', 'Denominator cannot be zero.', {iconType: 'error'});
+        return;
+      }
+      
+      // Store the fraction as a string
+      try {
+        const updatedBasketItems = basketItems.map(item =>
+          item.id === itemIdToUpdate ? { ...item, quantity: newQuantityStr } : item
+        );
+        setBasketItems(updatedBasketItems);
+        localStorage.setItem(SHOPPING_BASKET_KEY, JSON.stringify(updatedBasketItems));
+      } catch (e) { 
+        setError("Failed to update quantity."); 
+      }
+      return;
+    }
+
+    // Handle regular numbers
+    const newQuantity = parseFloat(newQuantityStr);
     if (isNaN(newQuantity) || newQuantity <= 0) {
-        showModal('alert', 'Invalid Quantity', 'Please enter a number greater than 0.', {iconType: 'error'});
+        showModal('alert', 'Invalid Quantity', 'Please enter a valid number or fraction (e.g., 1, 1.5, 1/2, 1/4).', {iconType: 'error'});
         setBasketItems(prev => prev.map(item => item.id === itemIdToUpdate ? { ...item, quantity: '1' } : item));
         localStorage.setItem(SHOPPING_BASKET_KEY, JSON.stringify(basketItems.map(item => item.id === itemIdToUpdate ? { ...item, quantity: '1' } : item)));
         return;
     }
+    
     try {
       const updatedBasketItems = basketItems.map(item =>
         item.id === itemIdToUpdate ? { ...item, quantity: newQuantity.toString() } : item
       );
       setBasketItems(updatedBasketItems);
       localStorage.setItem(SHOPPING_BASKET_KEY, JSON.stringify(updatedBasketItems));
-    } catch (e) { setError("Failed to update quantity."); }
+    } catch (e) { 
+      setError("Failed to update quantity."); 
+    }
   };
 
   const handleDownloadTxt = () => {
@@ -202,11 +233,11 @@ function ShoppingBasketPage() {
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
                         <div className="flex items-center mb-2 sm:mb-0">
                           <input
-                            type="number"
+                            type="text"
                             value={item.quantity}
                             onChange={(e) => handleQuantityChange(item.id, e.target.value)}
                             className="w-16 px-2 py-1 bg-white border border-emerald-100 text-emerald-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 text-sm text-center transition-all duration-200"
-                            min="1"
+                            placeholder="1"
                             aria-label={`Quantity for ${item.name}`}
                           />
                           <div className="ml-3 text-sm">

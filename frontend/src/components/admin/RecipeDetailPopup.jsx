@@ -95,10 +95,16 @@ const RecipeDetailPopup = ({ recipe, onClose }) => {
                       <span className="text-gray-800">{recipe.Servings}</span>
                     </div>
                   )}
-                  {recipe.CookingTime && (
+                  {recipe.CookingTimeMinutes && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Cooking Time:</span>
-                      <span className="text-gray-800">{recipe.CookingTime}</span>
+                      <span className="text-gray-800">{recipe.CookingTimeMinutes} minutes</span>
+                    </div>
+                  )}
+                  {recipe.PreparationTimeMinutes && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Preparation Time:</span>
+                      <span className="text-gray-800">{recipe.PreparationTimeMinutes} minutes</span>
                     </div>
                   )}
                 </div>
@@ -140,14 +146,14 @@ const RecipeDetailPopup = ({ recipe, onClose }) => {
                   Instructions
                 </h3>
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  {recipe.instructions && recipe.instructions.length > 0 ? (
+                  {recipe.Instructions ? (
                     <ol className="space-y-3">
-                      {recipe.instructions.map((instruction, index) => (
+                      {recipe.Instructions.split('\n').filter(step => step.trim()).map((instruction, index) => (
                         <li key={index} className="flex">
                           <span className="flex-shrink-0 w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center text-sm font-medium mr-3">
                             {index + 1}
                           </span>
-                          <p className="text-gray-700 leading-relaxed">{instruction}</p>
+                          <p className="text-gray-700 leading-relaxed">{instruction.trim()}</p>
                         </li>
                       ))}
                     </ol>

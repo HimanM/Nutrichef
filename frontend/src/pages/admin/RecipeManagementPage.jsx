@@ -23,6 +23,7 @@ function RecipeManagementPage() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [sortColumn, setSortColumn] = useState('RecipeID'); // Default sort column
   const [sortDirection, setSortDirection] = useState('asc'); // Default sort direction
+  const [publicFilter, setPublicFilter] = useState('all'); // 'all', 'public', 'private'
 
   const fetchRecipes = useCallback(async (currentPage, currentRowsPerPage, currentSortColumn, currentSortDirection) => {
     setLoading(true); setError(null); 
@@ -61,30 +62,21 @@ function RecipeManagementPage() {
     setPage(0); // Reset to first page on sort change
   };
 
+  const handlePublicFilterClick = () => {
+    if (publicFilter === 'all') {
+      setPublicFilter('public');
+    } else if (publicFilter === 'public') {
+      setPublicFilter('private');
+    } else {
+      setPublicFilter('all');
+    }
+    setPage(0); // Reset to first page on filter change
+  };
+
   const handleChangePage = (newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
-
-  const handleStatusChange = async (recipeId, newStatus) => {
-    setActionError(null);
-    try {
-      const response = await authenticatedFetch(`/api/admin/recipes/${recipeId}/status`, {
-        method: 'PUT',
-        body: JSON.stringify({ status: newStatus }),
-      }, authContextValue);
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Failed to update status: ${response.status}`);
-      }
-      fetchRecipes(page, rowsPerPage, sortColumn, sortDirection); // Re-fetch to confirm change
-      showModal('alert', 'Status Updated', `Recipe status updated to ${newStatus}.`, {iconType: 'success'});
-    } catch (err) {
-      console.error("Error updating status:", err);
-      setActionError(err.message);
-      showModal('alert', 'Update Error', err.message, {iconType: 'error'});
-    }
   };
 
   const handleViewRecipe = (recipe) => {
@@ -120,6 +112,17 @@ function RecipeManagementPage() {
 
   const commonButtonClassNameBase = "px-3 py-1.5 text-xs font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50";
 
+  // Filter recipes based on publicFilter
+  const filteredRecipes = recipes.filter(recipe => {
+    if (publicFilter === 'all') return true;
+    if (publicFilter === 'public') return recipe.is_public === true;
+    if (publicFilter === 'private') return recipe.is_public === false;
+    return true;
+  });
+
+  // Update total count for filtered results
+  const filteredTotalCount = publicFilter === 'all' ? totalCount : filteredRecipes.length;
+
   if (loading && recipes.length === 0) {
     return <div className="flex justify-center items-center min-h-[calc(100vh-200px)]"><PageLoaderSpinner /></div>;
   }
@@ -130,7 +133,7 @@ function RecipeManagementPage() {
         <div className="container-modern">
           <div className="text-center mb-10 animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">Recipe Management</h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">Approve, edit, or delete user-submitted recipes. Manage recipe content.</p>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">View and manage user-submitted recipes.</p>
           </div>
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">{error}</div>
         </div>
@@ -143,11 +146,11 @@ function RecipeManagementPage() {
       <div className="container-modern">
         <div className="text-center mb-10 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">Recipe Management</h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">Approve, edit, or delete user-submitted recipes. Manage recipe content.</p>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">View and manage user-submitted recipes.</p>
         </div>
         {actionError && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">Action Error: {actionError}</div>}
         {error && recipes.length > 0 && <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-md text-sm">Could not refresh recipes: {error}</div>}
-        {recipes.length === 0 && !loading && !error ? (
+        {filteredRecipes.length === 0 && !loading && !error ? (
           <p className="text-center text-gray-400 mt-6 text-lg">No recipes found.</p>
         ) : (
           <div className="card-glass shadow-xl rounded-3xl overflow-hidden">
@@ -178,10 +181,10 @@ function RecipeManagementPage() {
                     </th>
                     <th 
                       scope="col" 
-                      onClick={() => handleSort('Status')} 
+                      onClick={handlePublicFilterClick}
                       className="px-4 py-3 text-left text-xs font-medium text-emerald-700 hover:text-emerald-900 uppercase tracking-wider cursor-pointer"
                     >
-                      Status {sortColumn === 'Status' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      Visibility {publicFilter !== 'all' && `(${publicFilter})`}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-emerald-700 uppercase tracking-wider">Actions</th>
                   </tr>
@@ -190,7 +193,7 @@ function RecipeManagementPage() {
                   {loading && (
                     <tr><td colSpan={5} className="text-center py-4"><TableSpinner /></td></tr>
                   )}
-                  {!loading && recipes.map((recipe) => (
+                  {!loading && filteredRecipes.map((recipe) => (
                     <tr key={recipe.RecipeID} className="hover:bg-emerald-50">
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{recipe.RecipeID}</td>
                       <td 
@@ -202,15 +205,11 @@ function RecipeManagementPage() {
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{recipe.AuthorName}</td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                        <select
-                          value={recipe.Status}
-                          onChange={(e) => handleStatusChange(recipe.RecipeID, e.target.value)}
-                          className="block w-full pl-3 pr-10 py-1.5 text-xs bg-gray-100 border-gray-200 text-gray-800 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 rounded-md"
-                        >
-                          <option value="pending">pending</option>
-                          <option value="approved">approved</option>
-                          <option value="rejected">rejected</option>
-                        </select>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          recipe.is_public ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {recipe.is_public ? 'Public' : 'Private'}
+                        </span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
                         <button
@@ -225,16 +224,16 @@ function RecipeManagementPage() {
                 </tbody>
               </table>
             </div>
-            {totalCount > 0 && (
+            {filteredTotalCount > 0 && (
               <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 bg-white rounded-b-3xl">
                 <div className="flex-1 flex justify-between sm:hidden">
                   <button onClick={() => handleChangePage(page - 1)} disabled={page === 0} className={`btn-primary ${commonButtonClassNameBase}`}>Previous</button>
-                  <button onClick={() => handleChangePage(page + 1)} disabled={(page + 1) * rowsPerPage >= totalCount} className={`btn-primary ${commonButtonClassNameBase}`}>Next</button>
+                  <button onClick={() => handleChangePage(page + 1)} disabled={(page + 1) * rowsPerPage >= filteredTotalCount} className={`btn-primary ${commonButtonClassNameBase}`}>Next</button>
                 </div>
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
                     <p className="text-xs text-gray-500">
-                      Showing <span className="font-medium">{page * rowsPerPage + 1}</span> to <span className="font-medium">{Math.min((page + 1) * rowsPerPage, totalCount)}</span> of <span className="font-medium">{totalCount}</span> results
+                      Showing <span className="font-medium">{page * rowsPerPage + 1}</span> to <span className="font-medium">{Math.min((page + 1) * rowsPerPage, filteredTotalCount)}</span> of <span className="font-medium">{filteredTotalCount}</span> results
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -244,7 +243,7 @@ function RecipeManagementPage() {
                     </select>
                     <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                       <button onClick={() => handleChangePage(page - 1)} disabled={page === 0} className={`${commonButtonClassNameBase} bg-gray-100 text-gray-500 hover:bg-gray-200 border-gray-200 rounded-l-md border`}>Prev</button>
-                      <button onClick={() => handleChangePage(page + 1)} disabled={(page + 1) * rowsPerPage >= totalCount} className={`${commonButtonClassNameBase} bg-gray-100 text-gray-500 hover:bg-gray-200 border-gray-200 rounded-r-md border`}>Next</button>
+                      <button onClick={() => handleChangePage(page + 1)} disabled={(page + 1) * rowsPerPage >= filteredTotalCount} className={`${commonButtonClassNameBase} bg-gray-100 text-gray-500 hover:bg-gray-200 border-gray-200 rounded-r-md border`}>Next</button>
                     </nav>
                   </div>
                 </div>
