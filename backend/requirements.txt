@@ -1,0 +1,18 @@
+Flask
+Flask-SQLAlchemy
+Werkzeug
+mysql-connector-python>=8.0.0
+pytest
+python-dotenv
+Flask-JWT-Extended
+google-genai
+pandas
+rapidfuzz
+Flask-Mail
+spacy==3.7.2
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz
+tensorflow>=2.15.0
+keras>=3.0.0
+keras-nightly
+Pillow
+tensorflow-hub>=0.13.0

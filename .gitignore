@@ -1,0 +1,6 @@
+/backend/ai_models/gemini_nlp/.env
+**/__pycache__/
+*.pyc
+/.qodo
+/.recipe_images/
+/__temp_pipreqsnb_folder

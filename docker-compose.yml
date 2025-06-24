@@ -1,0 +1,68 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_db_container  # Your original container name
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: nutrichef      # Your desired root password
+      MYSQL_DATABASE: nutrichef_db        # Your desired database name
+    ports:
+      - "3308:3306"                     # Your original port
+    volumes:
+      - mysql_data:/var/lib/mysql       # Your original named data volume
+      - ./SQL/schema_mysql.sql:/docker-entrypoint-initdb.d/init.sql # Your schema script
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend
+    container_name: backend_container
+    restart: unless-stopped
+    ports:
+      - "5000:5000" # Host:Container
+    environment:
+      # Database connection details
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: nutrichef_db   # Updated
+      DB_USER: root           # Updated
+      DB_PASS: nutrichef      # Updated (or reference from .env)
+
+      # Flask specific
+      FLASK_APP: app.py
+      FLASK_RUN_HOST: 0.0.0.0
+      # PYTHONUNBUFFERED: 1 # Useful for seeing logs immediately
+      # FLASK_SECRET_KEY: 'your_flask_secret_key' # Add your Flask secret key
+
+
+      # Frontend URL (if backend needs to generate absolute URLs to frontend)
+      FRONTEND_URL: http://localhost:5173
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    container_name: frontend_container
+    restart: unless-stopped
+    ports:
+      - "3000:80" # Host:Container - Nginx in container runs on 80, access via localhost:3000
+    volumes:
+      - ./frontend/src:/app/src # Mount local frontend source for development
+      # The following anonymous volume prevents local node_modules from overwriting container's node_modules
+      # This is important if your local machine's OS is different from the container's (e.g. Windows host, Linux container)
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data: # Defines the named volume for MySQL data persistence

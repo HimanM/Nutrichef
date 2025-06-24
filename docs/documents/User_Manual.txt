@@ -1,0 +1,191 @@
+# NutriChef User Manual
+
+Welcome to NutriChef! This manual will guide you through using the application, whether you're a general user looking to manage your recipes and nutrition, or an administrator overseeing the platform.
+
+**Part 1: For General Users**
+
+**1. Getting Started with NutriChef**
+
+*   **1.1. Welcome to NutriChef!**
+    NutriChef is your intelligent kitchen assistant, designed to make your culinary journey easier, healthier, and more enjoyable. Whether you're a seasoned chef or just starting out, NutriChef offers a suite of tools to help you:
+    *   **Manage Recipes:** Store your personal recipes and explore a vast collection from the community.
+    *   **Gain Nutritional Insights:** Understand the nutritional content of your meals and individual ingredients.
+    *   **Cook Safely with Allergies:** Personalize your experience to avoid allergens and find suitable alternatives.
+    *   **Discover New Flavors:** Explore new recipes and ingredients tailored to your tastes and dietary needs, including a dedicated Recipe Suggestions page.
+    *   **Plan Meals Efficiently:** Organize your meals with the Meal Planner and generate Shopping Lists.
+    *   **Manage Your Pantry:** Keep track of ingredients you have on hand with the User Pantry Management feature.
+
+    Key benefits of using NutriChef include:
+    *   **Effortless Recipe Organization:** Keep all your favorite recipes in one place, easily searchable and accessible.
+    *   **Informed Dietary Choices:** Make better food choices with detailed nutritional information at your fingertips.
+    *   **Peace of Mind for Allergy Sufferers:** Filter out recipes containing specific allergens and discover safe, delicious alternatives.
+    *   **Expanded Culinary Horizons:** Break out of your routine and find new inspiration for your meals.
+    *   **Streamlined Grocery Trips:** Generate shopping lists based on your meal plans.
+
+*   **1.2. Creating Your Account**
+    (As previously described: Navigate to Registration, fill form, strong password importance) - `UserRegistration.jsx`
+
+*   **1.3. Email Verification**
+    (As previously described: Why necessary, checking email, clicking link, troubleshooting) - `EmailVerificationPage.jsx`
+
+*   **1.4. Logging In**
+    (As previously described: Navigating to Login, entering credentials, "Forgot Password", successful login) - `LoginPage.jsx`
+
+**2. Navigating NutriChef**
+
+*   **2.1. The Dashboard/Homepage (`HomePage.jsx`)**
+    The homepage is your central hub in NutriChef. You might find:
+    *   Personalized Recipe Suggestions (based on allergies/preferences).
+    *   Links to "Recipe Suggestions Page" for general discovery.
+    *   Recently Added Recipes.
+    *   Search Bar.
+    *   Quick Links: "Upload Recipe," "Meal Planner," "User Pantry," "AI Tools."
+    *   **Main Navigation Menu (`NavigationBar.jsx`):**
+        *   Home, Recipes/Browse (`PublicRecipeBrowser.jsx`), Meal Planner (`MealPlanner.jsx`), Shopping Basket (`ShoppingBasketPage.jsx`), Pantry (`PantryPage.jsx`), Recipe Suggestions (`RecipeSuggestionsPage.jsx`).
+        *   AI Tools: Ingredient Classifier, Nutrition Lookup, Ingredient Substitute.
+        *   User Profile/Settings, Logout.
+        *   Links to "About Us" (`AboutUsPage.jsx`) and "Privacy Policy" (`PrivacyPolicyPage.jsx`) pages, often found in the footer or settings menu.
+
+*   **2.2. Understanding the User Interface**
+    NutriChef uses common web design elements for ease of use.
+    *   **Icons:** (Standard icons for search, settings, profile, add, delete, edit, favorite).
+    *   **Buttons:** Clearly labeled buttons will guide actions like "Save," "Cancel," "Upload," "Search." These are styled using Tailwind CSS, providing a modern and consistent look and feel.
+    *   **Cards (`RecipeCard.jsx`, `MealItemCard.jsx`):** Recipes and other items are often displayed in a card format.
+    *   **Modals (`InteractiveModal.jsx`, `RecipeSubmissionModal.jsx`):** Pop-up windows for notifications, confirmations, or forms.
+    *   **Forms:** Input fields, dropdowns, checkboxes, styled with Tailwind CSS.
+    *   **Floating Elements (`FloatingChatbot.jsx`, `FloatingLoader.jsx`):** Chatbot for help, loader for processing.
+
+*   **2.3. About Us Page (`AboutUsPage.jsx`)**
+    You can find information about the NutriChef project, its mission, and perhaps the team behind it on the "About Us" page. This page is typically accessible from the main navigation menu or the footer of the website.
+
+*   **2.4. Privacy Policy Page (`PrivacyPolicyPage.jsx`)**
+    The "Privacy Policy" page details how NutriChef collects, uses, and protects your personal information. It's important to review this to understand your rights and our commitments. This page is typically accessible from the main navigation menu or the footer.
+
+**3. Managing Your Recipes**
+
+*   **3.1. Browsing and Discovering Recipes (`PublicRecipeBrowser.jsx`)**
+    (As previously described: Accessing browser, search, filtering, pagination).
+
+*   **3.2. Viewing Recipe Details (`RecipeDetail.jsx`)**
+    (As previously described: Clicking recipe, information displayed).
+
+*   **3.3. Uploading Your Own Recipes**
+    NutriChef offers flexible ways to add your recipes, utilizing an efficient backend recipe pipeline.
+
+    *   **3.3.1. Using the Recipe Form (`RecipeUploadForm.jsx`)**
+        (As previously described: Navigation, filling fields, adding ingredients, instructions, image upload, submission. The `recipe_pipeline_service.py` ensures this data is processed and saved efficiently).
+
+    *   **3.3.2. Uploading via Raw Text (NLP Parser & Pipeline)**
+        1.  **Finding the Option:** Look for "Parse from Text" or similar on the "Upload Recipe" page.
+        2.  **Pasting Recipe Text:** Copy and paste your recipe text (ingredients, instructions).
+        3.  **How the System Parses (Recipe Pipeline):** NutriChef's `recipe_pipeline_service.py` takes over. It uses Google Gemini (an AI NLP tool) to understand and structure the pasted text. This service automatically identifies ingredients, quantities, units, and instructions.
+        4.  **Reviewing and Editing:** The system will display the parsed information in the recipe form fields. **Review this carefully.** Make any necessary corrections. The pipeline aims for accuracy, but user review is key.
+        5.  **Saving:** Once satisfied, save the recipe. The pipeline handles the backend processing to store it correctly.
+
+*   **3.4. Editing or Deleting Your Recipes**
+    (As previously described: Finding recipes, edit/delete options).
+
+**4. Personalizing Your NutriChef Experience**
+
+*   **4.1. Managing Allergies and Intolerances (`UserSettings.jsx`, `AllergyInfo.jsx`)**
+    (As previously described: Navigation, selecting allergies, saving, impact on feeds and warnings).
+
+*   **4.2. Personalized Recipe Feed (`PersonalizedRecipesPage.jsx`)**
+    (As previously described: Accessing feed, how it's curated based on allergies).
+
+*   **4.3. User Pantry Management (`PantryPage.jsx`)**
+    This feature allows you to keep track of ingredients you have at home.
+    1.  **Accessing Your Pantry:** Find the "My Pantry," "Pantry," or similar link in the navigation menu.
+    2.  **Adding Ingredients:**
+        *   Search for ingredients you have and add them to your pantry list.
+        *   Specify quantities and units (e.g., "200g Plain Flour," "3 Apples").
+    3.  **Viewing and Managing Pantry:**
+        *   See a list of all ingredients currently in your pantry.
+        *   Update quantities as you use ingredients.
+        *   Remove items you've run out of.
+    4.  **How it Helps:**
+        *   **Recipe Suggestions:** The system might use your pantry contents to suggest recipes you can make with ingredients you already have (look for this feature on the Recipe Suggestions page or as a filter).
+        *   **Shopping Lists:** Helps you identify what you need to buy by knowing what's already in your pantry.
+
+*   **4.4. User Account Settings (`UserSettings.jsx`)**
+    (As previously described: Accessing settings, changing info, password, dietary preferences).
+
+**5. Using AI-Powered Culinary Tools**
+
+*   **5.1. Ingredient Classifier (Image Upload) (`IngredientClassifier.jsx`)**
+    (As previously described: Navigation, uploading image, processing, viewing results, potential uses).
+
+*   **5.2. Nutrition Lookup (`FoodLookupPage.jsx`)**
+    (As previously described: Accessing tool, entering food item, viewing information).
+
+*   **5.3. Ingredient Substitution Finder (`IngredientSubstitutePage.jsx`)**
+    (As previously described: Accessing tool, entering ingredient, viewing substitutes, how it helps).
+
+*   **5.4. NLP Recipe Parser**
+    (As previously described: Primarily used during raw text recipe upload via the recipe pipeline).
+
+*   **5.5. Recipe Suggestions Page (`RecipeSuggestionsPage.jsx`)**
+    1.  **Accessing the Page:** Look for a "Recipe Suggestions," "Discover," or "Explore" link in the main navigation.
+    2.  **What it Offers:** This page provides recipe ideas that go beyond your direct allergy-based personalization. You might find:
+        *   **Trending Recipes:** Popular dishes within the NutriChef community.
+        *   **New Additions:** Recently uploaded recipes.
+        *   **Seasonal Picks:** Recipes based on seasonal ingredients.
+        *   **Based on Your Pantry (Potential Feature):** Suggestions for recipes you can make or almost make with items in your `PantryPage.jsx`.
+        *   Other curated collections or thematic suggestions.
+    3.  **Exploring Suggestions:** Browse the different categories or lists to find new inspiration for your cooking.
+
+**6. Meal Planning and Shopping (`MealPlanner.jsx`, `ShoppingBasketPage.jsx`)**
+
+NutriChef provides integrated tools to help you organize your meals and simplify shopping. These features are fully available.
+
+*   **6.1. Creating a Meal Plan (`MealPlanner.jsx`)**
+    1.  **Accessing Meal Planner:** Click on "Meal Planner" in the main navigation.
+    2.  **Interface:** You'll typically see a weekly calendar view.
+    3.  **Adding Recipes to Your Plan:**
+        *   Browse or search for recipes you want to include in your plan.
+        *   Drag and drop recipes onto specific days and meal slots (e.g., Monday Breakfast, Tuesday Lunch, Wednesday Dinner).
+        *   Alternatively, recipes might have an "Add to Meal Plan" button on their detail pages.
+    4.  **Organizing Your Meals:** Arrange recipes for the week. You can usually move recipes between days or meals if your plans change.
+    5.  **Viewing Your Plan:** See all your planned meals at a glance. You might be able to view nutritional summaries for each day or for the entire week.
+    6.  **Saving Your Plan:** Ensure your meal plan is saved so you can refer back to it.
+
+*   **6.2. Managing Your Shopping Basket/List (`ShoppingBasketPage.jsx`)**
+    1.  **Accessing Shopping List:** Click on "Shopping Basket" or "Shopping List" in the navigation.
+    2.  **Generating from Meal Plan:** There should be an option to automatically generate a shopping list based on the recipes in your current meal plan for a selected period (e.g., "Generate list for this week"). This will compile all necessary ingredients.
+    3.  **Considering Pantry Items:** The system may be smart enough to check your `PantryPage.jsx` and exclude or reduce quantities for ingredients you already have (though this is an advanced feature; verify its behavior).
+    4.  **Manual Addition:** You can also manually add items to your shopping list that aren't part of a recipe (e.g., "Paper towels," "Dish soap," "Snacks").
+    5.  **Viewing and Managing Your List:**
+        *   The list will show ingredients, quantities, and units.
+        *   It might be organized by recipe or by common grocery store categories (e.g., produce, dairy, pantry staples) to make shopping easier.
+        *   Check off items as you purchase them.
+        *   Edit quantities or remove items if needed.
+        *   Save or print your list.
+
+**Part 2: For Administrators**
+
+(Content for Administrator sections 7.1 to 7.5 remains largely the same as in the previous documentation, focusing on `AdminLayout.jsx`, `AdminDashboard.jsx`, `UserManagementPage.jsx`, `RecipeManagementPage.jsx`, and `ClassificationScoresPage.jsx`. The key change is that Tailwind CSS is used for styling admin interface elements as well. A new point about `AdminContactMessagePage.jsx` should be added if not already covered implicitly.)
+
+*   **7.6. Viewing and Replying to User Messages (`AdminContactMessagePage.jsx`)**
+    Administrators can access messages submitted by users via the "Contact Us" form.
+    1.  **Navigation:** Find a "User Messages," "Contact Submissions," or similar link in the Admin Dashboard.
+    2.  **Interface:** This page will list incoming messages, showing sender details, subject, and message content.
+    3.  **Functionality:**
+        *   Mark messages as read/unread.
+        *   Reply to messages directly from the interface (if `AdminResponse` field is utilized).
+        *   Keep track of communication history.
+
+**Part 3: Support & Troubleshooting**
+
+**8. Frequently Asked Questions (FAQs)**
+(As previously described, with updates reflecting current features like full meal planner, pantry, and recipe suggestions.)
+
+*   **Q: How does the Meal Planner work with my Pantry?**
+    A: While the primary function of the Pantry is to help you know what you have, advanced integration might allow the Shopping List (generated from the Meal Planner) to automatically adjust quantities based on your pantry stock. Check the Shopping List page for such options.
+
+*   **Q: Where can I find general recipe ideas if I'm not looking for something specific to my allergies?**
+    A: Check out the "Recipe Suggestions" page! It offers a variety of recipes based on trends, new additions, and other criteria.
+
+**9. Contacting Support**
+(As previously described. Mention the "Contact Us" form which is now explicitly part of admin viewable messages.)
+
+We hope this manual helps you make the most of NutriChef, now styled with Tailwind CSS and featuring comprehensive Meal Planning, Shopping List, User Pantry, and Recipe Suggestion tools! Happy cooking!
