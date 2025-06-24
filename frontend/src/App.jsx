@@ -8,6 +8,7 @@ import FloatingChatbot from './components/FloatingChatbot.jsx';
 import FloatingScroller from './components/FloatingScroller.jsx';
 import AdminRoute from './components/AdminRoute.jsx';
 import PrivateRoute from './components/PrivateRoute.jsx';
+import AnimatedBackground from './components/AnimatedBackground.jsx';
 
 import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
@@ -67,6 +68,7 @@ function App() {
             <MealPlanSelectionProvider>
               <div className="flex flex-col min-h-screen">
                   <ScrollToTop />
+                  <AnimatedBackground />
                   <NavigationBar /> 
                   <SessionExpiredModal /> 
                   <FloatingChatbot isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} /> 

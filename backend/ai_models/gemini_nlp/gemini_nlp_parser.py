@@ -29,7 +29,7 @@ class GeminiNlpParser:
             try:
                 client = genai.Client(api_key=self.api_key)
                 model_name = "gemini-1.5-flash-8b"
-                system_instruction_text = '''When user uploads a recipe parse them into the given sample json format. nothing can be a NULL value.
+                system_instruction_text = '''When user uploads a text that potentially contains a recipe, extract infotmation and  parse them into the given sample json format. nothing can be a NULL value.
                     {
                     "Title": "My Test Recipe (JSON)",
                     "Description": "A delicious recipe submitted as JSON.",
@@ -59,7 +59,7 @@ class GeminiNlpParser:
                     ]
                     }
                     
-                    if not a recipe return 
+                    if cannot extract a recipe in the text return 
                     {"error":"not-a-recipe"}'''
                 current_contents = [
                     types.Content(

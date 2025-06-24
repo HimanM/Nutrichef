@@ -29,7 +29,7 @@ const NavigationBar = () => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center animate-fade-in">
               <HiOutlineSparkles className="w-7 h-7 mr-2 text-emerald-500" />
-              <span className="font-bold text-xl gradient-text">NutriChef</span>
+              <span className="font-bold text-xl navbar-logo">NutriChef</span>
             </div>
             <div className="animate-pulse">
               <div className="h-2 w-16 bg-gray-200 rounded"></div>
@@ -57,10 +57,10 @@ const NavigationBar = () => {
           <div className="flex items-center animate-fade-in">
             <Link to="/" className="flex items-center hover:scale-105 transition-transform duration-200">
               <div className="relative">
-                <HiOutlineSparkles className="w-7 h-7 mr-2 text-emerald-500 animate-float" />
+                <HiOutlineSparkles className="w-7 h-7 mr-2 text-emerald-500" />
                 <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-sm"></div>
               </div>
-              <span className="font-bold text-xl gradient-text">NutriChef</span>
+              <span className="font-bold text-xl navbar-logo">NutriChef</span>
             </Link>
           </div>
 
