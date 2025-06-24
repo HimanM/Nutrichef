@@ -104,10 +104,10 @@ const ContactUsPage = () => {
                     <span>
                       <strong>Email:</strong>{' '}
                       <a 
-                        href={`mailto:contact@${appName.toLowerCase()}.example.com`} 
+                        href={`mailto:hghimanmanduja@gmail.com`} 
                         className="text-emerald-600 hover:text-emerald-700 transition-colors"
                       >
-                        contact@{appName.toLowerCase()}.example.com
+                        hghimanmanduja@gmail.com
                       </a>
                     </span>
                   </div>

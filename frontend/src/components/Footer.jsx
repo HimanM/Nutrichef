@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { HiOutlineSparkles, HiOutlineMail, HiOutlineGlobe, HiOutlineHeart } from 'react-icons/hi';
+import { FaGithub } from 'react-icons/fa';
 
 const Footer = () => {
   const appName = "NutriChef";
@@ -22,7 +23,7 @@ const Footer = () => {
               </p>
               <div className="flex space-x-4">
                 <a 
-                  href="mailto:contact@nutrichef.com" 
+                  href="mailto:hghimanmanduja@gmail.com.com" 
                   className="text-gray-400 hover:text-emerald-600 transition-colors duration-200"
                   aria-label="Email us"
                 >
@@ -34,6 +35,15 @@ const Footer = () => {
                   aria-label="Contact us"
                 >
                   <HiOutlineGlobe className="w-5 h-5" />
+                </a>
+                <a 
+                  href="https://github.com/HimanM/nutrichef" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-emerald-600 transition-colors duration-200"
+                  aria-label="GitHub repository"
+                >
+                  <FaGithub className="w-5 h-5" />
                 </a>
               </div>
             </div>
@@ -83,11 +93,6 @@ const Footer = () => {
                   <Link to="/privacy" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
                     Privacy Policy
                   </Link>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
-                    Help Center
-                  </a>
                 </li>
               </ul>
             </div>
