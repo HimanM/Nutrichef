@@ -2,226 +2,434 @@
 
 ## 1. Introduction
 
-*   **Project Name:** NutriChef
-*   **Brief overview:** NutriChef is an intelligent recipe and nutrition companion designed to assist users in managing their recipes, understanding nutritional information, catering to dietary restrictions and allergies, and discovering new culinary ideas. The application integrates Artificial Intelligence (AI) for advanced functionalities such as classifying food items from images, parsing recipes from text using Natural Language Processing (NLP), and offering personalized dietary recommendations.
-*   **Problems it aims to solve:**
-    *   **Recipe Management:** Simplifies the organization, storage, and retrieval of personal and public recipes. Users can upload their own recipes or browse a shared collection.
-    *   **Nutritional Information Access:** Provides easy access to detailed nutritional information for various food items and recipes, helping users make informed dietary choices.
-    *   **Dietary Restriction Management:** Allows users to specify allergies and dietary preferences (e.g., vegetarian, gluten-free), filtering out unsuitable recipes and suggesting appropriate alternatives.
-    *   **Culinary Discovery:** Facilitates the discovery of new recipes and ingredients, potentially tailored to user preferences and restrictions, broadening culinary horizons.
-    *   **Time-Consuming Meal Planning:** Streamlines meal planning by providing tools to organize recipes and generate shopping lists.
-    *   **Ingredient Understanding:** Helps users identify ingredients through image classification and find suitable substitutes.
-    *   **Efficient Recipe Input:** Offers a streamlined recipe pipeline for parsing and saving recipes from raw text.
+**Project Name:** NutriChef  
+**Brief Overview:** NutriChef is an intelligent recipe and nutrition companion designed to assist users in managing their recipes, understanding nutritional information, catering to dietary restrictions and allergies, and discovering new culinary ideas. The application integrates Artificial Intelligence (AI) for advanced functionalities such as classifying food items from images, parsing recipes from text using Natural Language Processing (NLP), and offering personalized dietary recommendations.
+
+**Problems it Aims to Solve:**
+* **Recipe Management:** Simplifies the organization, storage, and retrieval of personal and public recipes
+* **Nutritional Information Access:** Provides easy access to detailed nutritional information for various food items and recipes
+* **Dietary Restriction Management:** Allows users to specify allergies and dietary preferences, filtering out unsuitable recipes
+* **Culinary Discovery:** Facilitates the discovery of new recipes and ingredients tailored to user preferences
+* **Meal Planning:** Streamlines meal planning by providing tools to organize recipes and generate shopping lists
+* **Ingredient Understanding:** Helps users identify ingredients through image classification and find suitable substitutes
+* **Efficient Recipe Input:** Offers a streamlined recipe pipeline for parsing and saving recipes from raw text
+* **Pantry Management:** Enables users to track ingredients they have on hand for better meal planning
 
 ## 2. Project Scope
 
-*   **Target Audience:**
-    *   **General Users:** Individuals interested in cooking, exploring new recipes, and managing their nutritional intake.
-    *   **Users with Dietary Needs:** People with specific allergies (e.g., peanuts, gluten, dairy), intolerances, or dietary preferences (e.g., vegetarian, vegan, low-carb) who need a reliable tool for recipe filtering and nutritional guidance.
-    *   **Platform Administrators:** Personnel responsible for maintaining the application, managing user accounts, overseeing recipe content, and monitoring AI model performance.
-*   **Key Goals and Objectives:**
-    *   **Provide a centralized platform for recipe management:** Enable users to easily store, search, and categorize recipes.
-    *   **Offer comprehensive nutritional analysis:** Integrate tools to display detailed nutritional breakdowns for ingredients and full recipes.
-    *   **Deliver personalized user experiences:** Allow customization based on dietary restrictions, allergies, and preferences.
-    *   **Leverage AI for enhanced functionality:** Implement AI-driven tools for image-based ingredient classification, NLP recipe parsing (as part of an efficient recipe pipeline), and intelligent ingredient substitution.
-    *   **Ensure secure user account management:** Implement robust authentication, email verification, and password management.
-    *   **Facilitate easy recipe contribution:** Allow users to add recipes through structured forms or by pasting raw text, processed efficiently by the recipe pipeline.
-    *   **Develop a user-friendly interface:** Create an intuitive and accessible UI styled with Tailwind CSS.
-    *   **Enable administrative oversight:** Provide administrators with tools to manage users, recipes, and view system performance metrics.
-    *   **Offer functional meal planning and shopping list generation:** Provide tools for users to plan meals and manage shopping lists effectively.
-    *   **Implement User Pantry Management:** Allow users to track ingredients they have on hand.
+**Target Audience:**
+* **General Users:** Individuals interested in cooking, exploring new recipes, and managing their nutritional intake
+* **Users with Dietary Needs:** People with specific allergies, intolerances, or dietary preferences who need reliable recipe filtering
+* **Platform Administrators:** Personnel responsible for maintaining the application, managing user accounts, and monitoring AI model performance
+
+**Key Goals and Objectives:**
+* Provide a centralized platform for recipe management
+* Offer comprehensive nutritional analysis
+* Deliver personalized user experiences based on dietary restrictions
+* Leverage AI for enhanced functionality (image classification, NLP parsing, ingredient substitution)
+* Ensure secure user account management with email verification
+* Facilitate easy recipe contribution through structured forms and raw text parsing
+* Develop a user-friendly interface using modern web technologies
+* Enable administrative oversight of users, recipes, and system performance
+* Provide functional meal planning and shopping list generation
+* Implement comprehensive user pantry management
 
 ## 3. Core Functionalities
 
-*   **User-Facing Features:**
-    *   **User Account Management:**
-        *   **Registration:** Secure user sign-up process.
-        *   **Login:** Authenticated access to user accounts.
-        *   **Email Verification:** System for verifying user email addresses to ensure validity and enable communication (e.g., password resets).
-        *   **Password Management:** Secure password storage and reset functionality.
-    *   **Recipe Management:**
-        *   **Browse & Search:** Explore a public collection of recipes with robust search filters (e.g., by ingredient, name, dietary suitability) and pagination for easy navigation.
-        *   **View Details:** Access comprehensive recipe information, including title, description, ingredients with quantities and units, step-by-step instructions, preparation time, cooking time, servings, and user-uploaded images.
-        *   **Upload via Form:** Submit new recipes through a structured form, ensuring all necessary information is captured.
-        *   **Upload via Raw Text (NLP Recipe Parser & Pipeline):** Paste raw recipe text (ingredients and instructions). The `recipe_pipeline_service.py` coordinates the NLP parsing (via Google Gemini) to structure the text, potentially performs image processing if an image is uploaded alongside, and saves the complete recipe to the database. This offers a seamless experience from text input to stored recipe.
-        *   **Image Upload:** Attach images to recipes to provide visual context.
-    *   **Personalization:**
-        *   **Allergy Management:** Users can create and manage a list of their specific allergies and intolerances from a predefined list.
-        *   **Personalized Recipe Feed:** The system filters and suggests recipes based on the user's registered allergies, ensuring they are not shown potentially harmful or unsuitable recipes.
-        *   **User Settings:** Manage account preferences, including profile information and password changes.
-        *   **User Pantry Management (`PantryPage.jsx`):** Users can manage a list of ingredients they currently have in their pantry. This can be used for recipe suggestions based on available items or to help with shopping list generation. This feature is fully implemented.
-    *   **AI-Powered Tools:**
-        *   **Ingredient Classifier (Image-based):** Upload an image of a food item or ingredient, and the AI model identifies it, providing a predicted name and confidence score.
-        *   **Nutrition Lookup:** Obtain detailed nutritional information (calories, protein, fats, carbohydrates, vitamins, minerals, etc.) for specific food items. This likely queries an internal or external nutrition database.
-        *   **Ingredient Substitution:** Suggests suitable alternative ingredients for a given ingredient, which can be helpful for allergies, dietary preferences, or simply when an ingredient is unavailable.
-        *   **NLP Recipe Parser (Text-based Recipes):** As part of the recipe pipeline, this tool analyzes unstructured recipe text and converts it into a structured format for database storage and display.
-    *   **Meal Planner (`MealPlanner.jsx`):** An interface allowing users to organize recipes into daily or weekly meal plans. Users can add recipes to specific days and meal types, view their plan, and potentially see aggregated nutritional information. This feature is implemented.
-    *   **Shopping Basket (`ShoppingBasketPage.jsx`):** An interface for managing a shopping list. Users can add ingredients manually or generate a list from selected recipes or their meal plan. The list can be organized and items can be marked as acquired. This feature is implemented.
-    *   **Recipe Suggestions (`RecipeSuggestionsPage.jsx`):** A dedicated page offering general recipe suggestions. These suggestions might be based on trending recipes, new additions, seasonal ingredients, or other criteria beyond the user's direct personalization settings like allergies. This provides another avenue for culinary discovery.
-*   **Administrator Features:**
-    *   **Admin Dashboard Overview:** A centralized interface for administrators to access various management functions and view key platform statistics.
-    *   **User Management:**
-        *   **List Users:** View a list of all registered users.
-        *   **View User Details:** Access individual user profiles and information.
-        *   **Update User Roles:** Modify user roles (e.g., promote a user to an admin or demote).
-        *   **Delete Users:** Remove user accounts from the platform.
-    *   **Recipe Management:**
-        *   **List Recipes:** View all recipes available on the platform.
-        *   **Delete Recipes:** Remove recipes that are inappropriate, incorrect, or violate platform guidelines.
-    *   **View AI Classification Model Performance/Scores:** Access metrics or summaries related to the performance of the AI ingredient classification model, such as accuracy or confidence scores on past predictions. This helps in monitoring and potentially improving the AI components.
-    *   **View User Messages (`AdminContactMessagePage.jsx`):** Administrators can view and reply to messages submitted by users through the "Contact Us" form.
+### 3.1 User-Facing Features
+
+#### User Account Management
+* **Registration:** Secure user sign-up process with email verification
+* **Login:** Authenticated access with JWT tokens and password toggle functionality
+* **Email Verification:** System for verifying user email addresses
+* **Password Management:** Secure password storage with show/hide functionality
+* **User Settings:** Profile management, allergy preferences, and account customization
+
+#### Recipe Management
+* **Browse & Search:** Explore public recipes with robust search filters and pagination
+* **View Details:** Access comprehensive recipe information including ingredients, instructions, timing, and nutritional data
+* **Upload via Form:** Submit recipes through structured forms with image upload
+* **Upload via Raw Text:** Paste recipe text for AI-powered parsing using Google Gemini
+* **Recipe Visibility:** Control whether recipes are public or private
+* **Recipe Ratings:** Rate and review recipes with star-based system
+
+#### Personalization
+* **Allergy Management:** Comprehensive allergy and intolerance tracking system
+* **Personalized Recipe Feed:** Filter recipes based on user allergies and preferences
+* **User Pantry Management:** Track ingredients on hand for better meal planning
+* **Recipe Suggestions:** Curated recipe recommendations beyond allergy-based filtering
+
+#### AI-Powered Tools
+* **Ingredient Classifier:** Image-based food identification using TensorFlow models
+* **Nutrition Lookup:** Detailed nutritional information for food items
+* **Ingredient Substitution:** AI-powered substitute recommendations
+* **NLP Recipe Parser:** Text-to-structured recipe conversion using Google Gemini
+* **Floating Chatbot:** AI-powered assistance for user queries
+
+#### Meal Planning and Shopping
+* **Meal Planner:** Weekly meal planning interface with drag-and-drop functionality
+* **Shopping Basket:** Generate and manage shopping lists from meal plans
+* **Pantry Integration:** Smart shopping lists that consider available ingredients
+* **Nutritional Tracking:** Daily and weekly nutritional summaries
+
+#### Additional Features
+* **Contact System:** User feedback and support request system
+* **About Us & Privacy:** Information pages about the platform and data handling
+* **Responsive Design:** Mobile-friendly interface using Tailwind CSS
+* **Animated Background:** Engaging visual elements with floating orbs and gradients
+
+### 3.2 Administrator Features
+
+#### Admin Dashboard
+* **Overview Statistics:** Platform usage metrics and user activity
+* **Quick Actions:** Direct access to common administrative tasks
+* **System Health:** Performance monitoring and status indicators
+
+#### User Management
+* **User List:** View all registered users with search and filtering
+* **User Details:** Access individual user profiles and information
+* **Role Management:** Modify user roles and permissions
+* **Account Actions:** Suspend, delete, or modify user accounts
+
+#### Recipe Management
+* **Recipe Overview:** View all recipes with filtering and search
+* **Content Moderation:** Review and manage recipe content
+* **Recipe Actions:** Edit, delete, or feature recipes
+* **Visibility Control:** Manage public/private recipe settings
+
+#### AI Model Performance
+* **Classification Scores:** Monitor ingredient classifier performance
+* **Accuracy Metrics:** Track prediction accuracy and confidence scores
+* **Model Health:** System performance monitoring
+
+#### Contact Message Management
+* **Message Inbox:** View and respond to user messages
+* **Response System:** Reply to inquiries directly from admin interface
+* **Message Tracking:** Mark messages as read/unread and track responses
 
 ## 4. Technologies Used
 
-*   **Backend:**
-    *   **Programming Language:** Python (Version 3.9+ recommended)
-    *   **Framework:** Flask (A micro web framework for Python)
-    *   **Database ORM:** SQLAlchemy (Provides an Object-Relational Mapper, simplifying database interactions)
-    *   **Authentication:** Flask-JWT-Extended (Implements JSON Web Token (JWT) based authentication for securing API endpoints)
-    *   **Email Service:** Flask-Mail (Used for sending emails, such as for email verification)
-    *   **AI/ML Libraries:**
-        *   **Google Gemini:** Utilized for advanced Natural Language Processing tasks, primarily for the NLP Recipe Parser within the recipe pipeline.
-        *   **TensorFlow & TensorFlow Hub:** Employed for image classification tasks, specifically for the Ingredient Classifier feature.
-        *   **Spacy:** Another NLP library, possibly used for supplementary text processing tasks like tokenization or entity recognition if needed by the recipe pipeline.
-        *   **Pandas:** Used for data manipulation and analysis, likely in handling datasets for AI model training, processing nutritional data, or managing recipe data.
-        *   **RapidFuzz/FuzzyWuzzy:** Libraries for fuzzy string matching, useful for matching user input to ingredients in a database, handling typos, or linking similar ingredient names.
-    *   **Database:** Relational Database Management System (RDBMS). Designed with MySQL and MSSQL in mind, using the `mysql-connector-python` driver for MySQL connections.
-*   **Frontend:**
-    *   **Programming Language:** JavaScript (utilizing JSX syntax extension for React)
-    *   **Framework/Library:** React (A popular JavaScript library for building user interfaces, particularly Single Page Applications)
-    *   **Build Tool/Development Server:** Vite (A fast frontend build tool and development server)
-    *   **UI Library & Styling:** Tailwind CSS (A utility-first CSS framework for rapidly building custom user interfaces. Used for all styling and component design).
-    *   **Routing:** React Router (Handles client-side routing within the React SPA)
-    *   **State Management:** React Context API (Used for managing global state or state shared across multiple components)
-*   **DevOps/Deployment:**
-    *   **Containerization:** Docker and Docker Compose (Used to create, deploy, and manage the application in isolated containers, ensuring consistency across different environments)
+### 4.1 Backend Technologies
+* **Programming Language:** Python 3.9+
+* **Framework:** Flask (micro web framework)
+* **Database ORM:** SQLAlchemy
+* **Authentication:** Flask-JWT-Extended
+* **Email Service:** Flask-Mail
+* **Database:** MySQL with mysql-connector-python
+
+### 4.2 AI/ML Libraries
+* **Google Gemini:** NLP recipe parsing and text processing
+* **TensorFlow:** Image classification for ingredient identification
+* **Pandas:** Data manipulation and analysis
+* **RapidFuzz/FuzzyWuzzy:** Fuzzy string matching for ingredient matching
+
+### 4.3 Frontend Technologies
+* **Programming Language:** JavaScript with JSX
+* **Framework:** React (Single Page Application)
+* **Build Tool:** Vite (fast development server and build tool)
+* **Styling:** Tailwind CSS (utility-first CSS framework)
+* **Routing:** React Router
+* **State Management:** React Context API
+* **Icons:** React Icons (Heroicons, Font Awesome)
+
+### 4.4 DevOps/Deployment
+* **Containerization:** Docker and Docker Compose
+* **Web Server:** Nginx (frontend static file serving)
+* **Environment Management:** Environment variables and configuration files
 
 ## 5. Software Architecture
 
-*   **Overall Architecture:** NutriChef is designed as a **client-server web application**.
-    *   The **Frontend** is a Single Page Application (SPA) built with React, responsible for the user interface and user interaction, styled using Tailwind CSS.
-    *   The **Backend** is a RESTful API built with Flask, which handles business logic, data processing, database interactions, and AI model integration.
-    *   Communication between the frontend and backend occurs via HTTP requests to the RESTful API endpoints.
-*   **Frontend Architecture:**
-    *   **Single Page Application (SPA):** The frontend is built using React, meaning the application loads a single HTML page and dynamically updates content as the user interacts with it, providing a fluid user experience.
-    *   **Component-Based Structure:** The UI is organized into reusable React components, typically found in `frontend/src/components/` (for general components) and `frontend/src/pages/` (for components representing full pages). Styling is handled by Tailwind CSS utility classes applied directly to these components.
-    *   **Interaction with Backend:** The frontend interacts with the backend by making asynchronous API calls (e.g., using `fetch` or `axios`) to the RESTful API endpoints to retrieve and submit data.
-    *   **Static Asset Serving:** Static assets (HTML, CSS, JavaScript bundles, images) are built by Vite and can be served by a web server. In the Docker setup, Nginx is often used within the frontend container to serve these static files and proxy API requests to the backend service.
-*   **Backend Architecture:**
-    *   **RESTful API:** The backend, built with Flask, exposes a set of RESTful API endpoints that the frontend consumes. These endpoints handle operations related to users, recipes, AI tools, etc.
-    *   **Layered Architecture:** The backend follows a layered architectural pattern to separate concerns:
-        *   **Routes (`backend/routes/`):** Defines the API endpoints using Flask Blueprints. Each blueprint typically groups related routes (e.g., `auth_routes.py`, `recipe_routes.py`). These handle incoming requests and call appropriate service functions.
-        *   **Services (`backend/services/`):** Contains the core business logic of the application. Service functions orchestrate operations, interact with DAOs, and integrate with AI models.
-            *   **`recipe_pipeline_service.py`**: A key service that coordinates multiple steps for recipe processing, such as NLP parsing of text, image handling (if any), and saving structured data to the database.
-        *   **Data Access Objects (`backend/dao/`):** Responsible for all direct interactions with the database. DAOs encapsulate SQLAlchemy queries, providing a clean abstraction layer for database operations (e.g., `UserDAO`, `RecipeDAO`).
-        *   **Models (`backend/models/`):** Defines the SQLAlchemy database models, which represent the structure of the database tables as Python classes (e.g., `User`, `Recipe`, `Ingredient`).
-    *   **AI Models Integration (`backend/ai_models/`):** This directory houses the modules and scripts related to the AI functionalities.
-        *   Services call functions within these modules to perform tasks like image classification, NLP parsing, or nutrition lookup.
-        *   This might include loading pre-trained models (e.g., TensorFlow models for image classification), interacting with external AI APIs (e.g., Google Gemini), or querying internal data sources for AI tasks (e.g., custom nutrition databases or substitution lists).
-*   **Database Architecture:**
-    *   **Relational Database:** The application uses a relational database, with the schema designed for MySQL.
-    *   **Key Tables and Primary Purpose (summary, see section 6 for detail):**
-        *   `Users`, `Recipes`, `Ingredients`, `AllergyIntolerances`, `UserAllergies`, `RecipeIngredients`, `ClassificationResults`, `UserMealPlans`, `Substitutions`, `IngredientAllergiesIntolerances`, `UserPantryIngredients`.
-        *   `ContactMessages`: Stores messages submitted via the "Contact Us" form.
-    *   **Relationships:** Standard relational links, e.g., User-Recipes (one-to-many), Recipe-Ingredients (many-to-many).
-*   **Directory Structure Overview:**
-    *   `SQL/`: Contains SQL schema definition files.
-    *   `backend/`: Houses the entire Flask backend application.
-    *   `frontend/`: Contains the entire React frontend application.
-    *   `docs/`: Contains documentation files like this one and the User Manual.
-    *   `docker-compose.yml`: Docker Compose configuration.
-    *   `.env.example`: Template for environment variables.
+### 5.1 Overall Architecture
+NutriChef follows a **client-server web application** architecture:
+* **Frontend:** React SPA with Tailwind CSS styling
+* **Backend:** Flask RESTful API with layered architecture
+* **Communication:** HTTP requests to RESTful API endpoints
+* **Database:** MySQL relational database with SQLAlchemy ORM
+
+### 5.2 Frontend Architecture
+* **Single Page Application:** React-based SPA with dynamic content updates
+* **Component-Based Structure:** Modular React components organized by functionality
+* **Routing:** Client-side routing with React Router
+* **State Management:** Context API for global state (authentication, modals, meal plans)
+* **Static Asset Serving:** Vite-built assets served by Nginx
+
+### 5.3 Backend Architecture
+* **RESTful API:** Flask-based API with blueprint organization
+* **Layered Architecture:**
+  * **Routes (`backend/routes/`):** API endpoint definitions using Flask Blueprints
+  * **Services (`backend/services/`):** Business logic and AI model integration
+  * **Data Access Objects (`backend/dao/`):** Database interaction layer
+  * **Models (`backend/models/`):** SQLAlchemy database models
+* **AI Integration:** Dedicated AI models directory with specialized modules
+
+### 5.4 Database Architecture
+* **Relational Database:** MySQL with comprehensive schema
+* **Key Tables:** Users, Recipes, Ingredients, Allergies, Meal Plans, Pantry, Contact Messages
+* **Relationships:** Standard relational links with foreign key constraints
+* **Data Integrity:** Proper indexing and constraint management
 
 ## 6. Database Schema Details
 
-Based on `SQL/schema_mysql.sql`:
+### 6.1 Core Tables
 
-*   **Table: `Users`** (UserID, Name, Email, PasswordHash, role, etc.)
-*   **Table: `Recipes`** (RecipeID, UserID, Title, Description, Instructions, ImageURL, etc.)
-*   **Table: `Ingredients`** (IngredientID, Name)
-*   **Table: `AllergyIntolerances`** (id, name)
-*   **Table: `UserAllergies`** (UserAllergyID, UserID, AllergyID)
-*   **Table: `RecipeIngredients`** (RecipeIngredientID, RecipeID, IngredientID, Quantity, Unit)
-*   **Table: `ClassificationResults`** (ResultID, UserID, PredictedFoodName, NutritionInfoJSON, score, etc.)
-*   **Table: `UserMealPlans`** (UserMealPlanID, UserID, MealPlanData)
-*   **Table: `Substitutions`** (SubstitutionID, OriginalIngredientID, SubstituteIngredientID)
-*   **Table: `IngredientAllergiesIntolerances`** (ingredient_id, allergy_intolerance_id)
-*   **Table: `UserPantryIngredients`**
-    *   **Primary Key:** `UserPantryIngredientID` (INT, AUTO_INCREMENT)
-    *   **Important Columns:**
-        *   `UserID` (INT): Foreign key to `Users.UserID`.
-        *   `IngredientID` (INT): Foreign key to `Ingredients.IngredientID`.
-        *   `Quantity` (DECIMAL(10,2), NULLABLE): Amount of the ingredient.
-        *   `Unit` (VARCHAR(50), NULLABLE): Unit of measurement.
-        *   `CreatedAt`, `UpdatedAt`.
-*   **Table: `ContactMessages`**
-    *   **Primary Key:** `MessageID` (INT, AUTO_INCREMENT)
-    *   **Important Columns:**
-        *   `Name` (VARCHAR(255))
-        *   `Email` (VARCHAR(255))
-        *   `Subject` (VARCHAR(255), NULLABLE)
-        *   `Message` (TEXT)
-        *   `IsRead` (BOOLEAN, DEFAULT FALSE)
-        *   `SubmittedAt` (TIMESTAMP)
-        *   `RespondedAt` (TIMESTAMP, NULLABLE)
-        *   `AdminResponse` (TEXT, NULLABLE)
+#### Users Table
+* **Primary Key:** UserID (INT, AUTO_INCREMENT)
+* **Key Columns:** Name, Email, PasswordHash, Role, CreatedAt, UpdatedAt
+* **Purpose:** User account management and authentication
 
-(Detailed column descriptions for common tables omitted for brevity but are consistent with the previous version of this document).
+#### Recipes Table
+* **Primary Key:** RecipeID (INT, AUTO_INCREMENT)
+* **Key Columns:** UserID, Title, Description, Instructions, ImageURL, PreparationTimeMinutes, CookingTimeMinutes, Servings, IsPublic, CreatedAt, UpdatedAt
+* **Purpose:** Recipe storage and management
 
-## 7. API Endpoints Overview (Conceptual)
+#### Ingredients Table
+* **Primary Key:** IngredientID (INT, AUTO_INCREMENT)
+* **Key Columns:** Name, CreatedAt
+* **Purpose:** Ingredient catalog and reference
 
-The backend provides RESTful API endpoints. Common patterns include:
+#### RecipeIngredients Table
+* **Primary Key:** RecipeIngredientID (INT, AUTO_INCREMENT)
+* **Key Columns:** RecipeID, IngredientID, Quantity, Unit
+* **Purpose:** Many-to-many relationship between recipes and ingredients
 
-*   **Authentication Endpoints (e.g., `/api/auth/`)**: `/register`, `/login`, `/logout`, `/verify-email`, etc.
-*   **Recipe Endpoints (e.g., `/api/recipes/`)**: `/` (GET, POST), `/{recipe_id}` (GET, PUT, DELETE), `/parse-nlp` (POST - handled by `recipe_pipeline_service`).
-*   **User Profile & Personalization Endpoints (e.g., `/api/users/`)**: `/me`, `/me/allergies`, `/me/settings`, `/me/recipes`.
-*   **Pantry Endpoints (e.g., `/api/pantry/`)**:
-    *   `/` (GET, requires JWT): List all ingredients in the current user's pantry.
-    *   `/add` (POST, requires JWT): Add an ingredient to the pantry.
-    *   `/{pantry_ingredient_id}` (PUT, requires JWT): Update quantity/unit of a pantry ingredient.
-    *   `/{pantry_ingredient_id}` (DELETE, requires JWT): Remove an ingredient from the pantry.
-*   **AI Tool Endpoints (e.g., `/api/ai/` or `/api/tools/`)**: `/classify-image`, `/lookup-nutrition`, `/substitute-ingredient`.
-*   **Meal Planner Endpoints (e.g., `/api/mealplanner/`)**:
-    *   `/` (GET, POST, requires JWT): Manage meal plans.
-*   **Shopping List Endpoints (e.g., `/api/shoppinglist/`)**:
-    *   `/` (GET, POST, requires JWT): Manage shopping lists.
-    *   `/generate` (POST, requires JWT): Generate shopping list from meal plan.
-*   **Admin Endpoints (e.g., `/api/admin/`)**: `/users`, `/recipes`, `/classification-scores`, `/contact-messages`.
-*   **Other Endpoints**: `/api/allergies`, `/api/ingredients`, `/api/recipe-suggestions`.
+#### AllergyIntolerances Table
+* **Primary Key:** id (INT, AUTO_INCREMENT)
+* **Key Columns:** name, CreatedAt
+* **Purpose:** Allergy and intolerance definitions
+
+#### UserAllergies Table
+* **Primary Key:** UserAllergyID (INT, AUTO_INCREMENT)
+* **Key Columns:** UserID, AllergyID
+* **Purpose:** User-specific allergy associations
+
+#### UserPantryIngredients Table
+* **Primary Key:** UserPantryIngredientID (INT, AUTO_INCREMENT)
+* **Key Columns:** UserID, IngredientID, Quantity, Unit, CreatedAt, UpdatedAt
+* **Purpose:** User pantry management
+
+#### UserMealPlans Table
+* **Primary Key:** UserMealPlanID (INT, AUTO_INCREMENT)
+* **Key Columns:** UserID, MealPlanData (JSON), CreatedAt, UpdatedAt
+* **Purpose:** Meal planning data storage
+
+#### ContactMessages Table
+* **Primary Key:** MessageID (INT, AUTO_INCREMENT)
+* **Key Columns:** Name, Email, Message, Replied, CreatedAt
+* **Purpose:** User support and feedback system
+
+#### ClassificationResults Table
+* **Primary Key:** ResultID (INT, AUTO_INCREMENT)
+* **Key Columns:** UserID, UploadedImageURL, PredictedFoodName, NutritionInfoJSON, score, ClassificationTimestamp
+* **Purpose:** AI classification result tracking
+
+#### RecipeRatings Table
+* **Primary Key:** RatingID (INT, AUTO_INCREMENT)
+* **Key Columns:** UserID, RecipeID, Rating, Comment, CreatedAt
+* **Purpose:** Recipe rating and review system
+
+### 6.2 Supporting Tables
+* **Substitutions:** Ingredient substitution relationships
+* **IngredientAllergiesIntolerances:** Ingredient-allergy associations
+* **Additional metadata tables for system functionality**
+
+## 7. API Endpoints Overview
+
+### 7.1 Authentication Endpoints
+* **POST /api/auth/register:** User registration
+* **POST /api/auth/login:** User authentication
+* **POST /api/auth/verify-email:** Email verification
+* **POST /api/auth/logout:** User logout
+
+### 7.2 Recipe Endpoints
+* **GET /api/recipes:** Get public recipes with pagination and search
+* **GET /api/recipes/{recipe_id}:** Get specific recipe details
+* **POST /api/recipes/process_submission:** Submit new recipe (structured or raw text)
+* **POST /api/recipes/upload_image:** Upload recipe images
+* **GET /api/recipes/my-private:** Get user's private recipes
+* **POST /api/recipes/{recipe_id}/rate:** Rate a recipe
+* **PATCH /api/recipes/{recipe_id}/toggle-public:** Change recipe visibility
+
+### 7.3 User Management Endpoints
+* **GET /api/users/me:** Get current user profile
+* **PUT /api/users/me:** Update user profile
+* **GET /api/users/me/allergies:** Get user allergies
+* **POST /api/users/me/allergies:** Update user allergies
+
+### 7.4 AI Tool Endpoints
+* **POST /api/classification/classify:** Image-based ingredient classification
+* **POST /api/nlp/parse_recipe:** NLP recipe text parsing
+* **GET /api/food-lookup/{food_name}:** Nutrition information lookup
+* **GET /api/substitutions/{ingredient_name}:** Ingredient substitution suggestions
+
+### 7.5 Meal Planning Endpoints
+* **GET /api/meal-planner:** Get user meal plans
+* **POST /api/meal-planner:** Create/update meal plan
+* **DELETE /api/meal-planner:** Delete meal plan
+
+### 7.6 Pantry Management Endpoints
+* **GET /api/pantry:** Get user pantry ingredients
+* **POST /api/pantry/add:** Add ingredient to pantry
+* **PUT /api/pantry/{ingredient_id}:** Update pantry ingredient
+* **DELETE /api/pantry/{ingredient_id}:** Remove ingredient from pantry
+
+### 7.7 Shopping List Endpoints
+* **GET /api/shopping-list:** Get user shopping lists
+* **POST /api/shopping-list:** Create shopping list
+* **POST /api/shopping-list/generate:** Generate list from meal plan
+
+### 7.8 Admin Endpoints
+* **GET /api/admin/users:** Get all users (admin only)
+* **PUT /api/admin/users/{user_id}:** Update user (admin only)
+* **DELETE /api/admin/users/{user_id}:** Delete user (admin only)
+* **GET /api/admin/recipes:** Get all recipes (admin only)
+* **GET /api/admin/classification-scores:** Get AI performance metrics (admin only)
+* **GET /api/admin/contact-messages:** Get user messages (admin only)
+
+### 7.9 Additional Endpoints
+* **GET /api/allergies:** Get available allergies
+* **GET /api/ingredients:** Get ingredient catalog
+* **GET /api/personalized-recipes:** Get allergy-filtered recipes
+* **GET /api/recipe-suggestions:** Get curated recipe suggestions
+* **POST /api/contact-messages:** Submit contact form
 
 ## 8. AI Models and Integration
 
-*   **Allergy Analysis:** (As previously described, uses `UserAllergies` and `IngredientAllergiesIntolerances`).
-*   **Food & Ingredient Classification (Image-based):** (As previously described, uses TensorFlow model).
-*   **Natural Language Processing (Recipe Text Parsing) & Recipe Pipeline:**
-    *   **Model type:** Google Gemini, potentially with Spacy for supplementary tasks.
-    *   **Input:** Raw recipe text, optionally an image.
-    *   **Output:** Structured recipe data saved to the database.
-    *   **Integration (via `recipe_pipeline_service.py`):**
-        1.  Frontend sends raw text (and optional image) to `/api/recipes/parse-nlp` or a similar endpoint.
-        2.  The `RecipePipelineService` receives the data.
-        3.  **Text Parsing:** The service sends the text to Google Gemini with a prompt to extract structured information (ingredients, instructions, title, etc.).
-        4.  Gemini returns structured JSON. The service validates and standardizes this data.
-        5.  **(Optional) Image Processing:** If an image is included, it might be processed (e.g., stored, potentially analyzed if it's for identifying the dish itself rather than an ingredient).
-        6.  **Database Interaction:** The service uses DAOs to save the structured recipe data (ingredients, steps, image URL, etc.) into the respective database tables (`Recipes`, `Ingredients`, `RecipeIngredients`).
-        7.  A success/failure response is returned to the frontend. This streamlined pipeline makes adding recipes from text very efficient.
-*   **Nutrition Lookup:** (As previously described, uses internal/external databases).
-*   **Ingredient Substitution Recommendation:** (As previously described, uses `Substitutions` table or CSV).
+### 8.1 Ingredient Classification (Image-based)
+* **Model Type:** TensorFlow-based image classification
+* **Input:** Food/ingredient images
+* **Output:** Predicted ingredient name with confidence score
+* **Integration:** Direct model loading in classification service
+* **Performance Tracking:** Confidence scores and accuracy metrics stored
 
-## 9. Setup and Deployment (Brief Summary)
+### 8.2 Natural Language Processing (Recipe Parsing)
+* **Model Type:** Google Gemini API
+* **Input:** Raw recipe text
+* **Output:** Structured recipe data (ingredients, instructions, timing)
+* **Integration:** NLP service with recipe pipeline coordination
+* **Error Handling:** Fallback mechanisms for parsing failures
 
-*   **Local Development Setup:** (As previously described, backend with Flask, frontend with React/Vite).
-*   **Docker-Based Deployment:** (As previously described, using Docker Compose, root `.env` file).
+### 8.3 Nutrition Lookup
+* **Data Source:** Comprehensive nutrition database
+* **Input:** Food item names
+* **Output:** Detailed nutritional information
+* **Integration:** Nutrition service with fuzzy matching
+* **Data Format:** JSON responses with nutritional breakdowns
 
-## 10. Contribution and Future Scope
+### 8.4 Ingredient Substitution
+* **Model Type:** Rule-based system with AI enhancement
+* **Input:** Original ingredient name
+* **Output:** Substitution suggestions with ratios and considerations
+* **Integration:** Substitution service with allergy awareness
+* **Data Source:** Culinary expertise database
 
-*   **Contribution:** (Standard fork, branch, PR process).
-*   **Potential Future Enhancements:**
-    *   **Advanced Meal Planner:** Nutritional summaries for days/weeks, drag & drop interface.
-    *   **Enhanced Shopping Basket:** Store aisle categorization, price estimation.
-    *   **Pantry-driven Recipe Suggestions:** More sophisticated suggestions based on `UserPantryIngredients`.
-    *   **Social Features:** Ratings, reviews, sharing.
-    *   **Advanced Search:** By nutritional content, cooking difficulty.
-    *   (Other enhancements as previously listed).
+### 8.5 Floating Chatbot
+* **Model Type:** AI-powered conversational interface
+* **Input:** User queries and questions
+* **Output:** Helpful responses and guidance
+* **Integration:** Chatbot service with context awareness
+* **Features:** Real-time assistance and feature guidance
 
-This documentation provides a comprehensive overview of the NutriChef project, its functionalities, architecture, and technical details, reflecting the latest updates including the use of Tailwind CSS, fully implemented Meal Planner, Shopping Basket, User Pantry, Recipe Suggestions, and the integrated recipe pipeline.
+## 9. Security and Authentication
+
+### 9.1 Authentication System
+* **JWT Tokens:** Secure token-based authentication
+* **Email Verification:** Required account activation
+* **Password Security:** Hashed password storage
+* **Session Management:** Token expiration and refresh mechanisms
+
+### 9.2 Data Protection
+* **Input Validation:** Comprehensive input sanitization
+* **SQL Injection Prevention:** Parameterized queries via SQLAlchemy
+* **XSS Protection:** Content Security Policy and input filtering
+* **CSRF Protection:** Token-based request validation
+
+### 9.3 Privacy Features
+* **User Data Control:** Users can manage their data and privacy settings
+* **Recipe Visibility:** Public/private recipe control
+* **Allergy Privacy:** Secure storage of sensitive health information
+* **Data Retention:** Configurable data retention policies
+
+## 10. Deployment and Infrastructure
+
+### 10.1 Containerization
+* **Docker Images:** Separate containers for frontend and backend
+* **Docker Compose:** Orchestrated multi-container deployment
+* **Environment Isolation:** Consistent deployment across environments
+* **Volume Management:** Persistent data storage for uploads and database
+
+### 10.2 Frontend Deployment
+* **Build Process:** Vite-based production builds
+* **Static Serving:** Nginx serving optimized static assets
+* **API Proxying:** Nginx reverse proxy to backend services
+* **Caching:** Static asset caching for performance
+
+### 10.3 Backend Deployment
+* **Flask Application:** Production-ready WSGI server
+* **Database Connection:** MySQL connection pooling
+* **File Storage:** Static file serving for uploaded images
+* **Logging:** Comprehensive application logging
+
+### 10.4 Environment Configuration
+* **Environment Variables:** Secure configuration management
+* **Database Configuration:** Connection string management
+* **API Keys:** Secure storage of external service credentials
+* **Feature Flags:** Configurable feature enablement
+
+## 11. Performance and Scalability
+
+### 11.1 Frontend Performance
+* **Code Splitting:** Lazy loading of components and routes
+* **Asset Optimization:** Minified CSS and JavaScript
+* **Image Optimization:** Compressed recipe images
+* **Caching Strategy:** Browser and CDN caching
+
+### 11.2 Backend Performance
+* **Database Optimization:** Indexed queries and connection pooling
+* **API Response Caching:** Redis-based caching for frequent requests
+* **Image Processing:** Optimized image upload and storage
+* **AI Model Optimization:** Efficient model loading and inference
+
+### 11.3 Scalability Considerations
+* **Horizontal Scaling:** Stateless backend design
+* **Database Scaling:** Read replicas and connection pooling
+* **CDN Integration:** Global content delivery
+* **Load Balancing:** Multiple backend instances
+
+## 12. Monitoring and Analytics
+
+### 12.1 Application Monitoring
+* **Error Tracking:** Comprehensive error logging and reporting
+* **Performance Metrics:** Response time and throughput monitoring
+* **User Analytics:** Feature usage and engagement tracking
+* **AI Model Performance:** Classification accuracy and confidence tracking
+
+### 12.2 System Health
+* **Database Monitoring:** Query performance and connection health
+* **API Endpoint Monitoring:** Response times and error rates
+* **File Storage Monitoring:** Upload success rates and storage usage
+* **External Service Monitoring:** AI API availability and performance
+
+## 13. Future Enhancements
+
+### 13.1 Planned Features
+* **Social Features:** Recipe sharing and community features
+* **Advanced Meal Planning:** Nutritional goal tracking and meal optimization
+* **Mobile Application:** Native mobile app development
+* **Voice Integration:** Voice-controlled recipe navigation
+* **Advanced AI:** More sophisticated recipe recommendations
+
+### 13.2 Technical Improvements
+* **Microservices Architecture:** Service decomposition for better scalability
+* **Real-time Features:** WebSocket integration for live updates
+* **Advanced Caching:** Redis-based caching for improved performance
+* **API Versioning:** Backward-compatible API evolution
+
+### 13.3 Data and Analytics
+* **Advanced Analytics:** User behavior analysis and insights
+* **Recipe Analytics:** Popularity tracking and trend analysis
+* **Nutritional Insights:** Personalized nutritional recommendations
+* **Allergy Research:** Data-driven allergy pattern analysis
+
+---
+
+This documentation provides a comprehensive overview of the NutriChef application architecture, features, and technical implementation. The system is designed to be scalable, maintainable, and user-friendly while providing powerful AI-driven features for enhanced culinary experiences.
