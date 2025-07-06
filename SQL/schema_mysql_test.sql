@@ -588,6 +588,13 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `EmailVerificationToken` varchar(255) DEFAULT NULL,
   `EmailVerificationTokenExpiresAt` timestamp NULL DEFAULT NULL,
   `IsEmailVerified` tinyint(1) DEFAULT '0',
+  `DailyCalories` int DEFAULT NULL COMMENT 'Daily calorie target in kcal',
+  `DailyProtein` float DEFAULT NULL COMMENT 'Daily protein target in grams',
+  `DailyCarbs` float DEFAULT NULL COMMENT 'Daily carbohydrate target in grams',
+  `DailyFat` float DEFAULT NULL COMMENT 'Daily fat target in grams',
+  `DailyFiber` float DEFAULT NULL COMMENT 'Daily fiber target in grams',
+  `DailySugar` float DEFAULT NULL COMMENT 'Daily sugar target in grams',
+  `DailySodium` float DEFAULT NULL COMMENT 'Daily sodium target in mg',
   PRIMARY KEY (`UserID`),
   UNIQUE KEY `Email` (`Email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -47,4 +47,20 @@ class UserDAO:
         if 'EmailVerificationTokenExpiresAt' in data_to_update:
             user.EmailVerificationTokenExpiresAt = data_to_update['EmailVerificationTokenExpiresAt']
         
+        # Nutritional target fields
+        if 'DailyCalories' in data_to_update:
+            user.DailyCalories = data_to_update['DailyCalories']
+        if 'DailyProtein' in data_to_update:
+            user.DailyProtein = data_to_update['DailyProtein']
+        if 'DailyCarbs' in data_to_update:
+            user.DailyCarbs = data_to_update['DailyCarbs']
+        if 'DailyFat' in data_to_update:
+            user.DailyFat = data_to_update['DailyFat']
+        if 'DailyFiber' in data_to_update:
+            user.DailyFiber = data_to_update['DailyFiber']
+        if 'DailySugar' in data_to_update:
+            user.DailySugar = data_to_update['DailySugar']
+        if 'DailySodium' in data_to_update:
+            user.DailySodium = data_to_update['DailySodium']
+        
         return user

@@ -6,11 +6,13 @@ import { useModal } from '../context/ModalContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import MealItemCard from '../components/MealItemCard.jsx';
 import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
+import NutritionalProgress from '../components/NutritionalProgress.jsx';
+import NutritionalTargetsModal from '../components/NutritionalTargetsModal.jsx';
 import jsPDF from 'jspdf';
 import { format, addDays, startOfToday as getStartOfToday, isToday, isTomorrow, isBefore, parseISO } from 'date-fns';
 import { 
   MdClear, MdDeleteOutline, MdSave, MdCloudDownload, MdDownload, MdClose, 
-  MdShoppingCart, MdAddShoppingCart, MdCalendarToday, MdViewWeek, MdViewDay 
+  MdShoppingCart, MdAddShoppingCart, MdCalendarToday, MdViewWeek, MdViewDay, MdSettings
 } from 'react-icons/md';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { 
@@ -37,13 +39,100 @@ function MealPlanner() {
   const [isAddingToBasket, setIsAddingToBasket] = useState(false);
   const [basketMessage, setBasketMessage] = useState('');
   const [expandedDays, setExpandedDays] = useState(new Map()); // Track expanded state for each day
+  const [userNutritionalTargets, setUserNutritionalTargets] = useState({});
+  const [isNutritionalTargetsModalOpen, setIsNutritionalTargetsModalOpen] = useState(false);
   const isInitialMount = useRef(true);
   const paletteRef = useRef(null);
+  const [visibleEmptyDays, setVisibleEmptyDays] = useState([]);
 
   const { recipeSelectedForPlanning, setRecipeSelectedForPlanning, clearRecipeSelection } = useMealPlanSelection();
   const auth = useAuth();
   const { showModal } = useModal();
   const location = useLocation();
+
+  // Fetch user nutritional targets
+  const fetchUserNutritionalTargets = useCallback(async () => {
+    if (!auth.token) return;
+    
+    try {
+      const response = await authenticatedFetch('/api/user/preferences', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }, auth);
+      
+      if (response.ok) {
+        const userData = await response.json();
+        console.log('Raw user data from preferences:', userData);
+        const targets = {
+          DailyCalories: userData.DailyCalories,
+          DailyProtein: userData.DailyProtein,
+          DailyCarbs: userData.DailyCarbs,
+          DailyFat: userData.DailyFat,
+          DailyFiber: userData.DailyFiber,
+          DailySugar: userData.DailySugar,
+          DailySodium: userData.DailySodium
+        };
+        setUserNutritionalTargets(targets);
+        console.log('Fetched nutritional targets:', targets);
+        console.log('Has targets:', Object.values(targets).some(target => target && target > 0));
+      } else {
+        console.error('Failed to fetch user preferences:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching user nutritional targets:', error);
+    }
+  }, [auth]);
+
+  // Fetch nutritional targets when auth changes
+  useEffect(() => {
+    if (auth.token) {
+      fetchUserNutritionalTargets();
+    }
+  }, [auth.token, fetchUserNutritionalTargets]);
+
+  // Save nutritional targets
+  const handleSaveNutritionalTargets = async (targets) => {
+    if (!auth.token) {
+      setIsRequireLoginModalOpen(true);
+      return;
+    }
+
+    console.log('Saving nutritional targets:', targets);
+    try {
+      const response = await authenticatedFetch('/api/user/nutritional-targets', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(targets),
+      }, auth);
+
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Response result:', result);
+        setUserNutritionalTargets(targets);
+        console.log('Updated nutritional targets:', targets);
+        showModal('alert', 'Success', 'Nutritional targets updated successfully!', {iconType: 'success'});
+        
+        // Refresh the targets to ensure they're up to date
+        setTimeout(() => {
+          fetchUserNutritionalTargets();
+        }, 100);
+      } else {
+        const error = await response.json();
+        console.error('Error response:', error);
+        showModal('alert', 'Error', error.error || 'Failed to update nutritional targets', {iconType: 'error'});
+      }
+    } catch (error) {
+      console.error('Error saving nutritional targets:', error);
+      showModal('alert', 'Error', 'Failed to save nutritional targets', {iconType: 'error'});
+    }
+  };
 
   // Initialize dates and load saved data
   useEffect(() => {
@@ -66,17 +155,29 @@ function MealPlanner() {
       const storedPlannedMealsString = localStorage.getItem(PLANNED_MEALS_KEY);
       if (storedPlannedMealsString) {
         const loadedPlannedMeals = JSON.parse(storedPlannedMealsString);
+        console.log('Loaded meal plan from localStorage:', loadedPlannedMeals);
+        
         const today = getStartOfToday();
         const futureOrTodayPlannedMeals = {};
         for (const dateKey in loadedPlannedMeals) {
           if (/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) {
             const entryDate = parseISO(dateKey);
-            if (!isBefore(entryDate, today)) futureOrTodayPlannedMeals[dateKey] = loadedPlannedMeals[dateKey];
+            if (!isBefore(entryDate, today)) {
+              futureOrTodayPlannedMeals[dateKey] = loadedPlannedMeals[dateKey];
+              console.log('Keeping meal data for date:', dateKey, loadedPlannedMeals[dateKey]);
+            } else {
+              console.log('Filtering out past date:', dateKey);
+            }
           }
         }
         setPlannedMeals(futureOrTodayPlannedMeals);
-      } else setPlannedMeals({});
+        console.log('Final meal plan after filtering:', futureOrTodayPlannedMeals);
+      } else {
+        console.log('No meal plan found in localStorage');
+        setPlannedMeals({});
+      }
     } catch (err) { 
+      console.error('Error loading meal plan from localStorage:', err);
       setPlannedMeals({}); 
     }
   }, []);
@@ -87,10 +188,18 @@ function MealPlanner() {
       isInitialMount.current = false; 
       return; 
     }
-    if (Object.keys(plannedMeals).length > 0) {
-        localStorage.setItem(PLANNED_MEALS_KEY, JSON.stringify(plannedMeals));
-    } else {
+    
+    try {
+      if (Object.keys(plannedMeals).length > 0) {
+        const dataToSave = JSON.stringify(plannedMeals);
+        localStorage.setItem(PLANNED_MEALS_KEY, dataToSave);
+        console.log('Saved meal plan to localStorage:', plannedMeals);
+      } else {
         localStorage.removeItem(PLANNED_MEALS_KEY);
+        console.log('Removed meal plan from localStorage');
+      }
+    } catch (error) {
+      console.error('Error saving meal plan to localStorage:', error);
     }
   }, [plannedMeals]);
 
@@ -178,12 +287,23 @@ function MealPlanner() {
 
   const handleAssignRecipeToDay = (dayKey, recipeToAssign) => {
     if (!recipeToAssign) return;
+    
+    // Ensure the recipe has the proper structure with NutritionInfo
+    const recipeWithNutrition = {
+      ...recipeToAssign,
+      NutritionInfo: recipeToAssign.NutritionInfoJSON || recipeToAssign.NutritionInfo || null,
+      planInstanceId: `${recipeToAssign.RecipeID}-${Date.now()}`
+    };
+    
     setPlannedMeals(prev => {
       const dayItems = [...(prev[dayKey] || [])];
-      dayItems.push({ ...recipeToAssign, planInstanceId: `${recipeToAssign.RecipeID}-${Date.now()}` });
-      return { ...prev, [dayKey]: dayItems };
+      dayItems.push(recipeWithNutrition);
+      const newPlannedMeals = { ...prev, [dayKey]: dayItems };
+      console.log('Updated meal plan:', newPlannedMeals);
+      return newPlannedMeals;
     });
     clearRecipeSelection();
+    setVisibleEmptyDays(prev => prev.filter(key => key !== dayKey));
   };
 
   const handleRemoveRecipeFromDay = (dayKey, planInstanceIdToRemove) => {
@@ -391,18 +511,18 @@ function MealPlanner() {
       <div key={dayKey} className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
         <div className="p-4 border-b border-gray-50">
           <div className="flex items-center justify-between">
-            <h3 className={`font-semibold text-sm ${
-              isToday(date) ? 'text-emerald-600' : isTomorrow(date) ? 'text-blue-600' : 'text-gray-700'
-            }`}>
-              {dayLabel}
-            </h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className={`font-semibold text-sm ${
+                isToday(date) ? 'text-emerald-600' : isTomorrow(date) ? 'text-blue-600' : 'text-gray-700'
+              }`}>
+                {dayLabel}
+              </h3>
+              <span className="text-sm bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full font-medium leading-tight whitespace-nowrap">
+                {dayItems.length} meal{dayItems.length !== 1 ? 's' : ''}
+              </span>
+            </div>
             <div className="flex items-center gap-2">
               {dayItems.length > 0 && (
-                <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-medium">
-                  {dayItems.length} meal{dayItems.length !== 1 ? 's' : ''}
-                </span>
-              )}
-              {hasMultipleItems && (
                 <button
                   onClick={(e) => toggleExpanded(dayKey, e)}
                   className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
@@ -495,6 +615,17 @@ function MealPlanner() {
               <p className="text-sm text-emerald-600 font-medium">Drop recipe here or click to assign</p>
             </div>
           )}
+          
+          {/* Nutritional Progress */}
+          {dayItems.length > 0 && (
+            <NutritionalProgress
+              dayMeals={dayItems}
+              userNutritionalTargets={userNutritionalTargets}
+              isExpanded={isExpanded}
+              onToggleExpand={() => toggleExpanded(dayKey)}
+              onOpenSettings={() => setIsNutritionalTargetsModalOpen(true)}
+            />
+          )}
         </div>
       </div>
     );
@@ -506,6 +637,21 @@ function MealPlanner() {
 
   const getVisibleDates = () => {
     return viewMode === 'week' ? currentWeekDates.slice(0, 7) : currentWeekDates;
+  };
+
+  const handleAddEmptyDay = () => {
+    // Find the first date in currentWeekDates that is not already shown
+    const shownDates = new Set([
+      ...Object.keys(plannedMeals),
+      ...visibleEmptyDays
+    ]);
+    const nextAvailable = currentWeekDates.find(date => {
+      const key = format(date, 'yyyy-MM-dd');
+      return !shownDates.has(key);
+    });
+    if (nextAvailable) {
+      setVisibleEmptyDays(prev => [...prev, format(nextAvailable, 'yyyy-MM-dd')]);
+    }
   };
 
   return (
@@ -589,6 +735,15 @@ function MealPlanner() {
               {/* Right side - Action buttons */}
               <div className="flex items-center gap-3">
                 <button
+                  onClick={() => setIsNutritionalTargetsModalOpen(true)}
+                  className="btn-outline flex items-center gap-2"
+                  title="Set nutritional targets"
+                >
+                  <MdSettings className="w-4 h-4" />
+                  Nutrition
+                </button>
+                
+                <button
                   onClick={handleAddAllToBasket}
                   disabled={isAddingToBasket || Object.keys(plannedMeals).length === 0}
                   className="btn-primary flex items-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
@@ -655,6 +810,15 @@ function MealPlanner() {
           </div>
 
           {/* Main Content */}
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={handleAddEmptyDay}
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium shadow"
+              title="Add a new day to plan meals"
+            >
+              <span className="text-xl font-bold">+</span> Add Day
+            </button>
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Recipe Palette */}
             {isPaletteVisible && (
@@ -722,8 +886,13 @@ function MealPlanner() {
 
             {/* Calendar Grid */}
             <div className={`${isPaletteVisible ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {getVisibleDates().map((date) => renderDayCard(date))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-center">
+                {getVisibleDates().map((date) => {
+                  const dayKey = format(date, 'yyyy-MM-dd');
+                  const dayItems = plannedMeals[dayKey] || [];
+                  if (dayItems.length === 0 && !visibleEmptyDays.includes(dayKey)) return null;
+                  return renderDayCard(date);
+                })}
               </div>
             </div>
           </div>
@@ -736,6 +905,13 @@ function MealPlanner() {
         title="Login Required"
         message="You need to be logged in to save and load meal plans from the cloud."
         redirectState={{ from: location }}
+      />
+
+      <NutritionalTargetsModal
+        isOpen={isNutritionalTargetsModalOpen}
+        onClose={() => setIsNutritionalTargetsModalOpen(false)}
+        onSave={handleSaveNutritionalTargets}
+        currentTargets={userNutritionalTargets}
       />
     </div>
   );

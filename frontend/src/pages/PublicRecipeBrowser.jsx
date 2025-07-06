@@ -153,9 +153,14 @@ function PublicRecipeBrowser() {
         const existingPaletteString = localStorage.getItem(MEAL_PLAN_PALETTE_KEY);
         let currentPalette = existingPaletteString ? JSON.parse(existingPaletteString) : [];
         if (!currentPalette.some(recipe => recipe.RecipeID === recipeToAdd.RecipeID)) {
-          currentPalette.push({ RecipeID: recipeToAdd.RecipeID, Title: recipeToAdd.Title, ImageURL: recipeToAdd.ImageURL });
+          const recipeForPalette = {
+            ...recipeToAdd,
+            NutritionInfo: recipeToAdd.NutritionInfoJSON || recipeToAdd.NutritionInfo || null
+          };
+          currentPalette.push(recipeForPalette);
           localStorage.setItem(MEAL_PLAN_PALETTE_KEY, JSON.stringify(currentPalette));
           setPaletteRecipeIds(prevIds => new Set(prevIds).add(recipeToAdd.RecipeID));
+          console.log('Added recipe to palette with full data:', recipeForPalette);
         }
       } catch (error) {
         console.error("Error adding recipe to palette:", error);
