@@ -102,11 +102,12 @@ class RecipeDAO:
         return []
 
 
-    def create_recipe(self, user_id, title, description, instructions, prep_time, cook_time, servings, image_url, ingredients_data, is_public):
+    def create_recipe(self, user_id, title, description, instructions, prep_time, cook_time, servings, image_url, ingredients_data, is_public, nutrition_info=None):
         """
         Creates a new recipe and its associated RecipeIngredient entries.
         'ingredients_data' is a list of dictionaries, each like:
         { 'ingredient_model': <Ingredient instance>, 'quantity': '1', 'unit': 'cup' }
+        'nutrition_info' is optional nutritional information as a dictionary
         """
         new_recipe = Recipe(
             UserID=user_id,
@@ -117,7 +118,8 @@ class RecipeDAO:
             CookingTimeMinutes=cook_time,
             Servings=servings,
             ImageURL=image_url,
-            is_public=is_public
+            is_public=is_public,
+            NutritionInfoJSON=nutrition_info
         )
         db.session.add(new_recipe)
 

@@ -5,12 +5,14 @@ from ..ai_models.allergy_analyzer.allergy_analyzer import AllergyAnalyzer
 from ..db import db # For transaction management (db.session)
 from ..models.ingredient import Ingredient # For type checking if needed
 from ..models.recipe import Recipe # For type checking if needed
+import json
 
 class RecipePipelineService:
     def __init__(self):
         self.recipe_dao = RecipeDAO()
         self.ingredient_dao = IngredientDAO()
         self.allergy_analyzer = AllergyAnalyzer() # Uses sample CSV
+        self.gemini_nlp = GeminiNlpParser()
         
 
     def process_recipe_submission(self, submission_data, user_id):
@@ -26,10 +28,16 @@ class RecipePipelineService:
                  result_dict is the created recipe's data on success.
                  error_dict contains an error message on failure.
         """
+        if not submission_data:
+            return None, {"error": "No submission data provided."}, 400
+
         try:
             if isinstance(submission_data, str):
-
-                parsed_text_data = submission_data
+                # Parse raw text using Gemini NLP
+                parsed_text_data = self.gemini_nlp.parse_recipe(submission_data)
+                
+                if "error" in parsed_text_data:
+                    return None, {"error": f"NLP parsing failed: {parsed_text_data['error']}"}, 400
 
                 recipe_json = {
                     "Title": parsed_text_data.get('title'), 
@@ -62,6 +70,9 @@ class RecipePipelineService:
 
             if not all(k in recipe_json for k in ["Title", "Instructions", "Ingredients"]):
                 return None, {"error": "Missing required fields in recipe data (Title, Instructions, Ingredients)."}, 400
+
+            # Extract nutritional information using Gemini NLP
+            nutrition_info = self.gemini_nlp.extract_recipe_nutrition(recipe_json)
 
             enriched_ingredients_for_dao = []
             processed_ingredient_ids_for_current_recipe = [] 
@@ -105,6 +116,7 @@ class RecipePipelineService:
             if not enriched_ingredients_for_dao:
                  return None, {"error": "No valid ingredients processed."}, 400
 
+            # Create the recipe with nutritional information
             new_recipe = self.recipe_dao.create_recipe(
                 user_id=user_id,
                 title=recipe_json["Title"],
@@ -115,7 +127,8 @@ class RecipePipelineService:
                 servings=recipe_json.get("Servings"),
                 image_url=recipe_json.get("ImageURL"), 
                 ingredients_data=enriched_ingredients_for_dao,
-                is_public=recipe_json.get("is_public") 
+                is_public=recipe_json.get("is_public"),
+                nutrition_info=nutrition_info
             )
 
             db.session.commit()
