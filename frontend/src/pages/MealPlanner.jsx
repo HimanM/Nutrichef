@@ -18,12 +18,13 @@ import { AiOutlineLoading } from 'react-icons/ai';
 import { 
   HiOutlineCalendar, HiOutlineCloudUpload, HiOutlineDocumentDownload, 
   HiOutlineEye, HiOutlineEyeOff, HiOutlineShoppingBag, HiOutlinePlus,
-  HiOutlineMinus, HiOutlineTrash, HiOutlineRefresh
+  HiOutlineMinus, HiOutlineTrash, HiOutlineRefresh, HiOutlineMenu
 } from 'react-icons/hi';
 
 const MEAL_PLAN_PALETTE_KEY = 'mealPlanPaletteRecipes';
 const PLANNED_MEALS_KEY = 'plannedMealsData';
 const SHOPPING_BASKET_KEY = 'shoppingBasketItems';
+const PALETTE_POSITION_KEY = 'floatingPalettePosition';
 
 function MealPlanner() {
   const [paletteRecipes, setPaletteRecipes] = useState([]);
@@ -34,7 +35,7 @@ function MealPlanner() {
   const [isSavingToCloud, setIsSavingToCloud] = useState(false);
   const [isLoadingFromCloud, setIsLoadingFromCloud] = useState(false);
   const [isRequireLoginModalOpen, setIsRequireLoginModalOpen] = useState(false);
-  const [isPaletteVisible, setIsPaletteVisible] = useState(true);
+  const [isPaletteVisible, setIsPaletteVisible] = useState(false);
   const [viewMode, setViewMode] = useState('week'); // 'week', 'day'
   const [isAddingToBasket, setIsAddingToBasket] = useState(false);
   const [basketMessage, setBasketMessage] = useState('');
@@ -42,13 +43,100 @@ function MealPlanner() {
   const [userNutritionalTargets, setUserNutritionalTargets] = useState({});
   const [isNutritionalTargetsModalOpen, setIsNutritionalTargetsModalOpen] = useState(false);
   const isInitialMount = useRef(true);
+  const isInitializing = useRef(true);
   const paletteRef = useRef(null);
   const [visibleEmptyDays, setVisibleEmptyDays] = useState([]);
+  
+  // Floating palette state
+  const [palettePosition, setPalettePosition] = useState({ x: 20, y: 100 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   const { recipeSelectedForPlanning, setRecipeSelectedForPlanning, clearRecipeSelection } = useMealPlanSelection();
   const auth = useAuth();
   const { showModal } = useModal();
   const location = useLocation();
+
+  // Load palette position from localStorage
+  useEffect(() => {
+    try {
+      const savedPosition = localStorage.getItem(PALETTE_POSITION_KEY);
+      if (savedPosition) {
+        setPalettePosition(JSON.parse(savedPosition));
+      }
+    } catch (error) {
+      console.error('Error loading palette position:', error);
+    }
+  }, []);
+
+  // Save palette position to localStorage
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    try {
+      localStorage.setItem(PALETTE_POSITION_KEY, JSON.stringify(palettePosition));
+    } catch (error) {
+      console.error('Error saving palette position:', error);
+    }
+  }, [palettePosition]);
+
+  // Handle mouse events for dragging
+  const handleMouseDown = (e) => {
+    if (e.target.closest('.palette-content') || e.target.closest('button')) {
+      return; // Don't start dragging if clicking on content or buttons
+    }
+    
+    setIsDragging(true);
+    const rect = paletteRef.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+
+  const handleMouseMove = useCallback((e) => {
+    if (!isDragging) return;
+
+    const newX = e.clientX - dragOffset.x;
+    const newY = e.clientY - dragOffset.y;
+
+    // Constrain to viewport
+    const maxX = window.innerWidth - 320; // palette width
+    const maxY = window.innerHeight - 400; // palette height
+
+    setPalettePosition({
+      x: Math.max(0, Math.min(newX, maxX)),
+      y: Math.max(0, Math.min(newY, maxY))
+    });
+  }, [isDragging, dragOffset]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  // Add/remove global mouse event listeners
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'grabbing';
+      document.body.style.userSelect = 'none';
+    } else {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isDragging, handleMouseMove, handleMouseUp]);
 
   // Fetch user nutritional targets
   const fetchUserNutritionalTargets = useCallback(async () => {
@@ -155,7 +243,6 @@ function MealPlanner() {
       const storedPlannedMealsString = localStorage.getItem(PLANNED_MEALS_KEY);
       if (storedPlannedMealsString) {
         const loadedPlannedMeals = JSON.parse(storedPlannedMealsString);
-        console.log('Loaded meal plan from localStorage:', loadedPlannedMeals);
         
         const today = getStartOfToday();
         const futureOrTodayPlannedMeals = {};
@@ -164,28 +251,29 @@ function MealPlanner() {
             const entryDate = parseISO(dateKey);
             if (!isBefore(entryDate, today)) {
               futureOrTodayPlannedMeals[dateKey] = loadedPlannedMeals[dateKey];
-              console.log('Keeping meal data for date:', dateKey, loadedPlannedMeals[dateKey]);
-            } else {
-              console.log('Filtering out past date:', dateKey);
             }
           }
         }
         setPlannedMeals(futureOrTodayPlannedMeals);
-        console.log('Final meal plan after filtering:', futureOrTodayPlannedMeals);
       } else {
-        console.log('No meal plan found in localStorage');
         setPlannedMeals({});
       }
     } catch (err) { 
       console.error('Error loading meal plan from localStorage:', err);
       setPlannedMeals({}); 
     }
+    
+    // Mark initialization as complete after loading data with a small delay
+    setTimeout(() => {
+      isInitialMount.current = false;
+      isInitializing.current = false;
+    }, 100);
   }, []);
 
   // Save planned meals to localStorage
   useEffect(() => {
-    if (isInitialMount.current) { 
-      isInitialMount.current = false; 
+    // Skip saving during initial mount/load
+    if (isInitialMount.current || isInitializing.current) { 
       return; 
     }
     
@@ -193,15 +281,15 @@ function MealPlanner() {
       if (Object.keys(plannedMeals).length > 0) {
         const dataToSave = JSON.stringify(plannedMeals);
         localStorage.setItem(PLANNED_MEALS_KEY, dataToSave);
-        console.log('Saved meal plan to localStorage:', plannedMeals);
       } else {
         localStorage.removeItem(PLANNED_MEALS_KEY);
-        console.log('Removed meal plan from localStorage');
       }
     } catch (error) {
       console.error('Error saving meal plan to localStorage:', error);
     }
   }, [plannedMeals]);
+
+
 
   // Fetch recipe ingredients for shopping basket
   const fetchRecipeIngredients = async (recipeId) => {
@@ -299,7 +387,6 @@ function MealPlanner() {
       const dayItems = [...(prev[dayKey] || [])];
       dayItems.push(recipeWithNutrition);
       const newPlannedMeals = { ...prev, [dayKey]: dayItems };
-      console.log('Updated meal plan:', newPlannedMeals);
       return newPlannedMeals;
     });
     clearRecipeSelection();
@@ -819,85 +906,116 @@ function MealPlanner() {
               <span className="text-xl font-bold">+</span> Add Day
             </button>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Recipe Palette */}
-            {isPaletteVisible && (
-              <div className="lg:col-span-1">
-                <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl p-6 sticky top-4 border border-emerald-100">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-gray-800">Recipe Palette</h2>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                        {paletteRecipes.length}
-                      </span>
-                      {paletteRecipes.length > 0 && (
-                        <button
-                          onClick={handleClearPalette}
-                          className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded-md transition-colors duration-200 font-medium"
-                          title="Clear all recipes from palette"
-                        >
-                          Clear All
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {loadingPalette && (
-                    <div className="flex items-center justify-center py-8">
-                      <AiOutlineLoading className="animate-spin h-8 w-8 text-emerald-500" />
-                    </div>
-                  )}
-                  
-                  {paletteError && (
-                    <div className="text-red-600 text-sm mb-4 p-3 bg-red-50 rounded-lg">{paletteError}</div>
-                  )}
-                  
-                  {!loadingPalette && paletteRecipes.length === 0 && (
-                    <div className="text-center py-8">
-                      <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <HiOutlinePlus className="w-8 h-8 text-emerald-400" />
-                      </div>
-                      <p className="text-gray-500 mb-4">No recipes in palette</p>
-                      <RouterLink to="/recipes" className="btn-primary">
-                        Browse Recipes
-                      </RouterLink>
-                    </div>
-                  )}
-                  
-                  {!loadingPalette && paletteRecipes.length > 0 && (
-                    <div className="space-y-3 max-h-96 overflow-y-auto">
-                      {paletteRecipes.map((recipe) => (
-                        <MealItemCard
-                          key={recipe.RecipeID}
-                          recipe={recipe}
-                          onRemove={() => handleRemoveFromPalette(recipe.RecipeID)}
-                          isInPalette={true}
-                          onDragStart={() => setRecipeSelectedForPlanning(recipe)}
-                          onDragEnd={clearRecipeSelection}
-                          onClick={() => setRecipeSelectedForPlanning(recipe)}
-                          isDragging={recipeSelectedForPlanning?.RecipeID === recipe.RecipeID}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Calendar Grid */}
-            <div className={`${isPaletteVisible ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-center">
-                {getVisibleDates().map((date) => {
-                  const dayKey = format(date, 'yyyy-MM-dd');
-                  const dayItems = plannedMeals[dayKey] || [];
-                  if (dayItems.length === 0 && !visibleEmptyDays.includes(dayKey)) return null;
+          
+          {/* Calendar Grid - Full width now */}
+          <div className="w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-center">
+              {getVisibleDates().map((date) => {
+                const dayKey = format(date, 'yyyy-MM-dd');
+                const dayItems = plannedMeals[dayKey] || [];
+                
+                // Always show days that have meals, regardless of visibleEmptyDays
+                if (dayItems.length > 0) {
                   return renderDayCard(date);
-                })}
-              </div>
+                }
+                
+                // Show empty days only if they're explicitly marked as visible
+                if (visibleEmptyDays.includes(dayKey)) {
+                  return renderDayCard(date);
+                }
+                
+                // Hide days that are empty and not marked as visible
+                return null;
+              })}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Floating Recipe Palette */}
+      {isPaletteVisible && (
+        <div
+          ref={paletteRef}
+          className="fixed z-50 bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl border border-emerald-200 w-80 max-h-96 overflow-hidden"
+          style={{
+            left: `${palettePosition.x}px`,
+            top: `${palettePosition.y}px`,
+            cursor: isDragging ? 'grabbing' : 'grab'
+          }}
+          onMouseDown={handleMouseDown}
+        >
+          {/* Drag Handle */}
+          <div className="bg-emerald-50 border-b border-emerald-200 px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <HiOutlineMenu className="w-4 h-4 text-emerald-600" />
+              <h3 className="font-semibold text-emerald-800 text-sm">Recipe Palette</h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full font-medium">
+                {paletteRecipes.length}
+              </span>
+              {paletteRecipes.length > 0 && (
+                <button
+                  onClick={handleClearPalette}
+                  className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded-md transition-colors duration-200 font-medium"
+                  title="Clear all recipes from palette"
+                >
+                  Clear All
+                </button>
+              )}
+              <button
+                onClick={() => setIsPaletteVisible(false)}
+                className="text-emerald-600 hover:text-emerald-800 hover:bg-emerald-100 p-1 rounded-md transition-colors duration-200"
+                title="Close palette"
+              >
+                <MdClose className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Palette Content */}
+          <div className="palette-content p-4 max-h-80 overflow-y-auto">
+            {loadingPalette && (
+              <div className="flex items-center justify-center py-8">
+                <AiOutlineLoading className="animate-spin h-8 w-8 text-emerald-500" />
+              </div>
+            )}
+            
+            {paletteError && (
+              <div className="text-red-600 text-sm mb-4 p-3 bg-red-50 rounded-lg">{paletteError}</div>
+            )}
+            
+            {!loadingPalette && paletteRecipes.length === 0 && (
+              <div className="text-center py-8">
+                <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <HiOutlinePlus className="w-6 h-6 text-emerald-400" />
+                </div>
+                <p className="text-gray-500 text-sm mb-3">No recipes in palette</p>
+                <RouterLink to="/recipes" className="btn-primary text-sm px-3 py-1.5">
+                  Browse Recipes
+                </RouterLink>
+              </div>
+            )}
+            
+            {!loadingPalette && paletteRecipes.length > 0 && (
+              <div className="space-y-2">
+                {paletteRecipes.map((recipe) => (
+                  <MealItemCard
+                    key={recipe.RecipeID}
+                    recipe={recipe}
+                    onRemove={() => handleRemoveFromPalette(recipe.RecipeID)}
+                    isInPalette={true}
+                    onDragStart={() => setRecipeSelectedForPlanning(recipe)}
+                    onDragEnd={clearRecipeSelection}
+                    onClick={() => setRecipeSelectedForPlanning(recipe)}
+                    isDragging={recipeSelectedForPlanning?.RecipeID === recipe.RecipeID}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <RequireLoginModal
         isOpen={isRequireLoginModalOpen}
