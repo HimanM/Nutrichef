@@ -110,7 +110,7 @@ const NutritionalTargetsModal = ({ isOpen, onClose, onSave, currentTargets = {} 
 
   return (
     <div className="fixed inset-0 bg-white/60 backdrop-blur-md overflow-y-auto h-full w-full flex justify-center items-start z-40 px-4 py-6">
-      <div className="bg-white/90 rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden border border-emerald-100 mt-20">
+      <div className="bg-white/90 rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden border border-emerald-100 mt-20">
         {/* Header */}
         <div className="px-8 py-6 border-b border-emerald-100 bg-gradient-to-r from-emerald-50 to-blue-50">
           <div className="flex justify-between items-center">
@@ -149,7 +149,7 @@ const NutritionalTargetsModal = ({ isOpen, onClose, onSave, currentTargets = {} 
           )}
 
           {/* Nutritional Fields */}
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {nutritionFields.map(({ key, label, unit, placeholder, description, max }) => (
               <div key={key} className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
