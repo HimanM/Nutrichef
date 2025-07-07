@@ -89,7 +89,17 @@ class UserService:
         if not user:
             return None, {"error": "User not found"}, 404
         
-        return {"UserID": user.UserID, "DietaryPreferences": user.DietaryPreferences}, None, 200
+        return {
+            "UserID": user.UserID, 
+            "DietaryPreferences": user.DietaryPreferences,
+            "DailyCalories": user.DailyCalories,
+            "DailyProtein": user.DailyProtein,
+            "DailyCarbs": user.DailyCarbs,
+            "DailyFat": user.DailyFat,
+            "DailyFiber": user.DailyFiber,
+            "DailySugar": user.DailySugar,
+            "DailySodium": user.DailySodium
+        }, None, 200
 
     def update_user_preferences(self, user_id, prefs_data):
         user = self.user_dao.get_user_by_id(user_id)
@@ -169,3 +179,50 @@ class UserService:
             db.session.rollback()
             print(f"Error during email verification: {e}")
             return None, {"error": "Email verification failed due to server error"}, 500
+
+    def update_nutritional_targets(self, user_id, targets_data):
+        print(f"Updating nutritional targets for user {user_id}: {targets_data}")
+        user = self.user_dao.get_user_by_id(user_id)
+        if not user:
+            print(f"User {user_id} not found")
+            return False, {"error": "User not found"}, 404
+
+        # Validate and prepare data for update
+        valid_fields = [
+            'DailyCalories', 'DailyProtein', 'DailyCarbs', 'DailyFat', 
+            'DailyFiber', 'DailySugar', 'DailySodium'
+        ]
+        
+        data_to_update = {}
+        for field in valid_fields:
+            if field in targets_data:
+                value = targets_data[field]
+                # Convert empty strings to None
+                if value == '' or value is None:
+                    data_to_update[field] = None
+                else:
+                    # Ensure it's a valid number
+                    try:
+                        num_value = float(value)
+                        if num_value < 0:
+                            return False, {"error": f"{field} must be a positive number"}, 400
+                        data_to_update[field] = num_value
+                    except (ValueError, TypeError):
+                        return False, {"error": f"{field} must be a valid number"}, 400
+
+        print(f"Data to update: {data_to_update}")
+
+        if not data_to_update:
+            print("No valid data to update")
+            return False, {"error": "No valid nutritional target data provided"}, 400
+
+        try:
+            print(f"Updating user with data: {data_to_update}")
+            self.user_dao.update_user(user, data_to_update)
+            db.session.commit()
+            print("Successfully updated nutritional targets")
+            return True, {"message": "Nutritional targets updated successfully", "targets": data_to_update}, 200
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error updating nutritional targets: {e}")
+            return False, {"error": "Failed to update nutritional targets"}, 500
