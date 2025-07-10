@@ -87,7 +87,6 @@ NutriChef is a comprehensive web application designed to help users manage recip
 *   **Classification Scores:** View a summary of AI classification model performance.
 *   **View User Messages:** Access and review messages submitted by users via the Contact Us form.
         <!-- Consider adding a screenshot of the Admin Contact Messages Page here -->
-        ![Admin View Messages Page](./docs/images/admin_messages_screenshot_1.png)
         ![Admin Reply Messages Page](./docs/images/admin_messages_screenshot_2.png)
 
 
