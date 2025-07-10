@@ -15,6 +15,7 @@ const InteractiveModal = ({
   iconType = null,
   showCloseButton = true,
   primaryActionText,
+  showCancelButton = true,
 }) => {
   if (!isOpen) return null;
 
@@ -89,7 +90,7 @@ const InteractiveModal = ({
         <div className="flex justify-end items-center space-x-3 pt-4 border-t border-gray-200">
           {isConfirmDialog ? (
             <>
-              {onCancel && (
+              {onCancel && showCancelButton && (
                  <button
                     onClick={handleCancel}
                     className="btn-outline text-sm"
