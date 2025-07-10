@@ -1,56 +1,55 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.preprocessing import image
-import tensorflow_hub as hub
+from keras.preprocessing import image
 import os
 import json
 from backend.utils.logging_utils import log_success, log_error, log_warning
 
 class FoodIngredientClassifier:
-    def __init__(self, model_base_path=None, model_dir_name='ing_classification_model', indices_json_name='class_indices.json', img_size=(224, 224)):
+    def __init__(self, model_base_path=None, model_file_name='ingredient_model.keras', class_names_file='class_names.json', img_size=(224, 224)):
         """
         Initializes the classifier.
         :param model_base_path: Base path to the 'ingredient_classification' directory.
                                 If None, defaults to the directory of this script.
-        :param model_dir_name: Name of the directory containing the Keras model.
-        :param indices_json_name: Name of the JSON file for class indices.
+        :param model_file_name: Name of the Keras model file.
+        :param class_names_file: Name of the JSON file for class names.
         :param img_size: Tuple for image target size.
         """
         if model_base_path is None:
             model_base_path = os.path.dirname(os.path.abspath(__file__))
 
-        self.model_path = os.path.join(model_base_path, model_dir_name)
-        self.indices_path = os.path.join(self.model_path, indices_json_name)
+        self.model_path = os.path.join(model_base_path, model_file_name)
+        self.class_names_path = os.path.join(model_base_path, class_names_file)
         self.img_size = img_size
         
         self.model = None
         self.idx_to_class = {}
         self.model_loaded = False
 
-        input_shape_for_model = self.img_size + (3,)
-        input_dtype_for_model = tf.float32
-
         try:
             if not os.path.exists(self.model_path):
-                raise FileNotFoundError(f"Model directory not found at: {self.model_path}. User needs to place 'ing_classification_model' directory here.")
-            if not os.path.exists(self.indices_path):
-                 raise FileNotFoundError(f"Class indices JSON not found at: {self.indices_path}. User needs to place '{indices_json_name}' inside '{model_dir_name}'.")
+                raise FileNotFoundError(f"Model file not found at: {self.model_path}. User needs to place '{model_file_name}' here.")
+            if not os.path.exists(self.class_names_path):
+                raise FileNotFoundError(f"Class names JSON not found at: {self.class_names_path}. User needs to place '{class_names_file}' here.")
 
-            self.model = hub.KerasLayer(self.model_path, trainable=False)
-            log_success(f"Model initialized with KerasLayer from {self.model_path}", "FoodIngredientClassifier")
+            import keras
+            self.model = keras.models.load_model(self.model_path)
+            log_success(f"Model loaded from {self.model_path}", "FoodIngredientClassifier")
             
-            with open(self.indices_path, 'r') as f:
-                class_indices = json.load(f)
-            self.idx_to_class = {int(v): k for k, v in class_indices.items()}
+            with open(self.class_names_path, 'r') as f:
+                class_names = json.load(f)
+            if not isinstance(class_names, list):
+                raise ValueError(f"Expected class_names.json to be a list, got {type(class_names)}")
+            self.idx_to_class = {i: name for i, name in enumerate(class_names)}
             
             self.model_loaded = True
-            log_success(f"Model '{model_dir_name}' and class indices processed successfully.", "FoodIngredientClassifier")
+            log_success(f"Model '{model_file_name}' and class names processed successfully.", "FoodIngredientClassifier")
 
         except FileNotFoundError as fnf_error:
             log_error(str(fnf_error), "FoodIngredientClassifier")
         except Exception as e:
-            log_error(f"loading model using KerasLayer or class indices from {self.model_path} - {e}", "FoodIngredientClassifier")
-            
+            log_error(f"loading model using tf.keras.models.load_model or class names from {self.model_path} - {e}", "FoodIngredientClassifier")
+    
     def is_model_loaded(self):
         return self.model_loaded
 
@@ -68,31 +67,18 @@ class FoodIngredientClassifier:
 
         try:
             processed_img = self.preprocess_image(img_path)
-            raw_predictions = self.model(processed_img)
-            
-            if isinstance(raw_predictions, dict):
-                if 'output_0' in raw_predictions:
-                    prediction_values = raw_predictions['output_0']
-                elif len(raw_predictions) == 1:
-                    prediction_values = next(iter(raw_predictions.values()))
-                else:
-                    log_warning(f"Model output is a dictionary with multiple keys: {list(raw_predictions.keys())}. Using first one found or failing. Please specify output key if default is incorrect.", "FoodIngredientClassifier")
-                    prediction_values = next(iter(raw_predictions.values()), None)
-                    if prediction_values is None:
-                        raise ValueError("Model output is a dictionary, but could not determine the correct output tensor. Please check model signature and update classifier code.")
-            elif isinstance(raw_predictions, list):
-                 prediction_values = raw_predictions[0]
-            else:
-                prediction_values = raw_predictions
+            if self.model is None:
+                raise RuntimeError("Model is not loaded.")
+            raw_predictions = self.model(processed_img, training=False)
 
-            if prediction_values.ndim == 2 and prediction_values.shape[0] == 1:
-                preds = prediction_values[0] 
-            elif prediction_values.ndim == 1:
-                preds = prediction_values
+            if hasattr(raw_predictions, 'numpy'):
+                preds = raw_predictions.numpy()[0]
+            elif isinstance(raw_predictions, np.ndarray):
+                preds = raw_predictions[0]
             else:
-                raise ValueError(f"Unexpected shape for prediction_values: {prediction_values.shape}")
+                raise ValueError(f"Unexpected prediction output type: {type(raw_predictions)}")
 
-            top_indices = np.argsort(preds.numpy())[-top_k:][::-1]
+            top_indices = np.argsort(preds)[-top_k:][::-1]
             
             results = []
             for i in top_indices:
