@@ -5,3 +5,4 @@
 /.recipe_images/
 /__temp_pipreqsnb_folder
 /.old
+/backend/.pytest_cache
