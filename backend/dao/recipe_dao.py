@@ -1,6 +1,6 @@
-from ..models import Recipe, RecipeIngredient, Ingredient, User, RecipeRating, UserAllergy # Import necessary models using relative import
-from ..models.ingredient import ingredient_allergies_association_table # Import for allergy filtering
-from ..db import db # Import db instance using relative import
+from backend.models import Recipe, RecipeIngredient, Ingredient, User, RecipeRating, UserAllergy # Import necessary models using relative import
+from backend.models.ingredient import ingredient_allergies_association_table # Import for allergy filtering
+from backend.db import db # Import db instance using relative import
 from sqlalchemy.orm import joinedload
 from sqlalchemy import func # Import func for aggregate functions
 

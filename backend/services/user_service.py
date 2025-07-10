@@ -1,5 +1,5 @@
-from ..dao import UserDAO
-from ..db import db
+from backend.dao import UserDAO
+from backend.db import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token
 from .email_service import EmailService

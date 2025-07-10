@@ -1,5 +1,5 @@
-from ..models import ClassificationResult
-from ..db import db
+from backend.models import ClassificationResult
+from backend.db import db
 from datetime import datetime
 
 class ClassificationResultDAO:

@@ -1,5 +1,5 @@
 import os
-from ..ai_models.nutrition_lookup.nutrition_lookup import OfflineNutritionLookup
+from backend.ai_models.nutrition_lookup.nutrition_lookup import OfflineNutritionLookup
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 AI_MODELS_DIR = os.path.join(SCRIPT_DIR, '..', 'ai_models', 'nutrition_lookup')

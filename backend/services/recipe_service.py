@@ -1,7 +1,7 @@
-from ..dao import RecipeDAO, IngredientDAO, RecipeRatingDAO
-from ..db import db
-from ..ai_models.allergy_analyzer.allergy_analyzer import AllergyAnalyzer
-from ..ai_models.gemini_nlp.gemini_nlp_parser import GeminiNlpParser
+from backend.dao import RecipeDAO, IngredientDAO, RecipeRatingDAO
+from backend.db import db
+from backend.ai_models.allergy_analyzer.allergy_analyzer import AllergyAnalyzer
+from backend.ai_models.gemini_nlp.gemini_nlp_parser import GeminiNlpParser
 
 class RecipeService:
     def __init__(self):
