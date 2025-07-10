@@ -111,7 +111,7 @@ function PersonalizedRecipesPage() {
                             <span className="gradient-text">Personalized Recipes</span>
                         </h1>
                         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                            Discover recipes tailored to your dietary preferences, allergies, and nutritional goals
+                            Discover recipes tailored to your dietary preferences and allergies
                         </p>
                     </div>
 
