@@ -8,13 +8,10 @@ from .services import UserService, RecipeService
 from flask_jwt_extended import JWTManager, get_jwt_identity
 from flask_mail import Mail
 import os
-import warnings
-import logging
+from .utils.logging_utils import suppress_external_warnings, log_header, log_info
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-warnings.filterwarnings('ignore')
-logging.getLogger('tensorflow').setLevel(logging.ERROR)
+# Suppress warnings before other imports
+suppress_external_warnings()
 
 from .routes.user_routes import user_bp
 from .routes.recipe_routes import recipe_bp
@@ -33,8 +30,11 @@ from .routes.chatbot_routes import chatbot_bp, initialize_chatbot_service
 from .routes.pantry_routes import pantry_bp
 from .routes.contact_message_routes import contact_message_bp
 
+log_header("Application Startup")
 app = Flask(__name__, static_folder='static', static_url_path='/static')
+log_info("Flask app initialized.", "Startup")
 app.config.from_object(Config)
+log_info("Configuration loaded from object.", "Startup")
 app.extensions = {}
 
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "your-super-secret-jwt-key-fallback")
@@ -101,7 +101,9 @@ app.register_blueprint(pantry_bp)
 app.register_blueprint(contact_message_bp)
 
 with app.app_context():
+    log_header("Service Initialization")
     initialize_chatbot_service()
+    log_header("Service Initialization Complete")
 
 @app.errorhandler(404)
 def handle_not_found_error(e):

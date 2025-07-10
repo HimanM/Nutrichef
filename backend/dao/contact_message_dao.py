@@ -1,6 +1,6 @@
 from typing import Optional # Added import
-from ..models import ContactMessage
-from ..db import db
+from backend.models import ContactMessage
+from backend.db import db
 
 class ContactMessageDAO:
     def create_message(self, name: str, email: str, message: str) -> ContactMessage:

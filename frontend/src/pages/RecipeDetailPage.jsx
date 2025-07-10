@@ -473,6 +473,60 @@ function RecipeDetailPage() {
                   </div>
                 </div>
 
+                {/* Nutritional Information Section */}
+                {recipeData.NutritionInfo && (
+                  <div className="mb-8 pt-6 border-t border-emerald-100">
+                    <h2 className="text-xl font-semibold mb-4 text-emerald-700">Nutritional Information</h2>
+                    
+                    {recipeData.NutritionInfo.success ? (
+                      <div className="bg-white/60 rounded-xl p-6 border border-emerald-50 shadow-sm">
+                        {recipeData.NutritionInfo.nutrition && Object.keys(recipeData.NutritionInfo.nutrition).length > 0 ? (
+                          <div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                              {Object.entries(recipeData.NutritionInfo.nutrition).map(([nutrientName, nutrientData]) => {
+                                if (nutrientData && typeof nutrientData === 'object' && nutrientData.amount !== undefined) {
+                                  const amount = typeof nutrientData.amount === 'number' 
+                                    ? nutrientData.amount.toFixed(1) 
+                                    : nutrientData.amount;
+                                  return (
+                                    <div key={nutrientName} className="text-center p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                                      <div className="text-sm font-medium text-emerald-700 capitalize">
+                                        {nutrientName.replace(/([A-Z])/g, ' $1').trim()}
+                                      </div>
+                                      <div className="text-lg font-bold text-emerald-800">
+                                        {amount} {nutrientData.unit || ''}
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              })}
+                            </div>
+                            {recipeData.NutritionInfo.per_serving && (
+                              <p className="text-sm text-gray-600 italic text-center">
+                                Values shown per serving
+                              </p>
+                            )}
+                            {recipeData.NutritionInfo.notes && (
+                              <p className="text-sm text-gray-600 italic text-center mt-2">
+                                {recipeData.NutritionInfo.notes}
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 text-center">No detailed nutritional data available</p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                        <p className="text-amber-800 text-center">
+                          {recipeData.NutritionInfo.error || 'Unable to retrieve nutritional information'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="my-8 pt-6 border-t border-emerald-100">
                   {isAuthenticated && currentUser ? (
                     <div className="flex flex-col items-center">

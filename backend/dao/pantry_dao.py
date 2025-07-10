@@ -1,5 +1,5 @@
-from ..db import db # For db.session and ORM utilities like joinedload
-from ..models import UserPantryIngredient, Ingredient # SQLAlchemy models
+from backend.db import db # For db.session and ORM utilities like joinedload
+from backend.models import UserPantryIngredient, Ingredient # SQLAlchemy models
 from .ingredient_dao import IngredientDAO # Assumed to be SQLAlchemy based
 
 class PantryDAO:

@@ -73,6 +73,17 @@ def update_user_password_route():
     success, response_data, status = user_service.change_password(user_id, old_password, new_password)
     return jsonify(response_data), status
 
+@user_bp.route('/user/nutritional-targets', methods=['PUT'])
+@jwt_required()
+def update_nutritional_targets_route():
+    actual_user_id = get_jwt_identity()
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Request body must be JSON"}), 400
+
+    success, response_data, status = user_service.update_nutritional_targets(actual_user_id, data)
+    return jsonify(response_data), status
+
 @user_bp.route('/verify-email/<token>', methods=['GET'])
 def verify_user_email(token):
     user_dict, error_dict, status_code = user_service.verify_email(token)

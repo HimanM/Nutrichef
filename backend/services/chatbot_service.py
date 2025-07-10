@@ -7,10 +7,11 @@ from backend.ai_models.chatbot.food_chatbot import FoodChatbot
 from backend.ai_models.food_classification.food_classifier import FoodClassifier
 from backend.services.food_lookup_service import FoodLookupService
 from backend.services.substitution_service import SubstitutionService
+from backend.utils.logging_utils import log_info, log_success, log_warning, log_error
 
 
 class ChatbotService:
-    def __init__(self, static_tmp_folder='static/tmp'):
+    def __init__(self, static_tmp_folder='instance/chatbot_temp_uploads'):
         """
         Initializes the ChatbotService.
         It instantiates FoodChatbot and its dependencies.
@@ -18,29 +19,29 @@ class ChatbotService:
         Args:
             static_tmp_folder (str): Path to the temporary folder for uploaded images.
         """
-        print("ChatbotService: Initializing dependencies...")
+        log_info("Initializing dependencies...", "ChatbotService")
         try:
             food_classifier = FoodClassifier()
-            print("ChatbotService: FoodClassifier instantiated.")
+            log_success("FoodClassifier instantiated.", "ChatbotService")
         except Exception as e:
-            print(f"ChatbotService: ERROR - Failed to instantiate FoodClassifier: {e}")
+            log_error(f"Failed to instantiate FoodClassifier: {e}", "ChatbotService")
             food_classifier = None
 
         try:
             food_lookup_service = FoodLookupService.get_instance()
-            print("ChatbotService: FoodLookupService instance obtained.")
+            log_success("FoodLookupService instance obtained.", "ChatbotService")
         except Exception as e:
-            print(f"ChatbotService: ERROR - Failed to get FoodLookupService instance: {e}")
+            log_error(f"Failed to get FoodLookupService instance: {e}", "ChatbotService")
             food_lookup_service = None
 
         try:
             substitution_service = SubstitutionService()
-            print("ChatbotService: SubstitutionService instantiated.")
+            log_success("SubstitutionService instantiated.", "ChatbotService")
         except Exception as e:
-            print(f"ChatbotService: ERROR - Failed to instantiate SubstitutionService: {e}")
+            log_error(f"Failed to instantiate SubstitutionService: {e}", "ChatbotService")
             substitution_service = None
 
-        print("ChatbotService: Initializing FoodChatbot with dependencies...")
+        log_info("Initializing FoodChatbot with dependencies...", "ChatbotService")
         self.chatbot_instance = FoodChatbot(
             food_classifier_instance=food_classifier,
             food_lookup_service_instance=food_lookup_service,
@@ -50,14 +51,14 @@ class ChatbotService:
         self.temp_image_folder = os.path.abspath(static_tmp_folder)
         if not os.path.exists(self.temp_image_folder):
             os.makedirs(self.temp_image_folder, exist_ok=True)
-            print(f"ChatbotService: Created temp image folder: {self.temp_image_folder}")
+            log_info(f"Created temp image folder: {self.temp_image_folder}", "ChatbotService")
         else:
-            print(f"ChatbotService: Using existing temp image folder: {self.temp_image_folder}")
+            log_info(f"Using existing temp image folder: {self.temp_image_folder}", "ChatbotService")
 
         if self.chatbot_instance.is_ready():
-            print("ChatbotService: FoodChatbot instance is ready and configured.")
+            log_success("FoodChatbot instance is ready and configured.", "ChatbotService")
         else:
-            print("ChatbotService: WARNING - FoodChatbot instance reported not ready after initialization. Functionality may be limited.")
+            log_warning("FoodChatbot instance reported not ready after initialization. Functionality may be limited.", "ChatbotService")
 
     def is_chatbot_ready(self):
         return self.chatbot_instance and self.chatbot_instance.is_ready()
@@ -88,9 +89,9 @@ class ChatbotService:
 
                 image_file_storage.save(image_path)
                 temp_file_to_delete = image_path
-                print(f"ChatbotService: Image saved temporarily to {image_path}")
+                log_info(f"Image saved temporarily to {image_path}", "ChatbotService")
             except Exception as e:
-                print(f"ChatbotService: Error saving temporary image: {e}")
+                log_error(f"Error saving temporary image: {e}", "ChatbotService")
                 return {"error": "Could not process the uploaded image. Please try again."}
 
         try:
@@ -99,9 +100,9 @@ class ChatbotService:
             if temp_file_to_delete and os.path.exists(temp_file_to_delete):
                 try:
                     os.remove(temp_file_to_delete)
-                    print(f"ChatbotService: Temporary image {temp_file_to_delete} deleted.")
+                    log_info(f"Temporary image {temp_file_to_delete} deleted.", "ChatbotService")
                 except Exception as e:
-                    print(f"ChatbotService: Error deleting temporary image {temp_file_to_delete}: {e}")
+                    log_error(f"Error deleting temporary image {temp_file_to_delete}: {e}", "ChatbotService")
 
         return response
 
@@ -120,25 +121,25 @@ class ChatbotService:
 
         try:
             if not self.chatbot_instance or not self.chatbot_instance.is_ready():
-                print("ChatbotService: get_nutrition_for_food_direct called but chatbot core not ready.")
+                log_warning("get_nutrition_for_food_direct called but chatbot core not ready.", "ChatbotService")
                 return {"error": "Chatbot core components are not ready."}
             if not self.chatbot_instance.food_lookup_service:
-                print("ChatbotService: get_nutrition_for_food_direct called but food_lookup_service not available.")
+                log_warning("get_nutrition_for_food_direct called but food_lookup_service not available.", "ChatbotService")
                 return {"error": "Food lookup service is not available within the chatbot."}
 
             nutrition_data_dict = self.chatbot_instance.food_lookup_service.lookup_food(food_name_str.strip(), is_exact_match=True)
 
             if nutrition_data_dict.get("error"):
-                print(f"ChatbotService: food_lookup_service reported error for '{food_name_str}': {nutrition_data_dict['error']}")
+                log_error(f"food_lookup_service reported error for '{food_name_str}': {nutrition_data_dict['error']}", "ChatbotService")
                 return {"response": f"Could not retrieve nutritional information for '{food_name_str}': {nutrition_data_dict['error']}"}
 
             if nutrition_data_dict.get("data") and nutrition_data_dict.get("food"):
                 formatted_nutrition_string = self.chatbot_instance._format_nutrition(nutrition_data_dict)
                 return {"response": f"Nutrition for {nutrition_data_dict['food']}: {formatted_nutrition_string}"}
 
-            print(f"ChatbotService: Unexpected data structure from food_lookup_service for '{food_name_str}': {nutrition_data_dict}")
+            log_warning(f"Unexpected data structure from food_lookup_service for '{food_name_str}': {nutrition_data_dict}", "ChatbotService")
             return {"response": f"Could not find specific nutritional details for '{food_name_str}' in the expected format."}
 
         except Exception as e:
-            print(f"ChatbotService: Exception in get_nutrition_for_food_direct for '{food_name_str}': {e}")
+            log_error(f"Exception in get_nutrition_for_food_direct for '{food_name_str}': {e}", "ChatbotService")
             return {"error": f"An unexpected error occurred while fetching nutrition data for {food_name_str}."}

@@ -14,6 +14,15 @@ class User(db.Model):
     EmailVerificationToken = db.Column(db.String(255), nullable=True)
     EmailVerificationTokenExpiresAt = db.Column(db.DateTime, nullable=True)
     IsEmailVerified = db.Column(db.Boolean, default=False, nullable=False)
+    
+    # Nutritional preferences
+    DailyCalories = db.Column(db.Integer, nullable=True)
+    DailyProtein = db.Column(db.Float, nullable=True)  # in grams
+    DailyCarbs = db.Column(db.Float, nullable=True)    # in grams
+    DailyFat = db.Column(db.Float, nullable=True)      # in grams
+    DailyFiber = db.Column(db.Float, nullable=True)    # in grams
+    DailySugar = db.Column(db.Float, nullable=True)    # in grams
+    DailySodium = db.Column(db.Float, nullable=True)   # in mg
 
     recipes = db.relationship('Recipe', backref='author', lazy=True, cascade="all, delete-orphan")
     classification_results = db.relationship('ClassificationResult', backref='user', lazy=True, cascade="all, delete-orphan")
@@ -31,6 +40,13 @@ class User(db.Model):
             'Email': self.Email,
             'DietaryPreferences': self.DietaryPreferences,
             'role': self.role,
-            'CreatedAt': self.CreatedAt.isoformat() if self.CreatedAt else None
+            'CreatedAt': self.CreatedAt.isoformat() if self.CreatedAt else None,
+            'DailyCalories': self.DailyCalories,
+            'DailyProtein': self.DailyProtein,
+            'DailyCarbs': self.DailyCarbs,
+            'DailyFat': self.DailyFat,
+            'DailyFiber': self.DailyFiber,
+            'DailySugar': self.DailySugar,
+            'DailySodium': self.DailySodium
         }
         return user_dict

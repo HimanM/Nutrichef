@@ -1,5 +1,5 @@
-from ..db import db # Import db for session management
-from ..dao import PantryDAO, RecipeDAO
+from backend.db import db # Import db for session management
+from backend.dao import PantryDAO, RecipeDAO
 # UserPantryIngredient model is not directly used here for instantiation by the service,
 # but its instances are returned by the DAO and then converted to dicts.
 
@@ -129,7 +129,7 @@ class PantryService:
             print(f"Error in PantryService.remove_ingredient: {e}")
             raise
 
-    def suggest_recipes(self, user_id, match_threshold=0.5, page=1, limit=10):
+    def suggest_recipes(self, user_id, match_threshold=0.5, page=1, limit=12):
         pantry_item_models = self.pantry_dao.get_pantry_by_user_id(user_id)
 
         if not pantry_item_models:

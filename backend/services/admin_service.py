@@ -1,5 +1,5 @@
-from ..dao import UserDAO, RecipeDAO, ClassificationResultDAO
-from ..db import db # For db.session.commit() and db.session.rollback()
+from backend.dao import UserDAO, RecipeDAO, ClassificationResultDAO
+from backend.db import db # For db.session.commit() and db.session.rollback()
 
 class AdminService:
     def __init__(self):

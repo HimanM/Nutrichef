@@ -1,5 +1,6 @@
 from ..db import db
 from datetime import datetime
+import json
 
 class Recipe(db.Model):
     __tablename__ = 'Recipes'
@@ -14,6 +15,7 @@ class Recipe(db.Model):
     Servings = db.Column(db.Integer, nullable=True)
     ImageURL = db.Column(db.String(2083), nullable=True)
     is_public = db.Column(db.Boolean, default=False, nullable=False)
+    NutritionInfoJSON = db.Column(db.JSON, nullable=True)
     CreatedAt = db.Column(db.DateTime, default=datetime.utcnow)
     UpdatedAt = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -26,6 +28,18 @@ class Recipe(db.Model):
         image_url = self.ImageURL
         if self.ImageURL and not (self.ImageURL.startswith('http://') or self.ImageURL.startswith('https://')):
             image_url = f"{self.ImageURL}"
+        
+        # Parse nutrition info
+        nutrition_info = None
+        if self.NutritionInfoJSON:
+            try:
+                if isinstance(self.NutritionInfoJSON, str):
+                    nutrition_info = json.loads(self.NutritionInfoJSON)
+                else:
+                    nutrition_info = self.NutritionInfoJSON
+            except (json.JSONDecodeError, TypeError):
+                nutrition_info = None
+        
         return {
             'RecipeID': self.RecipeID,
             'UserID': self.UserID,
@@ -38,6 +52,7 @@ class Recipe(db.Model):
             'Servings': self.Servings,
             'ImageURL': image_url,
             'is_public': self.is_public,
+            'NutritionInfo': nutrition_info,
             'CreatedAt': self.CreatedAt.isoformat() if self.CreatedAt else None,
             'UpdatedAt': self.UpdatedAt.isoformat() if self.UpdatedAt else None,
             'ingredients': [ri.to_dict() for ri in self.recipe_ingredients],
@@ -48,6 +63,18 @@ class Recipe(db.Model):
         image_url = self.ImageURL
         if self.ImageURL and not (self.ImageURL.startswith('http://') or self.ImageURL.startswith('https://')):
             image_url = f"{self.ImageURL}"
+        
+        # Parse nutrition info for summary
+        nutrition_info = None
+        if self.NutritionInfoJSON:
+            try:
+                if isinstance(self.NutritionInfoJSON, str):
+                    nutrition_info = json.loads(self.NutritionInfoJSON)
+                else:
+                    nutrition_info = self.NutritionInfoJSON
+            except (json.JSONDecodeError, TypeError):
+                nutrition_info = None
+        
         return {
             'RecipeID': self.RecipeID,
             'Title': self.Title,
@@ -58,6 +85,7 @@ class Recipe(db.Model):
             'CookingTimeMinutes': self.CookingTimeMinutes,
             'Servings': self.Servings,
             'is_public': self.is_public,
+            'NutritionInfo': nutrition_info,
             'CreatedAt': self.CreatedAt.isoformat() if self.CreatedAt else None,
             'average_rating': self.average_rating if hasattr(self, 'average_rating') else None
         }

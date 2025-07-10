@@ -1,5 +1,5 @@
-from ..models import RecipeRating # Import RecipeRating model using relative import
-from ..db import db # Import db instance using relative import
+from backend.models import RecipeRating # Import RecipeRating model using relative import
+from backend.db import db # Import db instance using relative import
 
 class RecipeRatingDAO:
     def add_rating(self, recipe_id, user_id, rating):

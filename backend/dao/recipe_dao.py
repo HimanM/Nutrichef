@@ -1,6 +1,6 @@
-from ..models import Recipe, RecipeIngredient, Ingredient, User, RecipeRating, UserAllergy # Import necessary models using relative import
-from ..models.ingredient import ingredient_allergies_association_table # Import for allergy filtering
-from ..db import db # Import db instance using relative import
+from backend.models import Recipe, RecipeIngredient, Ingredient, User, RecipeRating, UserAllergy # Import necessary models using relative import
+from backend.models.ingredient import ingredient_allergies_association_table # Import for allergy filtering
+from backend.db import db # Import db instance using relative import
 from sqlalchemy.orm import joinedload
 from sqlalchemy import func # Import func for aggregate functions
 
@@ -16,7 +16,7 @@ class RecipeDAO:
             recipe.average_rating = avg_rating
         return recipe
 
-    def get_all_recipes(self, page=1, limit=10, search_term=None, is_admin=False, sort_by=None, sort_order='asc'):
+    def get_all_recipes(self, page=1, limit=12, search_term=None, is_admin=False, sort_by=None, sort_order='asc'):
         sort_map = {
             'RecipeID': Recipe.RecipeID,
             'Title': Recipe.Title,
@@ -50,7 +50,7 @@ class RecipeDAO:
             
         return paginated_result
 
-    def get_public_recipes(self, page=1, limit=10, search_term=None):
+    def get_public_recipes(self, page=1, limit=12, search_term=None):
         query = Recipe.query.filter_by(is_public=True)
         if search_term:
             query = query.filter(Recipe.Title.ilike(f"%{search_term}%"))
@@ -64,7 +64,7 @@ class RecipeDAO:
             
         return paginated_result
 
-    def get_user_private_recipes(self, user_id, page=1, limit=10, search_term=None):
+    def get_user_private_recipes(self, user_id, page=1, limit=12, search_term=None):
         query = Recipe.query.filter_by(UserID=user_id, is_public=False)
         if search_term:
             query = query.filter(Recipe.Title.ilike(f"%{search_term}%"))
@@ -102,11 +102,12 @@ class RecipeDAO:
         return []
 
 
-    def create_recipe(self, user_id, title, description, instructions, prep_time, cook_time, servings, image_url, ingredients_data, is_public):
+    def create_recipe(self, user_id, title, description, instructions, prep_time, cook_time, servings, image_url, ingredients_data, is_public, nutrition_info=None):
         """
         Creates a new recipe and its associated RecipeIngredient entries.
         'ingredients_data' is a list of dictionaries, each like:
         { 'ingredient_model': <Ingredient instance>, 'quantity': '1', 'unit': 'cup' }
+        'nutrition_info' is optional nutritional information as a dictionary
         """
         new_recipe = Recipe(
             UserID=user_id,
@@ -117,7 +118,8 @@ class RecipeDAO:
             CookingTimeMinutes=cook_time,
             Servings=servings,
             ImageURL=image_url,
-            is_public=is_public
+            is_public=is_public,
+            NutritionInfoJSON=nutrition_info
         )
         db.session.add(new_recipe)
 
@@ -139,7 +141,7 @@ class RecipeDAO:
             return recipe
         return None
         
-    def get_personalized_recipes_for_user(self, user_id, page=1, limit=10):
+    def get_personalized_recipes_for_user(self, user_id, page=1, limit=12):
         """
         Retrieves paginated recipes personalized for a user by filtering out
         recipes containing ingredients they are allergic to.
