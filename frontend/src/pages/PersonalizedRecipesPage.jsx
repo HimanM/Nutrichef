@@ -109,7 +109,7 @@ function PersonalizedRecipesPage() {
             <div className="section-padding">
                 <div className="container-modern">
                     {/* Header */}
-                    <div className="text-center mb-8 animate-fade-in">
+                    <div className="text-center mb-12 animate-fade-in">
                         <h1 className="text-4xl md:text-5xl font-bold mb-4">
                             <span className="gradient-text">Personalized Recipes</span>
                         </h1>
@@ -118,111 +118,107 @@ function PersonalizedRecipesPage() {
                         </p>
                     </div>
 
+                    {/* Summary Section */}
+                    <div className="card-glass p-6 mb-8 animate-fade-in">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="text-xl font-semibold">Your Personalized Recommendations</h2>
+                                <p className="text-gray-600 text-sm">Based on your preferences</p>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-2xl font-bold text-emerald-600">{totalRecipes}</div>
+                                <div className="text-gray-600 text-sm">Total Recipes</div>
+                            </div>
+                        </div>
+                    </div>
+
                     {error && (
                         <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm animate-fade-in">
                             {error}
                         </div>
                     )}
 
-                    {/* Main Content Area */}
-                    <div className="bg-white/80 backdrop-blur-xl shadow-xl rounded-3xl border border-emerald-100 overflow-hidden">
-                        {/* Content Header */}
-                        <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h2 className="text-xl font-semibold">Your Personalized Recommendations</h2>
-                                    <p className="text-emerald-100 text-sm">Based on your preferences</p>
+                    {/* Loading State for initial load */}
+                    {isLoading && recipes.length === 0 && (
+                        <div className="flex flex-col items-center justify-center min-h-[40vh]">
+                            <HiOutlineRefresh className="animate-spin h-12 w-12 text-emerald-500 mb-4" />
+                            <p className="text-gray-600 text-lg">Loading your personalized recipes...</p>
+                        </div>
+                    )}
+
+                    {/* Recipes Grid */}
+                    <div className="min-h-[50vh]">
+                        {!isLoading && recipes.length === 0 ? (
+                            <div className="text-center py-12">
+                                <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
                                 </div>
-                                <div className="text-right">
-                                    <div className="text-2xl font-bold">{totalRecipes}</div>
-                                    <div className="text-emerald-100 text-sm">Total Recipes</div>
-                                </div>
+                                <h3 className="text-xl font-semibold text-gray-800 mb-2">No Recipes Found</h3>
+                                <p className="text-gray-600 max-w-md mx-auto">
+                                    {(totalRecipes > 0 && recipes.length === 0)
+                                        ? "No personalized recipes on this page. Try a different page."
+                                        : "No personalized recipes found. This could be based on your preferences, allergies, or available pantry items. Try exploring all recipes or adjusting your settings."
+                                    }
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {recipes.map((recipe) => (
+                                    <div key={recipe.RecipeID} className="animate-fade-in">
+                                        <RecipeCard recipe={recipe} />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    
+                    {/* Loading indicator for pagination */}
+                    {isLoading && recipes.length > 0 && (
+                        <div className="flex justify-center items-center py-8">
+                            <HiOutlineRefresh className="animate-spin h-8 w-8 text-emerald-500" />
+                        </div>
+                    )}
+
+                    {/* Pagination */}
+                    {totalRecipes > 0 && !isLoading && recipes.length > 0 && (
+                        <div className="mt-12 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                            <div className="flex items-center space-x-2">
+                                <button
+                                    onClick={handlePreviousPage}
+                                    disabled={currentPage === 1}
+                                    className="btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Previous
+                                </button>
+                                <span className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg">
+                                    Page {currentPage} of {Math.ceil(totalRecipes / recipesPerPage)}
+                                </span>
+                                <button
+                                    onClick={handleNextPage}
+                                    disabled={currentPage * recipesPerPage >= totalRecipes}
+                                    className="btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <label htmlFor="recipesPerPageSelect" className="text-sm text-gray-600">Show:</label>
+                                <select
+                                    id="recipesPerPageSelect"
+                                    value={recipesPerPage}
+                                    onChange={handleRecipesPerPageChange}
+                                    className="form-input px-3 py-1.5 text-sm w-20"
+                                >
+                                    <option value={12}>12</option>
+                                    <option value={24}>24</option>
+                                    <option value={36}>36</option>
+                                </select>
+                                <span className="text-sm text-gray-600">per page</span>
                             </div>
                         </div>
-
-                        {/* Recipes Grid */}
-                        <div className="p-6">
-                            {isLoading && recipes.length === 0 && (
-                                <div className="flex flex-col items-center justify-center py-16">
-                                    <HiOutlineRefresh className="animate-spin h-12 w-12 text-emerald-500 mb-4" />
-                                    <p className="text-gray-600 text-lg">Loading your personalized recipes...</p>
-                                </div>
-                            )}
-
-                            {recipes.length > 0 && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                                    {recipes.map((recipe) => (
-                                        <div key={recipe.RecipeID} className="animate-fade-in">
-                                            <RecipeCard recipe={recipe} />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                            
-                            {isLoading && recipes.length > 0 && (
-                                <div className="flex justify-center items-center py-8">
-                                    <HiOutlineRefresh className="animate-spin h-8 w-8 text-emerald-500" />
-                                </div>
-                            )}
-
-                            {!isLoading && !error && recipes.length === 0 && (
-                                <div className="text-center py-16">
-                                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                    </div>
-                                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No Recipes Found</h3>
-                                    <p className="text-gray-600 max-w-md mx-auto">
-                                        {(totalRecipes > 0 && recipes.length === 0)
-                                            ? "No personalized recipes on this page. Try a different page."
-                                            : "No personalized recipes found. This could be based on your preferences, allergies, or available pantry items. Try exploring all recipes or adjusting your settings."
-                                        }
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Pagination */}
-                            {totalRecipes > 0 && recipes.length > 0 && ( 
-                                <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 pt-6 border-t border-gray-100">
-                                    <div className="flex items-center space-x-2">
-                                        <label htmlFor="recipesPerPageSelect" className="text-sm text-gray-600">Show:</label>
-                                        <select
-                                            id="recipesPerPageSelect"
-                                            value={recipesPerPage}
-                                            onChange={handleRecipesPerPageChange}
-                                            className="px-3 py-1.5 border border-gray-200 bg-white text-gray-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
-                                        >
-                                            <option value={12}>12</option>
-                                            <option value={24}>24</option>
-                                            <option value={36}>36</option>
-                                        </select>
-                                        <span className="text-sm text-gray-600">per page</span>
-                                    </div>
-                                    
-                                    <div className="flex items-center space-x-3">
-                                        <button 
-                                            onClick={handlePreviousPage} 
-                                            disabled={currentPage === 1} 
-                                            className="btn-outline px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
-                                        >
-                                            Previous
-                                        </button>
-                                        <span className="px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-200">
-                                            Page {currentPage} of {Math.ceil(totalRecipes / recipesPerPage)}
-                                        </span>
-                                        <button 
-                                            onClick={handleNextPage} 
-                                            disabled={currentPage * recipesPerPage >= totalRecipes} 
-                                            className="btn-outline px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
-                                        >
-                                            Next
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>
