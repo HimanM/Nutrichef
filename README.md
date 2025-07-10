@@ -73,8 +73,8 @@ NutriChef is a comprehensive web application designed to help users manage recip
         
     *   **Ingredient Substitution:** Find suitable substitutes for ingredients.
     *   **NLP Recipe Parser:** Input recipe text to have it automatically parsed into structured data (ingredients, steps).
-*   **(Planned/Partial) Meal Planner:** Interface for organizing recipes into a meal plan.
-*   **(Planned/Partial) Shopping Basket:** Interface for managing a shopping list.
+*   **Meal Planner:** Interface for organizing recipes into a meal plan.
+*   **Shopping Basket:** Interface for managing a shopping list.
 
 **For Administrators:**
 
@@ -130,7 +130,7 @@ NutriChef is a comprehensive web application designed to help users manage recip
 *   **Allergy Analysis**
 *   **Food & Ingredient Classification (Image-based):**
     *   The core models are integrated within the `backend/ai_models/` directory.
-    *   An example notebook and further details on a similar food classification approach can be found here: [Food Classification Notebook (TF)](https://github.com/HimanM/Classification-Models-for-NutriChef.git)
+    *   Notebooks and further details on classification approach can be found here: [Food Classification Notebook (TF)](https://github.com/HimanM/Classification-Models-for-NutriChef.git)
 *   **Natural Language Processing (Recipe Text Parsing)**
 *   **Nutrition Lookup**
 *   **Ingredient Substitution Recommendation**
