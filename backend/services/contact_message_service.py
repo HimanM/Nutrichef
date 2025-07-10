@@ -1,5 +1,5 @@
-from ..dao import ContactMessageDAO
-from ..db import db
+from backend.dao import ContactMessageDAO
+from backend.db import db
 from sqlalchemy.exc import SQLAlchemyError
 
 class ContactMessageService:

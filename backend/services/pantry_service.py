@@ -1,5 +1,5 @@
-from ..db import db # Import db for session management
-from ..dao import PantryDAO, RecipeDAO
+from backend.db import db # Import db for session management
+from backend.dao import PantryDAO, RecipeDAO
 # UserPantryIngredient model is not directly used here for instantiation by the service,
 # but its instances are returned by the DAO and then converted to dicts.
 

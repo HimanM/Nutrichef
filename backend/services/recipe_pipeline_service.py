@@ -1,10 +1,10 @@
-from ..dao.recipe_dao import RecipeDAO
-from ..dao.ingredient_dao import IngredientDAO
-from ..ai_models.gemini_nlp.gemini_nlp_parser import GeminiNlpParser
-from ..ai_models.allergy_analyzer.allergy_analyzer import AllergyAnalyzer
-from ..db import db # For transaction management (db.session)
-from ..models.ingredient import Ingredient # For type checking if needed
-from ..models.recipe import Recipe # For type checking if needed
+from backend.dao.recipe_dao import RecipeDAO
+from backend.dao.ingredient_dao import IngredientDAO
+from backend.ai_models.gemini_nlp.gemini_nlp_parser import GeminiNlpParser
+from backend.ai_models.allergy_analyzer.allergy_analyzer import AllergyAnalyzer
+from backend.db import db # For transaction management (db.session)
+from backend.models.ingredient import Ingredient # For type checking if needed
+from backend.models.recipe import Recipe # For type checking if needed
 import json
 
 class RecipePipelineService:

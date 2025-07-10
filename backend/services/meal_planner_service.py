@@ -1,5 +1,5 @@
-from ..dao.meal_planner_dao import MealPlannerDAO
-from ..db import db
+from backend.dao.meal_planner_dao import MealPlannerDAO
+from backend.db import db
 from sqlalchemy.exc import SQLAlchemyError
 import json
 

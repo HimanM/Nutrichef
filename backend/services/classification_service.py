@@ -4,8 +4,8 @@ from werkzeug.utils import secure_filename
 from backend.ai_models.ingredient_classification.ingredient_classifier import FoodIngredientClassifier
 from backend.ai_models.food_classification.food_classifier import FoodClassifier
 import json
-from ..dao import ClassificationResultDAO
-from ..db import db
+from backend.dao import ClassificationResultDAO
+from backend.db import db
 from backend.services.nutrition_service import NutritionService
 from backend.utils.logging_utils import log_info, log_warning, log_error
 
