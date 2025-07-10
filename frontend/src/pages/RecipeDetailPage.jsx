@@ -387,7 +387,7 @@ function RecipeDetailPage() {
             {/* Ingredients - GRID */}
             <div className="mb-10">
               <h2 className="text-xl font-semibold mb-3 text-emerald-700">Ingredients {allergiesLoading && <InlineSpinner />}</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
                 {(recipeData.ingredients || []).map((ing, index) => {
                   const currentIngredient = recipeData.ingredients[index];
                   const hasActiveSubstitute = currentIngredient && currentIngredient.selectedSubstitute;
@@ -396,17 +396,19 @@ function RecipeDetailPage() {
                   return (
                     <div key={currentIngredient.RecipeIngredientID || currentIngredient.IngredientID || index} className="bg-white/80 border border-emerald-100 rounded-xl p-4 shadow flex flex-col h-full">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-bold text-emerald-900 text-left">
-                          {ing.IngredientName}
-                          {hasActiveSubstitute && <span className="text-xs text-gray-400 italic ml-1">(Sub: {currentIngredient.originalName})</span>}
-                        </span>
-                        <span className="text-sm text-gray-500 text-right ml-2 whitespace-nowrap">
-                          {ing.Quantity || ''} {ing.Unit || ''}
-                        </span>
+                        <div className="flex items-center gap-1">
+                          <span className="font-bold text-emerald-900">
+                            {ing.IngredientName}
+                            {hasActiveSubstitute && <span className="text-xs text-gray-400 italic ml-1">(Sub: {currentIngredient.originalName})</span>}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {ing.Quantity || ''} {ing.Unit || ''}
+                          </span>
+                        </div>
                         <button
                           onClick={() => hasActiveSubstitute ? handleRevertSubstitute(index) : handleFetchSubstitutes(nameToFetchSubstitutesFor, index)}
                           disabled={substituteLoading[index]}
-                          className="ml-2 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-300 rounded-lg hover:bg-emerald-50 transition disabled:opacity-50 whitespace-nowrap"
+                          className="px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-300 rounded-lg hover:bg-emerald-50 transition disabled:opacity-50 whitespace-nowrap"
                         >
                           {substituteLoading[index] ? <InlineSpinner /> : (hasActiveSubstitute ? 'Revert' : 'Substitutes')}
                         </button>
