@@ -341,10 +341,10 @@ function RecipeDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
+      {/* Title and Description OUTSIDE main container */}
       <div className="section-padding">
         <div className="container-modern">
-          {/* Header */}
-          <div className="text-center mb-12 animate-fade-in">
+          <div className="text-center mb-8 animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               <span className="gradient-text">{recipeData.Title}</span>
             </h1>
@@ -352,219 +352,206 @@ function RecipeDetailPage() {
               {recipeData.Description || 'A delicious recipe for you to try'}
             </p>
           </div>
+
+          {/* Main Card Container */}
           <div className="max-w-4xl mx-auto mb-8 p-4 sm:p-8 rounded-3xl bg-white/70 shadow-xl backdrop-blur-md border border-emerald-100">
-              {recipeData.ImageURL && (
-                <div className="w-full h-72 sm:h-96 bg-gradient-to-br from-emerald-50 to-blue-50 flex justify-center items-center overflow-hidden">
-                  <img src={recipeData.ImageURL} alt={recipeData.Title} className="w-full h-full object-contain" />
-                </div>
-              )}
-              <div className="p-6 sm:p-10">
-                <h1 className="text-3xl sm:text-4xl mb-4 text-center font-bold text-emerald-700 drop-shadow">{recipeData.Title}</h1>
-                {recipeData.average_rating !== undefined && recipeData.average_rating > 0 ? (
-                    <div className="flex flex-col items-center mb-4">
-                      <StarRating rating={recipeData.average_rating} interactive={false} size="text-3xl" />
-                      <span className="ml-2 mt-1 text-gray-500">({recipeData.average_rating.toFixed(1)} average from users)</span>
+            {/* Image */}
+            {recipeData.ImageURL && (
+              <div className="w-full h-72 sm:h-96 bg-gradient-to-br from-emerald-50 to-blue-50 flex justify-center items-center overflow-hidden mb-8">
+                <img src={recipeData.ImageURL} alt={recipeData.Title} className="w-full h-full object-contain" />
+              </div>
+            )}
+
+            {/* Public Average Rating - below image */}
+            {recipeData.average_rating !== undefined && recipeData.average_rating > 0 ? (
+              <div className="flex flex-col items-center mb-6">
+                <StarRating rating={recipeData.average_rating} interactive={false} size="text-3xl" />
+                <span className="ml-2 mt-1 text-gray-500">({recipeData.average_rating.toFixed(1)} average from users)</span>
+              </div>
+            ) : (
+              <p className="text-gray-400 mb-6 text-center">This recipe has not been rated yet.</p>
+            )}
+
+            {/* Instructions - FULL WIDTH */}
+            <div className="mb-10">
+              <h2 className="text-xl font-semibold mb-3 text-emerald-700">Instructions</h2>
+              {typeof recipeData.Instructions === 'string' ?
+                renderInstructions(recipeData.Instructions) :
+                (Array.isArray(recipeData.Instructions) ?
+                  recipeData.Instructions.map((step, index) => (
+                    <p key={index} className="mb-2 text-gray-700 leading-relaxed whitespace-pre-line bg-white/60 rounded-xl p-3 border border-emerald-50 shadow-sm"><span className="font-semibold text-emerald-700">{index + 1}.</span> {step}</p>
+                  )) : <p className="text-gray-400">No instructions provided.</p>)
+              }
+            </div>
+
+            {/* Ingredients - GRID */}
+            <div className="mb-10">
+              <h2 className="text-xl font-semibold mb-3 text-emerald-700">Ingredients {allergiesLoading && <InlineSpinner />}</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {(recipeData.ingredients || []).map((ing, index) => {
+                  const currentIngredient = recipeData.ingredients[index];
+                  const hasActiveSubstitute = currentIngredient && currentIngredient.selectedSubstitute;
+                  const nameToFetchSubstitutesFor = currentIngredient.originalName;
+                  const ingredientAllergies = ingredientsAllergyMap[ing.IngredientID] || [];
+                  return (
+                    <div key={currentIngredient.RecipeIngredientID || currentIngredient.IngredientID || index} className="bg-white/80 border border-emerald-100 rounded-xl p-4 shadow flex flex-col h-full">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-bold text-emerald-900 text-left">
+                          {ing.IngredientName}
+                          {hasActiveSubstitute && <span className="text-xs text-gray-400 italic ml-1">(Sub: {currentIngredient.originalName})</span>}
+                        </span>
+                        <span className="text-sm text-gray-500 text-right ml-2 whitespace-nowrap">
+                          {ing.Quantity || ''} {ing.Unit || ''}
+                        </span>
+                        <button
+                          onClick={() => hasActiveSubstitute ? handleRevertSubstitute(index) : handleFetchSubstitutes(nameToFetchSubstitutesFor, index)}
+                          disabled={substituteLoading[index]}
+                          className="ml-2 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-300 rounded-lg hover:bg-emerald-50 transition disabled:opacity-50 whitespace-nowrap"
+                        >
+                          {substituteLoading[index] ? <InlineSpinner /> : (hasActiveSubstitute ? 'Revert' : 'Substitutes')}
+                        </button>
+                      </div>
+                      {ingredientAllergies.length > 0 && (
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          <span className="text-xs italic text-red-500 mr-1">Allergies:</span>
+                          {ingredientAllergies.map(allergy => (
+                            <span key={allergy.id} className="px-1.5 py-0.5 text-xs bg-red-100 text-red-700 rounded-full border border-red-200">{allergy.name}</span>
+                          ))}
+                        </div>
+                      )}
+                      {substituteLoading[index] && <div className="mt-1 text-center"><InlineSpinner /></div>}
+                      {substituteError[index] && !substituteLoading[index] && (
+                        <div className="mt-1 p-1.5 text-xs bg-amber-100 text-amber-800 border border-amber-200 rounded-md">
+                          {substituteError[index]}
+                          <button onClick={() => setSubstituteError(prev => ({...prev, [index]: null}))} className="ml-1 text-amber-700 font-bold">x</button>
+                        </div>
+                      )}
+                      {!substituteLoading[index] && !substituteError[index] && substituteSuggestions[index] && substituteSuggestions[index].length > 0 && (
+                        <div className="mt-1">
+                          <select
+                            value={currentIngredient.selectedSubstitute || ""}
+                            onChange={(e) => {
+                              const selectedSubName = e.target.value;
+                              if (selectedSubName) handleSubstituteSelected(currentIngredient.originalName, selectedSubName, index);
+                            }}
+                            className="w-full p-1.5 bg-white border border-emerald-100 text-emerald-700 rounded-md text-xs focus:ring-emerald-400 focus:border-emerald-400"
+                          >
+                            <option value="" disabled>Choose substitute...</option>
+                            {substituteSuggestions[index].map((sub) => (
+                              <option key={sub.name || sub} value={sub.name || sub}>{sub.name || sub}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <p className="text-gray-400 mb-4 text-center">This recipe has not been rated yet.</p>
-                  )}
+                  );
+                })}
+              </div>
+            </div>
 
-                <div className="flex justify-center items-center space-x-4 mb-6 text-sm text-gray-500">
-                  {recipeData.PreparationTimeMinutes && <span>Prep: <span className="font-medium text-emerald-700">{recipeData.PreparationTimeMinutes} min</span></span>}
-                  {recipeData.CookingTimeMinutes && <span>Cook: <span className="font-medium text-emerald-700">{recipeData.CookingTimeMinutes} min</span></span>}
-                  {recipeData.Servings && <span>Servings: <span className="font-medium text-emerald-700">{recipeData.Servings}</span></span>}
-                  
-                </div>
-
-                {recipeData.Description && (
-                  <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-2 text-emerald-700">Description</h2>
-                    <p className="text-gray-600 italic whitespace-pre-line leading-relaxed bg-white/60 rounded-xl p-4 border border-emerald-50 shadow-sm">{recipeData.Description}</p>
-                  </div>
-                )}
-
-                {isAuthenticated && currentUser && recipeData && currentUser.UserID === recipeData.UserID && (
-                  <div className="mt-3 pb-6 border-b border-emerald-100">
-                    <button
-                      onClick={handleTogglePublicStatus}
-                      className="btn-primary px-6 py-2 text-sm font-semibold rounded-lg shadow-md"
-                    >
-                      {recipeData.is_public ? 'Make Private' : 'Make Public'}
-                    </button>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                  <div className="md:col-span-1">
-                    <h2 className="text-xl font-semibold mb-3 text-emerald-700">Ingredients {allergiesLoading && <InlineSpinner />}</h2>
-                    <ul className="space-y-2 text-gray-700"> 
-                      {(recipeData.ingredients || []).map((ing, index) => {
-                        const currentIngredient = recipeData.ingredients[index];
-                        const hasActiveSubstitute = currentIngredient && currentIngredient.selectedSubstitute;
-                        const nameToFetchSubstitutesFor = currentIngredient.originalName;
-                        const ingredientAllergies = ingredientsAllergyMap[ing.IngredientID] || [];
-
-                        return (
-                          <li key={currentIngredient.RecipeIngredientID || currentIngredient.IngredientID || index} className="py-2 border-b border-emerald-100 last:border-b-0">
-                            <div className="flex flex-col">
-                              <div className="flex justify-between items-center">
-                                  <span className="font-medium">
-                                      {ing.Quantity || ''} {ing.Unit || ''} {ing.IngredientName}
-                                      {hasActiveSubstitute && <span className="text-xs text-gray-400 italic ml-1">(Sub: {currentIngredient.originalName})</span>}
-                                  </span>
-                                  <button
-                                      onClick={() => hasActiveSubstitute ? handleRevertSubstitute(index) : handleFetchSubstitutes(nameToFetchSubstitutesFor, index)}
-                                      disabled={substituteLoading[index]}
-                                      className="ml-2 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-300 rounded-lg hover:bg-emerald-50 transition disabled:opacity-50 whitespace-nowrap"
-                                  >
-                                      {substituteLoading[index] ? <InlineSpinner /> : (hasActiveSubstitute ? 'Revert' : 'Substitutes')}
-                                  </button>
-                              </div>
-
-                              {ingredientAllergies.length > 0 && (
-                                  <div className="mt-1 flex flex-wrap gap-1">
-                                      <span className="text-xs italic text-red-500 mr-1">Allergies:</span>
-                                      {ingredientAllergies.map(allergy => (
-                                          <span key={allergy.id} className="px-1.5 py-0.5 text-xs bg-red-100 text-red-700 rounded-full border border-red-200">{allergy.name}</span>
-                                      ))}
+            {/* Nutritional Information Section */}
+            {recipeData.NutritionInfo && (
+              <div className="mb-8 pt-6 border-t border-emerald-100">
+                <h2 className="text-xl font-semibold mb-4 text-emerald-700">Nutritional Information</h2>
+                {recipeData.NutritionInfo.success ? (
+                  <div className="bg-white/60 rounded-xl p-6 border border-emerald-50 shadow-sm">
+                    {recipeData.NutritionInfo.nutrition && Object.keys(recipeData.NutritionInfo.nutrition).length > 0 ? (
+                      <div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                          {Object.entries(recipeData.NutritionInfo.nutrition).map(([nutrientName, nutrientData]) => {
+                            if (nutrientData && typeof nutrientData === 'object' && nutrientData.amount !== undefined) {
+                              const amount = typeof nutrientData.amount === 'number' 
+                                ? nutrientData.amount.toFixed(1) 
+                                : nutrientData.amount;
+                              return (
+                                <div key={nutrientName} className="text-center p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                                  <div className="text-sm font-medium text-emerald-700 capitalize">
+                                    {nutrientName.replace(/([A-Z])/g, ' $1').trim()}
                                   </div>
-                              )}
-
-                              {substituteLoading[index] && <div className="mt-1 text-center"><InlineSpinner /></div>}
-                              {substituteError[index] && !substituteLoading[index] && (
-                                <div className="mt-1 p-1.5 text-xs bg-amber-100 text-amber-800 border border-amber-200 rounded-md">
-                                  {substituteError[index]}
-                                  <button onClick={() => setSubstituteError(prev => ({...prev, [index]: null}))} className="ml-1 text-amber-700 font-bold">x</button>
+                                  <div className="text-lg font-bold text-emerald-800">
+                                    {amount} {nutrientData.unit || ''}
+                                  </div>
                                 </div>
-                              )}
-                              {!substituteLoading[index] && !substituteError[index] && substituteSuggestions[index] && substituteSuggestions[index].length > 0 && (
-                                <div className="mt-1">
-                                  <select
-                                    value={currentIngredient.selectedSubstitute || ""}
-                                    onChange={(e) => {
-                                      const selectedSubName = e.target.value;
-                                      if (selectedSubName) handleSubstituteSelected(currentIngredient.originalName, selectedSubName, index);
-                                    }}
-                                    className="w-full p-1.5 bg-white border border-emerald-100 text-emerald-700 rounded-md text-xs focus:ring-emerald-400 focus:border-emerald-400"
-                                  >
-                                    <option value="" disabled>Choose substitute...</option>
-                                    {substituteSuggestions[index].map((sub) => (
-                                      <option key={sub.name || sub} value={sub.name || sub}>{sub.name || sub}</option>
-                                    ))}
-                                  </select>
-                                </div>
-                              )}
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <h2 className="text-xl font-semibold mb-3 text-emerald-700">Instructions</h2>
-                    {typeof recipeData.Instructions === 'string' ?
-                      renderInstructions(recipeData.Instructions) :
-                      (Array.isArray(recipeData.Instructions) ?
-                        recipeData.Instructions.map((step, index) => (
-                          <p key={index} className="mb-2 text-gray-700 leading-relaxed whitespace-pre-line bg-white/60 rounded-xl p-3 border border-emerald-50 shadow-sm"><span className="font-semibold text-emerald-700">{index + 1}.</span> {step}</p>
-                        )) : <p className="text-gray-400">No instructions provided.</p>)
-                    }
-                  </div>
-                </div>
-
-                {/* Nutritional Information Section */}
-                {recipeData.NutritionInfo && (
-                  <div className="mb-8 pt-6 border-t border-emerald-100">
-                    <h2 className="text-xl font-semibold mb-4 text-emerald-700">Nutritional Information</h2>
-                    
-                    {recipeData.NutritionInfo.success ? (
-                      <div className="bg-white/60 rounded-xl p-6 border border-emerald-50 shadow-sm">
-                        {recipeData.NutritionInfo.nutrition && Object.keys(recipeData.NutritionInfo.nutrition).length > 0 ? (
-                          <div>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                              {Object.entries(recipeData.NutritionInfo.nutrition).map(([nutrientName, nutrientData]) => {
-                                if (nutrientData && typeof nutrientData === 'object' && nutrientData.amount !== undefined) {
-                                  const amount = typeof nutrientData.amount === 'number' 
-                                    ? nutrientData.amount.toFixed(1) 
-                                    : nutrientData.amount;
-                                  return (
-                                    <div key={nutrientName} className="text-center p-3 bg-emerald-50 rounded-lg border border-emerald-100">
-                                      <div className="text-sm font-medium text-emerald-700 capitalize">
-                                        {nutrientName.replace(/([A-Z])/g, ' $1').trim()}
-                                      </div>
-                                      <div className="text-lg font-bold text-emerald-800">
-                                        {amount} {nutrientData.unit || ''}
-                                      </div>
-                                    </div>
-                                  );
-                                }
-                                return null;
-                              })}
-                            </div>
-                            {recipeData.NutritionInfo.per_serving && (
-                              <p className="text-sm text-gray-600 italic text-center">
-                                Values shown per serving
-                              </p>
-                            )}
-                            {recipeData.NutritionInfo.notes && (
-                              <p className="text-sm text-gray-600 italic text-center mt-2">
-                                {recipeData.NutritionInfo.notes}
-                              </p>
-                            )}
-                          </div>
-                        ) : (
-                          <p className="text-gray-500 text-center">No detailed nutritional data available</p>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
+                        {recipeData.NutritionInfo.per_serving && (
+                          <p className="text-sm text-gray-600 italic text-center">
+                            Values shown per serving
+                          </p>
+                        )}
+                        {recipeData.NutritionInfo.notes && (
+                          <p className="text-sm text-gray-600 italic text-center mt-2">
+                            {recipeData.NutritionInfo.notes}
+                          </p>
                         )}
                       </div>
                     ) : (
-                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                        <p className="text-amber-800 text-center">
-                          {recipeData.NutritionInfo.error || 'Unable to retrieve nutritional information'}
-                        </p>
-                      </div>
+                      <p className="text-gray-500 text-center">No detailed nutritional data available</p>
                     )}
                   </div>
+                ) : (
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                    <p className="text-amber-800 text-center">
+                      {recipeData.NutritionInfo.error || 'Unable to retrieve nutritional information'}
+                    </p>
+                  </div>
                 )}
-
-                <div className="my-8 pt-6 border-t border-emerald-100">
-                  {isAuthenticated && currentUser ? (
-                    <div className="flex flex-col items-center">
-                      <p className="text-gray-600 mb-2 text-lg">Your rating:</p>
-                      <StarRating rating={userRating || 0} onRate={handleRateRecipe} interactive={!isRatingSubmitting} size="text-4xl" />
-                      {isRatingSubmitting && <p className="text-sm text-blue-400 mt-2">Submitting rating...</p>}
-                      {ratingError && <p className="text-sm text-red-400 mt-2">{ratingError}</p>}
-                    </div>
-                  ) : (
-                    <div className="mt-4 text-center">
-                      <p className="text-gray-400">
-                        <button
-                          onClick={() => navigate('/login', { state: { from: location } })}
-                          className="text-emerald-600 hover:underline"
-                        >
-                          Log in
-                        </button> to rate this recipe.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-8 pt-6 border-t border-emerald-100 text-center">
-                  <button
-                    onClick={handleAddToBasket}
-                    disabled={!recipeData || !recipeData.ingredients || recipeData.ingredients.length === 0}
-                    className="btn-primary px-8 py-3 text-base font-semibold rounded-lg shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:opacity-75 disabled:cursor-not-allowed disabled:transform-none"
-                  >
-                    Add All Ingredients to Basket
-                  </button>
-                  {basketMessage && <p className="mt-3 text-sm text-emerald-600">{basketMessage}</p>}
-                </div>
               </div>
-            
+            )}
+
+            {/* Ratings Section */}
+            <div className="my-8 pt-6 border-t border-emerald-100">
+              {isAuthenticated && currentUser ? (
+                <div className="flex flex-col items-center">
+                  <p className="text-gray-600 mb-2 text-lg">Your rating:</p>
+                  <StarRating rating={userRating || 0} onRate={handleRateRecipe} interactive={!isRatingSubmitting} size="text-4xl" />
+                  {isRatingSubmitting && <p className="text-sm text-blue-400 mt-2">Submitting rating...</p>}
+                  {ratingError && <p className="text-sm text-red-400 mt-2">{ratingError}</p>}
+                </div>
+              ) : (
+                <div className="mt-4 text-center">
+                  <p className="text-gray-400">
+                    <button
+                      onClick={() => navigate('/login', { state: { from: location } })}
+                      className="text-emerald-600 hover:underline"
+                    >
+                      Log in
+                    </button> to rate this recipe.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Add to Basket Button */}
+            <div className="mt-8 pt-6 border-t border-emerald-100 text-center">
+              <button
+                onClick={handleAddToBasket}
+                disabled={!recipeData || !recipeData.ingredients || recipeData.ingredients.length === 0}
+                className="btn-primary px-8 py-3 text-base font-semibold rounded-lg shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:opacity-75 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                Add All Ingredients to Basket
+              </button>
+              {basketMessage && <p className="mt-3 text-sm text-emerald-600">{basketMessage}</p>}
+            </div>
+
+            {/* Toggle Public/Private for Owner */}
+            {isAuthenticated && currentUser && recipeData && currentUser.UserID === recipeData.UserID && (
+              <div className="mt-8 pb-6 border-b border-emerald-100 text-center">
+                <button
+                  onClick={handleTogglePublicStatus}
+                  className="btn-primary px-6 py-2 text-sm font-semibold rounded-lg shadow-md"
+                >
+                  {recipeData.is_public ? 'Make Private' : 'Make Public'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
-      
+      {/* Modals */}
       <InteractiveModal
         isOpen={modalState.isOpen}
         onClose={() => setModalState({ ...modalState, isOpen: false })}

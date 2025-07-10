@@ -246,7 +246,7 @@ function PantryPage() {
                                             <th className="px-4 py-2 text-left text-emerald-700 font-semibold">Ingredient</th>
                                             <th className="px-4 py-2 text-left text-emerald-700 font-semibold">Quantity</th>
                                             <th className="px-4 py-2 text-left text-emerald-700 font-semibold">Unit</th>
-                                            <th className="px-4 py-2 text-left text-emerald-700 font-semibold">Actions</th>
+                                            <th className="px-4 py-2 text-right text-emerald-700 font-semibold">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -267,18 +267,28 @@ function PantryPage() {
                                                         item.Unit
                                                     )}
                                                 </td>
-                                                <td className="px-4 py-2">
-                                                    {editingItemId === item.UserPantryIngredientID ? (
-                                                        <>
-                                                            <button onClick={() => handleUpdateItem(item.UserPantryIngredientID)} className="btn-primary px-3 py-1 rounded-lg font-semibold mr-2">Save</button>
-                                                            <button onClick={cancelEdit} className="btn-secondary px-3 py-1 rounded-lg font-semibold">Cancel</button>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <button onClick={() => startEditItem(item)} className="btn-secondary px-3 py-1 rounded-lg font-semibold mr-2">Edit</button>
-                                                            <button onClick={() => handleDeleteItem(item.UserPantryIngredientID, item.IngredientName)} className="btn-secondary px-3 py-1 rounded-lg font-semibold">Delete</button>
-                                                        </>
-                                                    )}
+                                                <td className="px-4 py-2 text-right">
+                                                    <div className="inline-flex justify-end w-full gap-2">
+                                                        {editingItemId === item.UserPantryIngredientID ? (
+                                                            <>
+                                                                <button onClick={() => handleUpdateItem(item.UserPantryIngredientID)} className="btn-primary px-3 py-1 rounded-lg font-semibold mr-2 flex items-center gap-1">
+                                                                    <SaveIcon /> Save
+                                                                </button>
+                                                                <button onClick={cancelEdit} className="btn-outline px-3 py-1 rounded-lg font-semibold flex items-center gap-1">
+                                                                    <CancelIcon /> Cancel
+                                                                </button>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <button onClick={() => startEditItem(item)} className="btn-success px-3 py-1 rounded-lg font-semibold mr-2 flex items-center gap-1">
+                                                                    <EditIcon /> Edit
+                                                                </button>
+                                                                <button onClick={() => handleDeleteItem(item.UserPantryIngredientID, item.IngredientName)} className="btn-danger px-3 py-1 rounded-lg font-semibold flex items-center gap-1">
+                                                                    <DeleteIcon /> Delete
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}
