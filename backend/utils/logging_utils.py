@@ -19,13 +19,13 @@ logger = logging.getLogger('NutriChefLogger')
 
 def get_icon(level):
     if level == 'SUCCESS':
-        return '✅'
+        return '✅  '
     elif level == 'INFO':
-        return 'ℹ️'
+        return 'ℹ️   '
     elif level == 'WARNING':
-        return '⚠️'
+        return '⚠️  '
     elif level == 'ERROR':
-        return '❌'
+        return '❌  '
     return ''
 
 def log_message(level, message, service_name=""):
