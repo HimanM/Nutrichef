@@ -4,12 +4,13 @@ from tensorflow.keras.preprocessing import image
 import tensorflow_hub as hub
 import os
 import json
+from backend.utils.logging_utils import log_success, log_error, log_warning
 
 class FoodIngredientClassifier:
     def __init__(self, model_base_path=None, model_dir_name='ing_classification_model', indices_json_name='class_indices.json', img_size=(224, 224)):
         """
         Initializes the classifier.
-        :param model_base_path: Base path to the 'ingredient_classification' directory. 
+        :param model_base_path: Base path to the 'ingredient_classification' directory.
                                 If None, defaults to the directory of this script.
         :param model_dir_name: Name of the directory containing the Keras model.
         :param indices_json_name: Name of the JSON file for class indices.
@@ -36,19 +37,19 @@ class FoodIngredientClassifier:
                  raise FileNotFoundError(f"Class indices JSON not found at: {self.indices_path}. User needs to place '{indices_json_name}' inside '{model_dir_name}'.")
 
             self.model = hub.KerasLayer(self.model_path, trainable=False)
-            print(f"✅ FoodIngredientClassifier: Model initialized with KerasLayer from {self.model_path}")
+            log_success(f"Model initialized with KerasLayer from {self.model_path}", "FoodIngredientClassifier")
             
             with open(self.indices_path, 'r') as f:
                 class_indices = json.load(f)
             self.idx_to_class = {int(v): k for k, v in class_indices.items()}
             
             self.model_loaded = True
-            print(f"✅ FoodIngredientClassifier: Model '{model_dir_name}' and class indices processed successfully.")
+            log_success(f"Model '{model_dir_name}' and class indices processed successfully.", "FoodIngredientClassifier")
 
         except FileNotFoundError as fnf_error:
-            print(f"FoodIngredientClassifier: ERROR - {fnf_error}")
+            log_error(str(fnf_error), "FoodIngredientClassifier")
         except Exception as e:
-            print(f"FoodIngredientClassifier: ERROR loading model using KerasLayer or class indices from {self.model_path} - {e}")
+            log_error(f"loading model using KerasLayer or class indices from {self.model_path} - {e}", "FoodIngredientClassifier")
             
     def is_model_loaded(self):
         return self.model_loaded
@@ -62,7 +63,7 @@ class FoodIngredientClassifier:
 
     def predict_ingredient(self, img_path, top_k=3):
         if not self.is_model_loaded():
-            print("FoodIngredientClassifier: Prediction skipped, model not loaded.")
+            log_warning("Prediction skipped, model not loaded.", "FoodIngredientClassifier")
             return []
 
         try:
@@ -75,7 +76,7 @@ class FoodIngredientClassifier:
                 elif len(raw_predictions) == 1:
                     prediction_values = next(iter(raw_predictions.values()))
                 else:
-                    print(f"FoodIngredientClassifier: WARNING - Model output is a dictionary with multiple keys: {list(raw_predictions.keys())}. Using first one found or failing. Please specify output key if default is incorrect.")
+                    log_warning(f"Model output is a dictionary with multiple keys: {list(raw_predictions.keys())}. Using first one found or failing. Please specify output key if default is incorrect.", "FoodIngredientClassifier")
                     prediction_values = next(iter(raw_predictions.values()), None)
                     if prediction_values is None:
                         raise ValueError("Model output is a dictionary, but could not determine the correct output tensor. Please check model signature and update classifier code.")
@@ -101,5 +102,5 @@ class FoodIngredientClassifier:
             
             return results
         except Exception as e:
-            print(f"FoodIngredientClassifier: Error during prediction for {img_path} - {e}")
+            log_error(f"Error during prediction for {img_path} - {e}", "FoodIngredientClassifier")
             return []

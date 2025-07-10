@@ -16,7 +16,7 @@ class RecipeDAO:
             recipe.average_rating = avg_rating
         return recipe
 
-    def get_all_recipes(self, page=1, limit=10, search_term=None, is_admin=False, sort_by=None, sort_order='asc'):
+    def get_all_recipes(self, page=1, limit=12, search_term=None, is_admin=False, sort_by=None, sort_order='asc'):
         sort_map = {
             'RecipeID': Recipe.RecipeID,
             'Title': Recipe.Title,
@@ -50,7 +50,7 @@ class RecipeDAO:
             
         return paginated_result
 
-    def get_public_recipes(self, page=1, limit=10, search_term=None):
+    def get_public_recipes(self, page=1, limit=12, search_term=None):
         query = Recipe.query.filter_by(is_public=True)
         if search_term:
             query = query.filter(Recipe.Title.ilike(f"%{search_term}%"))
@@ -64,7 +64,7 @@ class RecipeDAO:
             
         return paginated_result
 
-    def get_user_private_recipes(self, user_id, page=1, limit=10, search_term=None):
+    def get_user_private_recipes(self, user_id, page=1, limit=12, search_term=None):
         query = Recipe.query.filter_by(UserID=user_id, is_public=False)
         if search_term:
             query = query.filter(Recipe.Title.ilike(f"%{search_term}%"))
@@ -141,7 +141,7 @@ class RecipeDAO:
             return recipe
         return None
         
-    def get_personalized_recipes_for_user(self, user_id, page=1, limit=10):
+    def get_personalized_recipes_for_user(self, user_id, page=1, limit=12):
         """
         Retrieves paginated recipes personalized for a user by filtering out
         recipes containing ingredients they are allergic to.

@@ -102,14 +102,14 @@ def test_get_public_recipes(recipe_dao, new_user, ingredient_dao, db):
     recipe_dao.create_recipe(user_id=new_user.UserID, title="Searchable Public", description="D3", instructions="I3", prep_time=10, cook_time=10, servings=1, image_url=None, ingredients_data=ing_data, is_public=True)
     db.session.commit()
 
-    paginated_public_recipes = recipe_dao.get_public_recipes(page=1, limit=10)
+    paginated_public_recipes = recipe_dao.get_public_recipes(page=1, limit=12)
     assert paginated_public_recipes.total == 2
     assert len(paginated_public_recipes.items) == 2
     for recipe in paginated_public_recipes.items:
         assert recipe.is_public is True
 
     # Test search
-    paginated_search = recipe_dao.get_public_recipes(page=1, limit=10, search_term="Searchable")
+    paginated_search = recipe_dao.get_public_recipes(page=1, limit=12, search_term="Searchable")
     assert paginated_search.total == 1
     assert paginated_search.items[0].Title == "Searchable Public"
 
@@ -128,14 +128,14 @@ def test_get_user_private_recipes(recipe_dao, user_dao, db): # ingredient_dao no
     recipe_dao.create_recipe(user_id=user2.UserID, title="User2 Private", description="D", instructions="I", prep_time=10, cook_time=10, servings=1, image_url=None, ingredients_data=ing_data, is_public=False)
     db.session.commit()
 
-    paginated_user1_private = recipe_dao.get_user_private_recipes(user_id=user1.UserID, page=1, limit=10)
+    paginated_user1_private = recipe_dao.get_user_private_recipes(user_id=user1.UserID, page=1, limit=12)
     assert paginated_user1_private.total == 1
     assert len(paginated_user1_private.items) == 1
     assert paginated_user1_private.items[0].Title == "User1 Private"
     assert paginated_user1_private.items[0].is_public is False
 
     # Test search for user's private recipes
-    paginated_search = recipe_dao.get_user_private_recipes(user_id=user1.UserID, page=1, limit=10, search_term="Private")
+    paginated_search = recipe_dao.get_user_private_recipes(user_id=user1.UserID, page=1, limit=12, search_term="Private")
     assert paginated_search.total == 1
     assert paginated_search.items[0].Title == "User1 Private"
 
@@ -184,7 +184,7 @@ def test_get_all_recipes_fetches_only_public(recipe_dao, new_user, db):
     recipe_dao.create_recipe(user_id=new_user.UserID, title="Private For GetAll", description="D_private", instructions="I_private", prep_time=10, cook_time=10, servings=1, image_url=None, ingredients_data=ing_data, is_public=False)
     db.session.commit()
 
-    paginated_recipes = recipe_dao.get_all_recipes(page=1, limit=10)
+    paginated_recipes = recipe_dao.get_all_recipes(page=1, limit=12)
     assert paginated_recipes.total == 1
     assert len(paginated_recipes.items) == 1
     assert paginated_recipes.items[0].Title == "Public For GetAll"

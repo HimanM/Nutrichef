@@ -7,6 +7,7 @@ import json
 from ..dao import ClassificationResultDAO
 from ..db import db
 from backend.services.nutrition_service import NutritionService
+from backend.utils.logging_utils import log_info, log_warning, log_error
 
 class ClassificationService:
     def __init__(self):
@@ -15,11 +16,11 @@ class ClassificationService:
 
         self.ingredient_classifier = FoodIngredientClassifier()
         if not self.ingredient_classifier.is_model_loaded():
-            print("ClassificationService: WARNING - Ingredient classifier model failed to load. Predictions for 'ingredient' mode will be based on fallback dummy logic.")
+            log_warning("Ingredient classifier model failed to load. Predictions for 'ingredient' mode will be based on fallback dummy logic.", "ClassificationService")
 
         self.food_classifier = FoodClassifier()
         if not self.food_classifier.is_model_loaded():
-            print("ClassificationService: WARNING - Food classifier model failed to load. Predictions for 'food' mode will be based on fallback dummy logic.")
+            log_warning("Food classifier model failed to load. Predictions for 'food' mode will be based on fallback dummy logic.", "ClassificationService")
 
     def classify_item(self, image_file_storage, user_id, classification_mode, food_name=None):
         """
@@ -44,7 +45,7 @@ class ClassificationService:
 
 
         if not classifier_to_use:
-            print(f"ClassificationService: {classification_mode.capitalize()} model not loaded, using fallback dummy classification.")
+            log_warning(f"{classification_mode.capitalize()} model not loaded, using fallback dummy classification.", "ClassificationService")
             predicted_food_name_from_model = f"Fallback: {classification_mode.capitalize()} Model Not Loaded"
             name_for_nutrition_lookup = predicted_food_name_from_model
             predictions = []
@@ -65,7 +66,7 @@ class ClassificationService:
             predicted_food_name_from_model = None
             predictions = []
             if food_name:
-                print(f"ClassificationService: No image provided, using food name '{food_name}' for nutrition lookup (mode: {classification_mode}).")
+                log_info(f"No image provided, using food name '{food_name}' for nutrition lookup (mode: {classification_mode}).", "ClassificationService")
                 name_for_nutrition_lookup = food_name
                 nutrition_result = self.nutrition_service.get_nutrition(name_for_nutrition_lookup)
                 nutrition_info_json_string = json.dumps(nutrition_result)
@@ -81,7 +82,7 @@ class ClassificationService:
                     db.session.commit()
                 except Exception as db_error:
                     db.session.rollback()
-                    print(f"ClassificationService: Error saving name-only classification to DB - {db_error}")
+                    log_error(f"Error saving name-only classification to DB - {db_error}", "ClassificationService")
 
                 return {
                      "classification": {
@@ -101,7 +102,7 @@ class ClassificationService:
             filename = secure_filename(image_file_storage.filename if image_file_storage.filename else "temp_image.tmp")
             temp_image_path = os.path.join(temp_dir, filename)
             image_file_storage.save(temp_image_path)
-            print(f"ClassificationService: Image saved temporarily to {temp_image_path} for {classification_mode} classification.")
+            log_info(f"Image saved temporarily to {temp_image_path} for {classification_mode} classification.", "ClassificationService")
 
             predictions = []
             predicted_food_name_from_model = None
@@ -120,7 +121,7 @@ class ClassificationService:
                 name_for_nutrition_lookup = predicted_food_name_from_model
             elif food_name:
                 name_for_nutrition_lookup = food_name
-                print(f"ClassificationService: Model prediction failed or empty for {classification_mode}, using provided food_name '{food_name}' as fallback.")
+                log_warning(f"Model prediction failed or empty for {classification_mode}, using provided food_name '{food_name}' as fallback.", "ClassificationService")
             else:
                 name_for_nutrition_lookup = f"Unknown Food ({classification_mode} classification failed)"
             
@@ -139,10 +140,10 @@ class ClassificationService:
                     uploaded_image_url=uploaded_image_url,
                 )
                 db.session.commit()
-                print(f"ClassificationService: Result for user {user_id} ({classification_mode}) saved to DB.")
+                log_info(f"Result for user {user_id} ({classification_mode}) saved to DB.", "ClassificationService")
             except Exception as db_error:
                 db.session.rollback()
-                print(f"ClassificationService: Error saving {classification_mode} classification result to DB - {db_error}")
+                log_error(f"Error saving {classification_mode} classification result to DB - {db_error}", "ClassificationService")
 
             response_data = {
                 "classification": {
@@ -156,7 +157,7 @@ class ClassificationService:
             return response_data, None, 200
 
         except Exception as e:
-            print(f"ClassificationService: Error during {classification_mode} classification - {e}")
+            log_error(f"Error during {classification_mode} classification - {e}", "ClassificationService")
             import traceback
             traceback.print_exc()
             nutrition_result_on_error = {'success': False, 'error': f"Error during {classification_mode} classification processing: {e}"}
@@ -174,6 +175,6 @@ class ClassificationService:
             if temp_image_path and os.path.exists(temp_image_path):
                 try:
                     os.remove(temp_image_path)
-                    print(f"ClassificationService: Temporary image {temp_image_path} removed.")
+                    log_info(f"Temporary image {temp_image_path} removed.", "ClassificationService")
                 except Exception as e_remove:
-                    print(f"ClassificationService: Error removing temporary image {temp_image_path} - {e_remove}")
+                    log_error(f"Error removing temporary image {temp_image_path} - {e_remove}", "ClassificationService")

@@ -76,9 +76,9 @@ def test_get_public_recipes_summary(recipe_service, mock_recipe_dao):
     mock_paginated_obj.page = 1
     mock_recipe_dao.get_public_recipes.return_value = mock_paginated_obj
 
-    result, error, status = recipe_service.get_public_recipes_summary(page=1, limit=10)
+    result, error, status = recipe_service.get_public_recipes_summary(page=1, limit=12)
 
-    mock_recipe_dao.get_public_recipes.assert_called_once_with(page=1, limit=10, search_term=None)
+    mock_recipe_dao.get_public_recipes.assert_called_once_with(page=1, limit=12, search_term=None)
     assert status == 200
     assert result['total'] == 1
     assert result['recipes'][0]['Title'] == "Public Summary"
@@ -94,9 +94,9 @@ def test_get_user_private_recipes_summary(recipe_service, mock_recipe_dao):
     mock_paginated_obj.page = 1
     mock_recipe_dao.get_user_private_recipes.return_value = mock_paginated_obj
 
-    result, error, status = recipe_service.get_user_private_recipes_summary(user_id=user_id, page=1, limit=10)
+    result, error, status = recipe_service.get_user_private_recipes_summary(user_id=user_id, page=1, limit=12)
 
-    mock_recipe_dao.get_user_private_recipes.assert_called_once_with(user_id, page=1, limit=10, search_term=None)
+    mock_recipe_dao.get_user_private_recipes.assert_called_once_with(user_id, page=1, limit=12, search_term=None)
     assert status == 200
     assert result['recipes'][0]['Title'] == "Private Summary"
 

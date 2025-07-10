@@ -11,7 +11,7 @@ class RecipeService:
         self.allergy_analyzer = AllergyAnalyzer()
         self.gemini_nlp = GeminiNlpParser()
 
-    def get_public_recipes_summary(self, page=1, limit=10, search_term=None):
+    def get_public_recipes_summary(self, page=1, limit=12, search_term=None):
         """Fetches a paginated list of public recipes with summary information."""
         try:
             paginated_recipes = self.recipe_dao.get_public_recipes(page=page, limit=limit, search_term=search_term)
@@ -33,7 +33,7 @@ class RecipeService:
             print(f"Error getting public recipes summary: {e}")
             return None, {"error": "Failed to retrieve recipes"}, 500
 
-    def get_user_private_recipes_summary(self, user_id, page=1, limit=10, search_term=None):
+    def get_user_private_recipes_summary(self, user_id, page=1, limit=12, search_term=None):
         """Fetches a paginated list of a user's private recipes with summary information."""
         try:
             paginated_recipes = self.recipe_dao.get_user_private_recipes(user_id=user_id, page=page, limit=limit, search_term=search_term)
@@ -208,7 +208,7 @@ class RecipeService:
             print(f"Error in toggle_recipe_public_status: {e}")
             return None, {"error": "Server error toggling recipe public status"}, 500
 
-    def get_personalized_recipes(self, user_id, page=1, limit=10):
+    def get_personalized_recipes(self, user_id, page=1, limit=12):
         """
         Fetches paginated personalized recipes for a given user.
         """

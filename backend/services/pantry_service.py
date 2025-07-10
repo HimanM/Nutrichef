@@ -129,7 +129,7 @@ class PantryService:
             print(f"Error in PantryService.remove_ingredient: {e}")
             raise
 
-    def suggest_recipes(self, user_id, match_threshold=0.5, page=1, limit=10):
+    def suggest_recipes(self, user_id, match_threshold=0.5, page=1, limit=12):
         pantry_item_models = self.pantry_dao.get_pantry_by_user_id(user_id)
 
         if not pantry_item_models:

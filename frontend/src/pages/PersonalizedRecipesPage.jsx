@@ -21,32 +21,29 @@ function PersonalizedRecipesPage() {
             setTotalRecipes(0);
             return;
         }
-        setIsLoading(true); setError(null);
-        if (recipes.length === 0) {
-            setRecipes([]);
-        }
+        setIsLoading(true); 
+        setError(null);
 
         try {
             const response = await authenticatedFetch(`/api/users/${currentUser.UserID}/personalized_recipes?page=${page}&limit=${limit}`, { method: 'GET' }, auth);
             const data = await response.json();
             if (!response.ok) {
                 setError(data.message || data.error || `Failed to fetch personalized recipes. Status: ${response.status}`);
-                if (recipes.length === 0) setTotalRecipes(0);
+                setRecipes([]);
+                setTotalRecipes(0);
             } else {
                 setRecipes(data.recipes || []); 
-                setTotalRecipes(data.total || 0);
+                setTotalRecipes(data.pagination?.total || 0);
             }
         } catch (err) {
             console.error("Error fetching personalized recipes:", err);
             setError('An error occurred while fetching personalized recipes. Please try again later.');
-            if (recipes.length === 0) {
-                setRecipes([]);
-                setTotalRecipes(0);
-            }
+            setRecipes([]);
+            setTotalRecipes(0);
         } finally {
             setIsLoading(false);
         }
-    }, [isAuthenticated, currentUser, token, auth, recipes.length]);
+    }, [isAuthenticated, currentUser, token, auth]);
 
     useEffect(() => {
         if (isAuthenticated && currentUser?.UserID && token) {
@@ -183,39 +180,95 @@ function PersonalizedRecipesPage() {
 
                     {/* Pagination */}
                     {totalRecipes > 0 && !isLoading && recipes.length > 0 && (
-                        <div className="mt-12 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
-                            <div className="flex items-center space-x-2">
-                                <button
-                                    onClick={handlePreviousPage}
-                                    disabled={currentPage === 1}
-                                    className="btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Previous
-                                </button>
-                                <span className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg">
-                                    Page {currentPage} of {Math.ceil(totalRecipes / recipesPerPage)}
-                                </span>
-                                <button
-                                    onClick={handleNextPage}
-                                    disabled={currentPage * recipesPerPage >= totalRecipes}
-                                    className="btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Next
-                                </button>
+                        <div className="mt-12">
+                            {/* Recipe Count Summary */}
+                            <div className="text-center mb-6">
+                                <div className="inline-flex items-center px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-full text-sm text-emerald-700">
+                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Showing {((currentPage - 1) * recipesPerPage) + 1} to {Math.min(currentPage * recipesPerPage, totalRecipes)} of {totalRecipes} recipes
+                                </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <label htmlFor="recipesPerPageSelect" className="text-sm text-gray-600">Show:</label>
-                                <select
-                                    id="recipesPerPageSelect"
-                                    value={recipesPerPage}
-                                    onChange={handleRecipesPerPageChange}
-                                    className="form-input px-3 py-1.5 text-sm w-20"
-                                >
-                                    <option value={12}>12</option>
-                                    <option value={24}>24</option>
-                                    <option value={36}>36</option>
-                                </select>
-                                <span className="text-sm text-gray-600">per page</span>
+
+                            {/* Pagination Controls */}
+                            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200 p-6">
+                                <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0">
+                                    {/* Page Navigation */}
+                                    <div className="flex items-center space-x-2">
+                                        <button
+                                            onClick={handlePreviousPage}
+                                            disabled={currentPage === 1}
+                                            className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 transition-all duration-200"
+                                        >
+                                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                            Previous
+                                        </button>
+                                        
+                                        <div className="flex items-center space-x-1">
+                                            {Array.from({ length: Math.min(5, Math.ceil(totalRecipes / recipesPerPage)) }, (_, i) => {
+                                                const pageNum = i + 1;
+                                                const isCurrentPage = pageNum === currentPage;
+                                                return (
+                                                    <button
+                                                        key={pageNum}
+                                                        onClick={() => setCurrentPage(pageNum)}
+                                                        className={`w-10 h-10 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                                            isCurrentPage
+                                                                ? 'bg-emerald-500 text-white shadow-md'
+                                                                : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:border-emerald-300'
+                                                        }`}
+                                                    >
+                                                        {pageNum}
+                                                    </button>
+                                                );
+                                            })}
+                                            {Math.ceil(totalRecipes / recipesPerPage) > 5 && (
+                                                <span className="px-2 text-gray-500">...</span>
+                                            )}
+                                        </div>
+                                        
+                                        <button
+                                            onClick={handleNextPage}
+                                            disabled={currentPage * recipesPerPage >= totalRecipes}
+                                            className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 transition-all duration-200"
+                                        >
+                                            Next
+                                            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    {/* Page Size Selector */}
+                                    <div className="flex items-center space-x-3">
+                                        <label htmlFor="recipesPerPageSelect" className="text-sm font-medium text-gray-700">Show:</label>
+                                        <select
+                                            id="recipesPerPageSelect"
+                                            value={recipesPerPage}
+                                            onChange={handleRecipesPerPageChange}
+                                            className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white hover:border-emerald-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all duration-200"
+                                        >
+                                            <option value={12}>12 per page</option>
+                                            <option value={24}>24 per page</option>
+                                            <option value={36}>36 per page</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* Single Page Indicator */}
+                                {totalRecipes <= recipesPerPage && (
+                                    <div className="mt-4 text-center">
+                                        <div className="inline-flex items-center px-3 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs text-blue-700">
+                                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            All recipes displayed
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}

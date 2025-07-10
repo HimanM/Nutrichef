@@ -14,14 +14,14 @@ def get_personalized_recipes(user_id):
 
     try:
         page = int(request.args.get('page', 1))
-        limit = int(request.args.get('limit', 10))
+        limit = int(request.args.get('limit', 12))
     except ValueError:
         return jsonify({"error": "Invalid page or limit parameter. Must be integers."}), 400
 
     if page < 1:
         page = 1
     if limit < 1:
-        limit = 10 
+        limit = 12 
     if limit > 100:
         limit = 100
 
