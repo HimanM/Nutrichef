@@ -5,6 +5,7 @@ import { authenticatedFetch } from '../utils/apiUtil.js';
 import StarRating from '../components/StarRating';
 import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
 import InteractiveModal from '../components/InteractiveModal.jsx';
+import { FiLock, FiUnlock } from 'react-icons/fi';
 
 const PageLoaderSpinner = () => <svg className="animate-spin h-10 w-10 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>;
 const InlineSpinner = () => <svg className="animate-spin h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>;
@@ -372,6 +373,20 @@ function RecipeDetailPage() {
               <p className="text-gray-400 mb-6 text-center">This recipe has not been rated yet.</p>
             )}
 
+            {/* Toggle Public/Private for Owner - left before ratings */}
+            {isAuthenticated && currentUser && recipeData && currentUser.UserID === recipeData.UserID && (
+              <div className="flex mb-6">
+                <button
+                  onClick={handleTogglePublicStatus}
+                  className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-lg border shadow-sm transition-colors
+                    ${recipeData.is_public ? 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200' : 'bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300'}`}
+                >
+                  {recipeData.is_public ? <FiLock className="text-lg" /> : <FiUnlock className="text-lg" />}
+                  {recipeData.is_public ? 'Make Private' : 'Make Public'}
+                </button>
+              </div>
+            )}
+
             {/* Instructions - FULL WIDTH */}
             <div className="mb-10">
               <h2 className="text-xl font-semibold mb-3 text-emerald-700">Instructions</h2>
@@ -387,7 +402,7 @@ function RecipeDetailPage() {
             {/* Ingredients - GRID */}
             <div className="mb-10">
               <h2 className="text-xl font-semibold mb-3 text-emerald-700">Ingredients {allergiesLoading && <InlineSpinner />}</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
                 {(recipeData.ingredients || []).map((ing, index) => {
                   const currentIngredient = recipeData.ingredients[index];
                   const hasActiveSubstitute = currentIngredient && currentIngredient.selectedSubstitute;
@@ -396,17 +411,19 @@ function RecipeDetailPage() {
                   return (
                     <div key={currentIngredient.RecipeIngredientID || currentIngredient.IngredientID || index} className="bg-white/80 border border-emerald-100 rounded-xl p-4 shadow flex flex-col h-full">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-bold text-emerald-900 text-left">
-                          {ing.IngredientName}
-                          {hasActiveSubstitute && <span className="text-xs text-gray-400 italic ml-1">(Sub: {currentIngredient.originalName})</span>}
-                        </span>
-                        <span className="text-sm text-gray-500 text-right ml-2 whitespace-nowrap">
-                          {ing.Quantity || ''} {ing.Unit || ''}
-                        </span>
+                        <div className="flex items-center gap-1">
+                          <span className="font-bold text-emerald-900">
+                            {ing.IngredientName}
+                            {hasActiveSubstitute && <span className="text-xs text-gray-400 italic ml-1">(Sub: {currentIngredient.originalName})</span>}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {ing.Quantity || ''} {ing.Unit || ''}
+                          </span>
+                        </div>
                         <button
                           onClick={() => hasActiveSubstitute ? handleRevertSubstitute(index) : handleFetchSubstitutes(nameToFetchSubstitutesFor, index)}
                           disabled={substituteLoading[index]}
-                          className="ml-2 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-300 rounded-lg hover:bg-emerald-50 transition disabled:opacity-50 whitespace-nowrap"
+                          className="px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-300 rounded-lg hover:bg-emerald-50 transition disabled:opacity-50 whitespace-nowrap"
                         >
                           {substituteLoading[index] ? <InlineSpinner /> : (hasActiveSubstitute ? 'Revert' : 'Substitutes')}
                         </button>
@@ -447,6 +464,17 @@ function RecipeDetailPage() {
                   );
                 })}
               </div>
+            </div>
+            {/* Add to Basket Button - moved below ingredients */}
+            <div className="pt-2 pb-8 text-center">
+              <button
+                onClick={handleAddToBasket}
+                disabled={!recipeData || !recipeData.ingredients || recipeData.ingredients.length === 0}
+                className="btn-primary px-8 py-3 text-base font-semibold rounded-lg shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:opacity-75 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                Add All Ingredients to Basket
+              </button>
+              {basketMessage && <p className="mt-3 text-sm text-emerald-600">{basketMessage}</p>}
             </div>
 
             {/* Nutritional Information Section */}
@@ -524,30 +552,6 @@ function RecipeDetailPage() {
                 </div>
               )}
             </div>
-
-            {/* Add to Basket Button */}
-            <div className="mt-8 pt-6 border-t border-emerald-100 text-center">
-              <button
-                onClick={handleAddToBasket}
-                disabled={!recipeData || !recipeData.ingredients || recipeData.ingredients.length === 0}
-                className="btn-primary px-8 py-3 text-base font-semibold rounded-lg shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:opacity-75 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                Add All Ingredients to Basket
-              </button>
-              {basketMessage && <p className="mt-3 text-sm text-emerald-600">{basketMessage}</p>}
-            </div>
-
-            {/* Toggle Public/Private for Owner */}
-            {isAuthenticated && currentUser && recipeData && currentUser.UserID === recipeData.UserID && (
-              <div className="mt-8 pb-6 border-b border-emerald-100 text-center">
-                <button
-                  onClick={handleTogglePublicStatus}
-                  className="btn-primary px-6 py-2 text-sm font-semibold rounded-lg shadow-md"
-                >
-                  {recipeData.is_public ? 'Make Private' : 'Make Public'}
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>
