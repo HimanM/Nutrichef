@@ -349,9 +349,24 @@ function RecipeDetailPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               <span className="gradient-text">{recipeData.Title}</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6">
               {recipeData.Description || 'A delicious recipe for you to try'}
             </p>
+            
+            {/* Recipe Tags */}
+            {recipeData.tags && recipeData.tags.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-2 mb-4">
+                {recipeData.tags.map((tag) => (
+                  <span
+                    key={tag.TagID}
+                    className="px-3 py-1 text-sm font-medium text-white rounded-full shadow-sm"
+                    style={{ backgroundColor: tag.TagColor || '#6B7280' }}
+                  >
+                    {tag.TagName}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Main Card Container */}

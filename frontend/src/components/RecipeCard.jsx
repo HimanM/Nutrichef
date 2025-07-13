@@ -145,24 +145,45 @@ const RecipeCard = ({ recipe = defaultRecipe, renderActions, onCardClick }) => {
           />
           <TruncatedText
             text={Description || 'No description available.'}
-            maxLength={80}
-            className="text-sm text-gray-600 mb-4 leading-relaxed block"
+            maxLength={60}
+            className="text-sm text-gray-600 mb-3 leading-relaxed block"
           />
+          
+          {/* Recipe Tags */}
+          {recipe.tags && recipe.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-3">
+              {recipe.tags.slice(0, 3).map((tag) => (
+                <span
+                  key={tag.TagID}
+                  className="px-2 py-1 text-xs font-medium text-white rounded-full"
+                  style={{ backgroundColor: tag.TagColor || '#6B7280' }}
+                >
+                  {tag.TagName}
+                </span>
+              ))}
+              {recipe.tags.length > 3 && (
+                <span className="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded-full">
+                  +{recipe.tags.length - 3} more
+                </span>
+              )}
+            </div>
+          )}
+          
           {/* Rating Section */}
           {typeof recipe.average_rating === 'number' && recipe.average_rating > 0 ? (
-            <div className="mb-4 flex items-center text-sm">
+            <div className="mb-3 flex items-center text-sm">
               <StarRating rating={recipe.average_rating} interactive={false} size="text-sm" />
               <span className="ml-2 text-gray-600 font-medium">({recipe.average_rating.toFixed(1)})</span>
             </div>
           ) : (
-            <div className="mb-4 text-sm text-gray-500">Not rated yet</div>
+            <div className="mb-3 text-sm text-gray-500">Not rated yet</div>
           )}
           {/* Ingredients Match */}
           {typeof match_percentage === 'number' &&
             typeof available_ingredients_count === 'number' &&
             typeof required_ingredients_count === 'number' && (
-              <div className="mb-4">
-                <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+              <div className="mb-3">
+                <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
                   <span>Ingredients available:</span>
                   <span className="font-medium">{available_ingredients_count}/{required_ingredients_count}</span>
                 </div>
@@ -188,13 +209,13 @@ const RecipeCard = ({ recipe = defaultRecipe, renderActions, onCardClick }) => {
         </div>
       </div>
       {renderActions && typeof renderActions === 'function' && (
-        <div className="px-6 pb-6 pt-0">{renderActions(recipe)}</div>
+        <div className="px-6 pb-4 pt-0">{renderActions(recipe)}</div>
       )}
     </>
   );
 
   const cardClasses =
-    'card group hover-lift w-full max-w-sm h-[500px] flex flex-col overflow-hidden animate-fade-in border border-gray-100';
+    'card group hover-lift w-full max-w-sm min-h-[520px] flex flex-col overflow-hidden animate-fade-in border border-gray-100';
 
   if (typeof onCardClick === 'function') {
     return (
