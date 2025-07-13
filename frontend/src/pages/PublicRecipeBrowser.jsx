@@ -406,101 +406,104 @@ function PublicRecipeBrowser() {
       <div className="section-padding">
         <div className="container-modern">
           {/* Header */}
-          <div className="text-center mb-12 animate-fade-in">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <div className="text-center mb-6 animate-fade-in">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">
               <span className="gradient-text">
                 {currentView === 'private' ? "My Private Recipes" : 
                  currentView === 'favorites' ? "My Favorite Recipes" : 
                  "Browse Recipes"}
               </span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-sm text-gray-600 max-w-2xl mx-auto">
               {currentView === 'favorites' ? "Your saved favorite recipes" :
                "Discover delicious recipes and add them to your meal planning palette"}
             </p>
           </div>
 
           {/* Search and Filter Section */}
-          <div className="card-glass p-6 mb-8 animate-fade-in">
-            {/* View Selection Buttons */}
-            <div className="flex flex-wrap gap-3 mb-6">
-              <button
-                type="button"
-                onClick={() => handleViewChange('public')}
-                className={`btn-outline flex items-center ${currentView === 'public' ? 'bg-emerald-100 text-emerald-700 border-emerald-300' : ''}`}
-              >
-                <HiOutlineEye className="w-4 h-4 mr-2" />
-                Public Recipes
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => handleViewChange('private')}
-                disabled={!isAuthenticated}
-                title={!isAuthenticated ? "Log in to view your private recipes" : ""}
-                className={`btn-outline flex items-center ${currentView === 'private' ? 'bg-blue-100 text-blue-700 border-blue-300' : ''} ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                <HiOutlineEyeOff className="w-4 h-4 mr-2" />
-                Private Recipes
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => handleViewChange('favorites')}
-                disabled={!isAuthenticated}
-                title={!isAuthenticated ? "Log in to view your favorite recipes" : ""}
-                className={`inline-flex items-center justify-center font-medium py-3 px-6 rounded-xl transition-all duration-300 ease-out transform hover:scale-105 ${
-                  currentView === 'favorites' 
-                    ? 'bg-pink-100 text-pink-700 border-2 border-pink-300' 
-                    : 'border-2 border-gray-300 text-gray-600 hover:border-pink-300 hover:text-pink-600 hover:bg-pink-50'
-                } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                <HiOutlineHeart className="w-4 h-4 mr-2" />
-                Favorites
-              </button>
-            </div>
-
-            {/* Search Bar */}
-            <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-4 items-center mb-6">
-              <div className="flex-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <HiOutlineSearch className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  placeholder="Search recipes by name, ingredients, or cuisine..."
-                  className="form-input pl-12 w-full"
-                />
+          <div className="card-glass p-3 mb-4 animate-fade-in">
+            {/* Single Line: View Buttons + Search Bar */}
+            <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center mb-3">
+              {/* View Selection Buttons */}
+              <div className="flex gap-2 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleViewChange('public')}
+                  className={`btn-outline flex items-center text-xs py-2 px-2.5 ${currentView === 'public' ? 'bg-emerald-100 text-emerald-700 border-emerald-300' : ''}`}
+                >
+                  <HiOutlineEye className="w-3 h-3 mr-1" />
+                  Public
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => handleViewChange('private')}
+                  disabled={!isAuthenticated}
+                  title={!isAuthenticated ? "Log in to view your private recipes" : ""}
+                  className={`btn-outline flex items-center text-xs py-2 px-2.5 ${currentView === 'private' ? 'bg-blue-100 text-blue-700 border-blue-300' : ''} ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <HiOutlineEyeOff className="w-3 h-3 mr-1" />
+                  Private
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => handleViewChange('favorites')}
+                  disabled={!isAuthenticated}
+                  title={!isAuthenticated ? "Log in to view your favorite recipes" : ""}
+                  className={`inline-flex items-center justify-center font-medium text-xs py-2 px-2.5 rounded-lg transition-all duration-200 ${
+                    currentView === 'favorites' 
+                      ? 'bg-pink-100 text-pink-700 border-2 border-pink-300' 
+                      : 'border-2 border-gray-300 text-gray-600 hover:border-pink-300 hover:text-pink-600 hover:bg-pink-50'
+                  } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <HiOutlineHeart className="w-3 h-3 mr-1" />
+                  Favorites
+                </button>
               </div>
-              
-              <button type="submit" className="btn-primary">
-                <HiOutlineSearch className="w-5 h-5" />
-              </button>
-            </form>
+
+              {/* Search Bar */}
+              <form onSubmit={handleSearchSubmit} className="flex flex-1 gap-2 items-center">
+                <div className="flex-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <HiOutlineSearch className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    placeholder="Search recipes by name, ingredients, or cuisine..."
+                    className="form-input pl-10 w-full py-2 text-sm"
+                  />
+                </div>
+                
+                <button type="submit" className="btn-primary py-2 px-3 flex-shrink-0">
+                  <HiOutlineSearch className="w-4 h-4" />
+                </button>
+              </form>
+            </div>
 
             {/* Tag Filters Toggle & Section */}
             {currentView === 'public' && Object.keys(availableTags).length > 0 && (
-              <div className="border-t pt-6">
+              <div className="border-t pt-2 border-gray-200">
                 {/* Toggle Button */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-2">
                   <button
                     type="button"
                     onClick={toggleTagsFilter}
-                    className={`flex items-center text-lg font-semibold transition-colors ${
-                      selectedTags.length > 0 ? 'text-emerald-700' : 'text-gray-800 hover:text-gray-600'
+                    className={`flex items-center text-xs font-medium transition-colors ${
+                      selectedTags.length > 0 ? 'text-emerald-700' : 'text-gray-700 hover:text-gray-600'
                     }`}
                   >
-                    <HiOutlineTag className="w-5 h-5 mr-2" />
+                    <HiOutlineTag className="w-3 h-3 mr-1" />
                     Filter by Tags
                     {selectedTags.length > 0 && (
-                      <span className="ml-2 px-2 py-1 text-xs bg-emerald-100 text-emerald-700 rounded-full">
-                        {selectedTags.length} active
+                      <span className="ml-1 px-1.5 py-0.5 text-xs bg-emerald-100 text-emerald-700 rounded-full">
+                        {selectedTags.length}
                       </span>
                     )}
                     <svg 
-                      className={`w-4 h-4 ml-2 transition-transform duration-200 ${showTagsFilter ? 'rotate-180' : ''}`}
+                      className={`w-3 h-3 ml-1 transition-transform duration-200 ${showTagsFilter ? 'rotate-180' : ''}`}
                       fill="none" 
                       stroke="currentColor" 
                       viewBox="0 0 24 24"
@@ -513,10 +516,10 @@ function PublicRecipeBrowser() {
                     <button
                       type="button"
                       onClick={clearTagFilters}
-                      className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
+                      className="text-xs text-gray-500 hover:text-gray-700 flex items-center"
                     >
-                      <HiOutlineX className="w-4 h-4 mr-1" />
-                      Clear Filters
+                      <HiOutlineX className="w-3 h-3 mr-0.5" />
+                      Clear
                     </button>
                   )}
                 </div>
@@ -525,15 +528,15 @@ function PublicRecipeBrowser() {
                 {showTagsFilter && (
                   <div className="animate-fade-in">
                     {Object.entries(availableTags).map(([category, tags]) => (
-                      <div key={category} className="mb-4">
-                        <h4 className="text-sm font-medium text-gray-600 mb-2 capitalize">{category}</h4>
-                        <div className="flex flex-wrap gap-2">
+                      <div key={category} className="mb-2">
+                        <h4 className="text-xs font-medium text-gray-600 mb-1 capitalize">{category}</h4>
+                        <div className="flex flex-wrap gap-1">
                           {Array.isArray(tags) && tags.map((tag) => (
                             <button
                               key={tag.TagID}
                               type="button"
                               onClick={() => handleTagToggle(tag.TagID)}
-                              className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                              className={`px-2 py-0.5 text-xs rounded-full border transition-colors ${
                                 selectedTags.includes(tag.TagID)
                                   ? 'text-white border-transparent'
                                   : 'text-gray-600 border-gray-300 hover:border-gray-400'
@@ -557,7 +560,7 @@ function PublicRecipeBrowser() {
 
           {/* Error Message */}
           {error && recipes.length > 0 && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm animate-slide-in">
+            <div className="mb-3 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm animate-slide-in">
               {error}
             </div>
           )}
@@ -595,7 +598,7 @@ function PublicRecipeBrowser() {
                       key={recipe.RecipeID}
                       recipe={recipe}
                       renderActions={(currentRecipe) => (
-                        <div className="flex gap-2 mt-4">
+                        <div className="flex gap-2 mt-1">
                           {/* Favorites Button - Icon Only */}
                           {isAuthenticated && (
                             <button
