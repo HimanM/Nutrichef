@@ -16,6 +16,7 @@ function toTitleCase(str) {
 
 const IngredientSubstitutePage = () => {
   const [ingredientName, setIngredientName] = useState('');
+  const [searchedIngredient, setSearchedIngredient] = useState('');
   const [results, setResults] = useState([]);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,11 +67,13 @@ const IngredientSubstitutePage = () => {
     if (!ingredientName.trim()) {
       setError('Please enter an ingredient name.');
       setResults([]);
+      setSearchedIngredient('');
       return;
     }
     setError(null);
     setResults([]);
     setIsLoading(true);
+    setSearchedIngredient(ingredientName.trim());
 
     try {
       const response = await authenticatedFetch('/api/substitute', {
@@ -178,7 +181,7 @@ const IngredientSubstitutePage = () => {
           {results.length > 0 && (
             <div className="space-y-6 animate-fade-in">
               <h2 className="text-2xl font-bold text-gray-800 text-center">
-                Suggested Substitutes for "{toTitleCase(ingredientName)}"
+                Suggested Substitutes for "{toTitleCase(searchedIngredient)}"
               </h2>
               {results.map((substitute, index) => (
                 <div key={index} className="card-glass p-6">
@@ -206,12 +209,22 @@ const IngredientSubstitutePage = () => {
                   )}
 
                   {substitute.nutritionError && !substitute.isLoadingNutrition && (
-                    <div className={`my-4 p-4 rounded-lg text-sm ${
-                      NUTRITION_WARNING_MESSAGES.includes(substitute.nutritionError) ?
-                      'bg-amber-50 border border-amber-200 text-amber-700' :
-                      'bg-red-50 border border-red-200 text-red-700'
-                    }`}>
-                      {substitute.nutritionError}
+                    <div className="my-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                            <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="ml-3">
+                          <h5 className="text-sm font-medium text-blue-800">Nutritional Information</h5>
+                          <p className="text-sm text-blue-700">
+                            Nutritional data is not available for this substitute at the moment.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   )}
 
