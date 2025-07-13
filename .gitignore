@@ -6,3 +6,5 @@
 /__temp_pipreqsnb_folder
 /.old
 /backend/.pytest_cache
+/start_frontend.bat
+/start_backend.bat
