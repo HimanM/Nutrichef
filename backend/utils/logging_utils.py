@@ -72,14 +72,15 @@ def suppress_external_warnings():
     log_info("Suppressing verbose logs from external libraries (e.g., TensorFlow).", "System")
     
     # Suppress TensorFlow C++ level logs (1 = INFO, 2 = WARNING, 3 = ERROR)
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    # Set to '2' to suppress INFO and WARNING but keep ERROR messages
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
     
     # Turn off oneDNN custom operations messages
     os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
     
     # Suppress TensorFlow Python logs
     import tensorflow as tf
-    tf.get_logger().setLevel('ERROR')
+    tf.get_logger().setLevel('WARNING')  # Changed from ERROR to WARNING to keep error messages
     
     # Suppress other warnings
     import warnings

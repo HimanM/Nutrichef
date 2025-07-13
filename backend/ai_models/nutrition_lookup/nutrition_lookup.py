@@ -3,18 +3,31 @@ import pandas as pd
 from rapidfuzz import process
 import json
 import re
+import warnings
 
 class OfflineNutritionLookup:
     def __init__(self, data_folder):
-        # Build full paths
-        food_csv = os.path.join(data_folder, "food.csv")
-        nutrient_csv = os.path.join(data_folder, "nutrient.csv")
-        food_nutrient_csv = os.path.join(data_folder, "food_nutrient.csv")
+        # Suppress pandas DtypeWarnings for this specific case
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=pd.errors.DtypeWarning)
+            
+            # Build full paths
+            food_csv = os.path.join(data_folder, "food.csv")
+            nutrient_csv = os.path.join(data_folder, "nutrient.csv")
+            food_nutrient_csv = os.path.join(data_folder, "food_nutrient.csv")
 
-        self.food_df = pd.read_csv(food_csv)
-        self.food_df = self.food_df.dropna(subset=['description'])
-        self.nutrient_df = pd.read_csv(nutrient_csv)
-        self.food_nutrient_df = pd.read_csv(food_nutrient_csv)
+            self.food_df = pd.read_csv(food_csv)
+            self.food_df = self.food_df.dropna(subset=['description'])
+            self.nutrient_df = pd.read_csv(nutrient_csv)
+            
+            # Define dtype for mixed columns to avoid warning
+            food_nutrient_dtypes = {
+                'footnote': 'str',  # Column 9 has mixed types, force to string
+                'min': 'str',       # These columns may have empty strings
+                'max': 'str',
+                'median': 'str'
+            }
+            self.food_nutrient_df = pd.read_csv(food_nutrient_csv, dtype=food_nutrient_dtypes, low_memory=False)
 
         self.food_df['description_clean'] = self.food_df['description'].apply(self._clean_string)
         self.nutrient_lookup = self.nutrient_df.set_index('id')[['name', 'unit_name']].to_dict('index')

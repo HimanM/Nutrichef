@@ -17,8 +17,6 @@ class GeminiNlpParser:
         self.api_key = os.getenv("GEMINI_API_KEY")
         if not self.api_key:
             print("Warning: GEMINI_API_KEY not found in environment variables.")
-        else:
-            print("GEMINI_API_KEY loaded successfully.")
 
     def parse_recipe(self, recipe_text: str):
         if not self.api_key:
