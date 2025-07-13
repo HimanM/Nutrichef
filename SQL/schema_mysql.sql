@@ -635,6 +635,130 @@ CREATE TABLE IF NOT EXISTS `RecipeTagAssignments` (
   KEY `TagID` (`TagID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+--
+-- Dumping data for table `RecipeTagAssignments`
+--
+
+INSERT INTO `RecipeTagAssignments` (`AssignmentID`, `RecipeID`, `TagID`, `AssignedAt`) VALUES
+-- Recipe 1: Classic Tomato Basil Pasta
+(1, 1, 10, '2025-07-13 12:32:22'), -- Italian
+(2, 1, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(3, 1, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(4, 1, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 2: Quick Chicken Stir-Fry
+(5, 2, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(6, 2, 11, '2025-07-13 12:32:22'), -- Asian
+(7, 2, 15, '2025-07-13 12:32:22'), -- Dinner
+(8, 2, 17, '2025-07-13 12:32:22'), -- Healthy
+
+-- Recipe 3: Creamy Mushroom Soup
+(9, 3, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(10, 3, 15, '2025-07-13 12:32:22'), -- Dinner
+(11, 3, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+
+-- Recipe 4: Lentil Salad with Roasted Vegetables
+(12, 4, 1, '2025-07-13 12:32:22'), -- Vegetarian
+(13, 4, 2, '2025-07-13 12:32:22'), -- Vegan
+(14, 4, 17, '2025-07-13 12:32:22'), -- Healthy
+(15, 4, 14, '2025-07-13 12:32:22'), -- Lunch
+(16, 4, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 5: Garlic Butter Shrimp Scampi with Linguine
+(17, 5, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(18, 5, 10, '2025-07-13 12:32:22'), -- Italian
+(19, 5, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 6: Fluffy Scrambled Eggs with Toast
+(20, 6, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(21, 6, 13, '2025-07-13 12:32:22'), -- Breakfast
+(22, 6, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+
+-- Recipe 7: Black Bean Burgers
+(23, 7, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(24, 7, 2, '2025-07-13 12:32:22'),  -- Vegan
+(25, 7, 17, '2025-07-13 12:32:22'), -- Healthy
+(26, 7, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 8: Simple Roasted Chicken Thighs with Root Vegetables
+(27, 8, 15, '2025-07-13 12:32:22'), -- Dinner
+(28, 8, 17, '2025-07-13 12:32:22'), -- Healthy
+
+-- Recipe 9: Caprese Salad
+(29, 9, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(30, 9, 10, '2025-07-13 12:32:22'), -- Italian
+(31, 9, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(32, 9, 17, '2025-07-13 12:32:22'), -- Healthy
+(33, 9, 14, '2025-07-13 12:32:22'), -- Lunch
+
+-- Recipe 10: Berry Smoothie
+(34, 10, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(35, 10, 13, '2025-07-13 12:32:22'), -- Breakfast
+(36, 10, 17, '2025-07-13 12:32:22'), -- Healthy
+(37, 10, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+
+-- Recipe 11: Sheet Pan Lemon Herb Salmon and Asparagus
+(38, 11, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(39, 11, 17, '2025-07-13 12:32:22'), -- Healthy
+(40, 11, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 12: Chicken and Vegetable Skewers
+(41, 12, 17, '2025-07-13 12:32:22'), -- Healthy
+(42, 12, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 13: Simple Cheese Omelette
+(43, 13, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(44, 13, 13, '2025-07-13 12:32:22'), -- Breakfast
+(45, 13, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+
+-- Recipe 14: Veggie Fried Rice
+(46, 14, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(47, 14, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(48, 14, 11, '2025-07-13 12:32:22'), -- Asian
+(49, 14, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 15: Simple Guacamole
+(50, 15, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(51, 15, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(52, 15, 2, '2025-07-13 12:32:22'),  -- Vegan
+(53, 15, 17, '2025-07-13 12:32:22'), -- Healthy
+(54, 15, 12, '2025-07-13 12:32:22'), -- Mexican
+
+-- Recipe 16: Microwave Mug Cake
+(55, 16, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(56, 16, 16, '2025-07-13 12:32:22'), -- Dessert
+(57, 16, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+
+-- Recipe 17: Classic Tomato Soup
+(58, 17, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(59, 17, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(60, 17, 17, '2025-07-13 12:32:22'), -- Healthy
+(61, 17, 14, '2025-07-13 12:32:22'), -- Lunch
+
+-- Recipe 18: Pan-Seared Pork Chops
+(62, 18, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(63, 18, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 19: Berry Chia Pudding
+(64, 19, 17, '2025-07-13 12:32:22'), -- Healthy
+(65, 19, 13, '2025-07-13 12:32:22'), -- Breakfast
+(66, 19, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(67, 19, 2, '2025-07-13 12:32:22'),  -- Vegan
+
+-- Recipe 20: Classic Grilled Cheese Sandwich
+(68, 20, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(69, 20, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(70, 20, 14, '2025-07-13 12:32:22'), -- Lunch
+
+-- Recipe 21: Speedy Black Bean and Corn Salsa
+(71, 21, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(72, 21, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(73, 21, 2, '2025-07-13 12:32:22'),  -- Vegan
+(74, 21, 17, '2025-07-13 12:32:22'), -- Healthy
+(75, 21, 12, '2025-07-13 12:32:22'); -- Mexican
+
+-- --------------------------------------------------------
 -- --------------------------------------------------------
 
 --

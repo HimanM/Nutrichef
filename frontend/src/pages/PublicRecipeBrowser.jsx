@@ -425,6 +425,7 @@ function PublicRecipeBrowser() {
             {/* View Selection Buttons */}
             <div className="flex flex-wrap gap-3 mb-6">
               <button
+                type="button"
                 onClick={() => handleViewChange('public')}
                 className={`btn-outline flex items-center ${currentView === 'public' ? 'bg-emerald-100 text-emerald-700 border-emerald-300' : ''}`}
               >
@@ -433,6 +434,7 @@ function PublicRecipeBrowser() {
               </button>
               
               <button
+                type="button"
                 onClick={() => handleViewChange('private')}
                 disabled={!isAuthenticated}
                 title={!isAuthenticated ? "Log in to view your private recipes" : ""}
@@ -443,6 +445,7 @@ function PublicRecipeBrowser() {
               </button>
               
               <button
+                type="button"
                 onClick={() => handleViewChange('favorites')}
                 disabled={!isAuthenticated}
                 title={!isAuthenticated ? "Log in to view your favorite recipes" : ""}
@@ -479,6 +482,7 @@ function PublicRecipeBrowser() {
                 {/* Toggle Button */}
                 <div className="flex items-center justify-between mb-4">
                   <button
+                    type="button"
                     onClick={toggleTagsFilter}
                     className={`flex items-center text-lg font-semibold transition-colors ${
                       selectedTags.length > 0 ? 'text-emerald-700' : 'text-gray-800 hover:text-gray-600'
@@ -503,6 +507,7 @@ function PublicRecipeBrowser() {
                   
                   {showTagsFilter && selectedTags.length > 0 && (
                     <button
+                      type="button"
                       onClick={clearTagFilters}
                       className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
                     >
@@ -522,6 +527,7 @@ function PublicRecipeBrowser() {
                           {Array.isArray(tags) && tags.map((tag) => (
                             <button
                               key={tag.TagID}
+                              type="button"
                               onClick={() => handleTagToggle(tag.TagID)}
                               className={`px-3 py-1 text-sm rounded-full border transition-colors ${
                                 selectedTags.includes(tag.TagID)
