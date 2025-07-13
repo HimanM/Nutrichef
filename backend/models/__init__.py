@@ -9,6 +9,8 @@ from .meal_plan import UserMealPlan
 from .user_pantry_ingredient import UserPantryIngredient
 from .contact_message import ContactMessage
 from .recipe_rating import RecipeRating
+from .user_favorite_recipe import UserFavoriteRecipe
+from .recipe_tag import RecipeTag, RecipeTagAssignment
 
 __all__ = [
     'User',
@@ -22,5 +24,8 @@ __all__ = [
     'UserMealPlan',
     'UserPantryIngredient',
     'ContactMessage',
-    'RecipeRating'
+    'RecipeRating',
+    'UserFavoriteRecipe',
+    'RecipeTag',
+    'RecipeTagAssignment'
 ]

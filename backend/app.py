@@ -32,6 +32,8 @@ from .routes.food_lookup_routes import food_lookup_bp
 from .routes.chatbot_routes import chatbot_bp, initialize_chatbot_service
 from .routes.pantry_routes import pantry_bp
 from .routes.contact_message_routes import contact_message_bp
+from .routes.favorites_routes import favorites_bp
+from .routes.tags_routes import tags_bp
 
 log_header("Application Startup")
 app = Flask(__name__, static_folder='static', static_url_path='/static')
@@ -102,6 +104,8 @@ app.register_blueprint(food_lookup_bp)
 app.register_blueprint(chatbot_bp)
 app.register_blueprint(pantry_bp)
 app.register_blueprint(contact_message_bp)
+app.register_blueprint(favorites_bp)
+app.register_blueprint(tags_bp)
 
 with app.app_context():
     log_header("Service Initialization")

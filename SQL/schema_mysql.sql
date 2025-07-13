@@ -581,6 +581,80 @@ INSERT INTO `RecipeRatings` (`RatingID`, `RecipeID`, `UserID`, `Rating`, `Create
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `RecipeTags`
+--
+
+DROP TABLE IF EXISTS `RecipeTags`;
+CREATE TABLE IF NOT EXISTS `RecipeTags` (
+  `TagID` int NOT NULL AUTO_INCREMENT,
+  `TagName` varchar(100) NOT NULL,
+  `TagCategory` varchar(50) DEFAULT 'general',
+  `TagColor` varchar(7) DEFAULT '#6B7280',
+  `CreatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`TagID`),
+  UNIQUE KEY `TagName` (`TagName`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `RecipeTags`
+--
+
+INSERT INTO `RecipeTags` (`TagID`, `TagName`, `TagCategory`, `TagColor`, `CreatedAt`) VALUES
+(1, 'Vegetarian', 'diet', '#10B981', '2025-07-13 10:00:00'),
+(2, 'Vegan', 'diet', '#059669', '2025-07-13 10:00:00'),
+(3, 'Gluten-Free', 'diet', '#F59E0B', '2025-07-13 10:00:00'),
+(4, 'Low-Carb', 'diet', '#3B82F6', '2025-07-13 10:00:00'),
+(5, 'Keto', 'diet', '#8B5CF6', '2025-07-13 10:00:00'),
+(6, 'Quick & Easy', 'difficulty', '#10B981', '2025-07-13 10:00:00'),
+(7, 'Beginner', 'difficulty', '#10B981', '2025-07-13 10:00:00'),
+(8, 'Intermediate', 'difficulty', '#F59E0B', '2025-07-13 10:00:00'),
+(9, 'Advanced', 'difficulty', '#EF4444', '2025-07-13 10:00:00'),
+(10, 'Italian', 'cuisine', '#EF4444', '2025-07-13 10:00:00'),
+(11, 'Asian', 'cuisine', '#F59E0B', '2025-07-13 10:00:00'),
+(12, 'Mexican', 'cuisine', '#10B981', '2025-07-13 10:00:00'),
+(13, 'Breakfast', 'course', '#F97316', '2025-07-13 10:00:00'),
+(14, 'Lunch', 'course', '#EAB308', '2025-07-13 10:00:00'),
+(15, 'Dinner', 'course', '#3B82F6', '2025-07-13 10:00:00'),
+(16, 'Dessert', 'course', '#EC4899', '2025-07-13 10:00:00'),
+(17, 'Healthy', 'general', '#10B981', '2025-07-13 10:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `RecipeTagAssignments`
+--
+
+DROP TABLE IF EXISTS `RecipeTagAssignments`;
+CREATE TABLE IF NOT EXISTS `RecipeTagAssignments` (
+  `AssignmentID` int NOT NULL AUTO_INCREMENT,
+  `RecipeID` int NOT NULL,
+  `TagID` int NOT NULL,
+  `AssignedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`AssignmentID`),
+  UNIQUE KEY `unique_recipe_tag` (`RecipeID`, `TagID`),
+  KEY `TagID` (`TagID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `UserFavoriteRecipes`
+--
+
+DROP TABLE IF EXISTS `UserFavoriteRecipes`;
+CREATE TABLE IF NOT EXISTS `UserFavoriteRecipes` (
+  `FavoriteID` int NOT NULL AUTO_INCREMENT,
+  `UserID` int NOT NULL,
+  `RecipeID` int NOT NULL,
+  `CreatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`FavoriteID`),
+  UNIQUE KEY `unique_user_recipe` (`UserID`, `RecipeID`),
+  KEY `RecipeID` (`RecipeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `Recipes`
 --
 
@@ -768,6 +842,20 @@ ALTER TABLE `RecipeRatings`
 --
 ALTER TABLE `Recipes`
   ADD CONSTRAINT `recipes_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `RecipeTagAssignments`
+--
+ALTER TABLE `RecipeTagAssignments`
+  ADD CONSTRAINT `recipetagassignments_ibfk_1` FOREIGN KEY (`RecipeID`) REFERENCES `Recipes` (`RecipeID`) ON DELETE CASCADE,
+  ADD CONSTRAINT `recipetagassignments_ibfk_2` FOREIGN KEY (`TagID`) REFERENCES `RecipeTags` (`TagID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `UserFavoriteRecipes`
+--
+ALTER TABLE `UserFavoriteRecipes`
+  ADD CONSTRAINT `userfavoriterecipes_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE,
+  ADD CONSTRAINT `userfavoriterecipes_ibfk_2` FOREIGN KEY (`RecipeID`) REFERENCES `Recipes` (`RecipeID`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `UserAllergies`
