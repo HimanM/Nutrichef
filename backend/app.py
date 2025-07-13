@@ -8,6 +8,9 @@ from .services import UserService, RecipeService
 from flask_jwt_extended import JWTManager, get_jwt_identity
 from flask_mail import Mail
 import os
+import signal
+import sys
+import atexit
 from .utils.logging_utils import suppress_external_warnings, log_header, log_info
 
 # Suppress warnings before other imports
@@ -105,6 +108,32 @@ with app.app_context():
     initialize_chatbot_service()
     log_header("Service Initialization Complete")
 
+def graceful_shutdown():
+    """Perform cleanup tasks before shutting down the application."""
+    log_info("Initiating graceful shutdown...", "Shutdown")
+    try:
+        # Cleanup any background services or tasks here
+        # Add any other cleanup tasks specific to your application
+        log_info("Background services cleaned up.", "Shutdown")
+    except Exception as e:
+        log_info(f"Error during service cleanup: {e}", "Shutdown")
+    
+    log_info("Graceful shutdown complete.", "Shutdown")
+
+def signal_handler(signum, frame):
+    """Handle termination signals gracefully."""
+    signal_name = signal.Signals(signum).name
+    log_info(f"Received signal {signal_name} ({signum}). Shutting down gracefully...", "Shutdown")
+    graceful_shutdown()
+    sys.exit(0)
+
+# Register signal handlers for graceful shutdown
+signal.signal(signal.SIGINT, signal_handler)   # Ctrl+C
+signal.signal(signal.SIGTERM, signal_handler)  # Termination signal
+
+# Register cleanup function to run on normal exit
+atexit.register(graceful_shutdown)
+
 @app.errorhandler(404)
 def handle_not_found_error(e):
     return jsonify(error="Not Found", message="The requested URL was not found on the server."), 404
@@ -145,4 +174,12 @@ def make_shell_context():
     }
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    try:
+        log_info("Starting Flask application...", "Startup")
+        app.run(debug=True, host='0.0.0.0', port=5000)
+    except KeyboardInterrupt:
+        log_info("Received keyboard interrupt. Shutting down...", "Shutdown")
+    except Exception as e:
+        log_info(f"Application error: {e}", "Error")
+    finally:
+        graceful_shutdown()
