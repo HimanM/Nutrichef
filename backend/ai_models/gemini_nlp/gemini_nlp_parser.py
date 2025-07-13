@@ -190,3 +190,106 @@ class GeminiNlpParser:
         except Exception as e:
             print(f"An error occurred in GeminiNlpParser.extract_recipe_nutrition: {e}")
             return {"error": str(e), "success": False}
+
+    def extract_recipe_tags(self, recipe_data: dict):
+        """
+        Extract relevant tags for a recipe based on its content.
+        Uses Gemini to analyze the recipe and suggest appropriate tags.
+        """
+        if not self.api_key:
+            print("ERROR in GeminiNlpParser: GEMINI_API_KEY not found or not loaded.")
+            return {"error": "API key not configured", "success": False}
+
+        try:
+            # Prepare the recipe information for analysis
+            recipe_info = {
+                "title": recipe_data.get("Title", ""),
+                "description": recipe_data.get("Description", ""),
+                "ingredients": recipe_data.get("Ingredients", []),
+                "instructions": recipe_data.get("Instructions", []),
+                "prep_time": recipe_data.get("PreparationTimeMinutes", 0),
+                "cook_time": recipe_data.get("CookingTimeMinutes", 0)
+            }
+
+            # Create a detailed prompt for tag extraction
+            tags_prompt = f"""
+            Analyze the following recipe and suggest appropriate tags from the predefined categories.
+            
+            Recipe Title: {recipe_info['title']}
+            Description: {recipe_info['description']}
+            Preparation Time: {recipe_info['prep_time']} minutes
+            Cooking Time: {recipe_info['cook_time']} minutes
+            Ingredients: {json.dumps(recipe_info['ingredients'], indent=2)}
+            Instructions: {recipe_info['instructions']}
+            
+            Available tag categories and examples:
+            - cuisine: Italian, Asian, Mexican, Indian, Mediterranean, American, French, Chinese, Japanese, Thai
+            - diet: Vegetarian, Vegan, Gluten-Free, Low-Carb, Keto, Paleo, Dairy-Free, Sugar-Free, High-Protein
+            - course: Breakfast, Lunch, Dinner, Dessert, Snack, Appetizer, Side Dish
+            - difficulty: Beginner (under 30 min, simple steps), Intermediate (30-60 min), Advanced (over 60 min, complex)
+            - general: Healthy, Comfort Food, Quick & Easy, One-Pot, Baking, Grilling, Family-Friendly, Holiday, Seasonal
+            
+            Rules for tag suggestion:
+            - Suggest 3-6 most relevant tags
+            - Prioritize accuracy over quantity
+            - Consider ingredients, cooking method, and cultural origin
+            - Quick & Easy = prep + cook time under 30 minutes
+            - Healthy = low in processed ingredients, includes vegetables/fruits
+            - Analyze ingredient names to determine cuisine type
+            - Look for dietary restrictions based on ingredients
+            
+            Return in JSON format:
+            {{
+                "success": true,
+                "tags": ["tag1", "tag2", "tag3"],
+                "reasoning": "Brief explanation of why these tags were chosen"
+            }}
+            
+            If you cannot determine appropriate tags, return:
+            {{
+                "success": false,
+                "error": "Unable to determine appropriate tags for this recipe"
+            }}
+            """
+
+            client = genai.Client(api_key=self.api_key)
+            model_name = "gemini-1.5-flash-8b"
+            
+            current_contents = [
+                types.Content(
+                    role="user",
+                    parts=[
+                        types.Part.from_text(text=tags_prompt),
+                    ],
+                ),
+            ]
+            
+            generation_config_obj = types.GenerateContentConfig(
+                temperature=0.1,
+                response_mime_type="application/json",
+            )
+            
+            full_response_text = ""
+            stream = client.models.generate_content_stream(
+                model=model_name,
+                contents=current_contents,
+                config=generation_config_obj,
+            )
+            
+            for chunk in stream:
+                if chunk.text:
+                    full_response_text += chunk.text
+                
+            if not full_response_text.strip():
+                return {"error": "Empty API response stream", "success": False}
+                
+            try:
+                tags_data = json.loads(full_response_text)
+                return tags_data
+            except json.JSONDecodeError as e:
+                print(f"Error in GeminiNlpParser: Failed to decode tags JSON response: {e}")
+                return {"error": f"Invalid JSON response: {e.msg}", "success": False}
+                
+        except Exception as e:
+            print(f"An error occurred in GeminiNlpParser.extract_recipe_tags: {e}")
+            return {"error": str(e), "success": False}

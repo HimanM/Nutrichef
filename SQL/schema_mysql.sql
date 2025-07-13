@@ -581,6 +581,204 @@ INSERT INTO `RecipeRatings` (`RatingID`, `RecipeID`, `UserID`, `Rating`, `Create
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `RecipeTags`
+--
+
+DROP TABLE IF EXISTS `RecipeTags`;
+CREATE TABLE IF NOT EXISTS `RecipeTags` (
+  `TagID` int NOT NULL AUTO_INCREMENT,
+  `TagName` varchar(100) NOT NULL,
+  `TagCategory` varchar(50) DEFAULT 'general',
+  `TagColor` varchar(7) DEFAULT '#6B7280',
+  `CreatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`TagID`),
+  UNIQUE KEY `TagName` (`TagName`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `RecipeTags`
+--
+
+INSERT INTO `RecipeTags` (`TagID`, `TagName`, `TagCategory`, `TagColor`, `CreatedAt`) VALUES
+(1, 'Vegetarian', 'diet', '#10B981', '2025-07-13 10:00:00'),
+(2, 'Vegan', 'diet', '#059669', '2025-07-13 10:00:00'),
+(3, 'Gluten-Free', 'diet', '#F59E0B', '2025-07-13 10:00:00'),
+(4, 'Low-Carb', 'diet', '#3B82F6', '2025-07-13 10:00:00'),
+(5, 'Keto', 'diet', '#8B5CF6', '2025-07-13 10:00:00'),
+(6, 'Quick & Easy', 'difficulty', '#10B981', '2025-07-13 10:00:00'),
+(7, 'Beginner', 'difficulty', '#10B981', '2025-07-13 10:00:00'),
+(8, 'Intermediate', 'difficulty', '#F59E0B', '2025-07-13 10:00:00'),
+(9, 'Advanced', 'difficulty', '#EF4444', '2025-07-13 10:00:00'),
+(10, 'Italian', 'cuisine', '#EF4444', '2025-07-13 10:00:00'),
+(11, 'Asian', 'cuisine', '#F59E0B', '2025-07-13 10:00:00'),
+(12, 'Mexican', 'cuisine', '#10B981', '2025-07-13 10:00:00'),
+(13, 'Breakfast', 'course', '#F97316', '2025-07-13 10:00:00'),
+(14, 'Lunch', 'course', '#EAB308', '2025-07-13 10:00:00'),
+(15, 'Dinner', 'course', '#3B82F6', '2025-07-13 10:00:00'),
+(16, 'Dessert', 'course', '#EC4899', '2025-07-13 10:00:00'),
+(17, 'Healthy', 'general', '#10B981', '2025-07-13 10:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `RecipeTagAssignments`
+--
+
+DROP TABLE IF EXISTS `RecipeTagAssignments`;
+CREATE TABLE IF NOT EXISTS `RecipeTagAssignments` (
+  `AssignmentID` int NOT NULL AUTO_INCREMENT,
+  `RecipeID` int NOT NULL,
+  `TagID` int NOT NULL,
+  `AssignedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`AssignmentID`),
+  UNIQUE KEY `unique_recipe_tag` (`RecipeID`, `TagID`),
+  KEY `TagID` (`TagID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+--
+-- Dumping data for table `RecipeTagAssignments`
+--
+
+INSERT INTO `RecipeTagAssignments` (`AssignmentID`, `RecipeID`, `TagID`, `AssignedAt`) VALUES
+-- Recipe 1: Classic Tomato Basil Pasta
+(1, 1, 10, '2025-07-13 12:32:22'), -- Italian
+(2, 1, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(3, 1, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(4, 1, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 2: Quick Chicken Stir-Fry
+(5, 2, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(6, 2, 11, '2025-07-13 12:32:22'), -- Asian
+(7, 2, 15, '2025-07-13 12:32:22'), -- Dinner
+(8, 2, 17, '2025-07-13 12:32:22'), -- Healthy
+
+-- Recipe 3: Creamy Mushroom Soup
+(9, 3, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(10, 3, 15, '2025-07-13 12:32:22'), -- Dinner
+(11, 3, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+
+-- Recipe 4: Lentil Salad with Roasted Vegetables
+(12, 4, 1, '2025-07-13 12:32:22'), -- Vegetarian
+(13, 4, 2, '2025-07-13 12:32:22'), -- Vegan
+(14, 4, 17, '2025-07-13 12:32:22'), -- Healthy
+(15, 4, 14, '2025-07-13 12:32:22'), -- Lunch
+(16, 4, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 5: Garlic Butter Shrimp Scampi with Linguine
+(17, 5, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(18, 5, 10, '2025-07-13 12:32:22'), -- Italian
+(19, 5, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 6: Fluffy Scrambled Eggs with Toast
+(20, 6, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(21, 6, 13, '2025-07-13 12:32:22'), -- Breakfast
+(22, 6, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+
+-- Recipe 7: Black Bean Burgers
+(23, 7, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(24, 7, 2, '2025-07-13 12:32:22'),  -- Vegan
+(25, 7, 17, '2025-07-13 12:32:22'), -- Healthy
+(26, 7, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 8: Simple Roasted Chicken Thighs with Root Vegetables
+(27, 8, 15, '2025-07-13 12:32:22'), -- Dinner
+(28, 8, 17, '2025-07-13 12:32:22'), -- Healthy
+
+-- Recipe 9: Caprese Salad
+(29, 9, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(30, 9, 10, '2025-07-13 12:32:22'), -- Italian
+(31, 9, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(32, 9, 17, '2025-07-13 12:32:22'), -- Healthy
+(33, 9, 14, '2025-07-13 12:32:22'), -- Lunch
+
+-- Recipe 10: Berry Smoothie
+(34, 10, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(35, 10, 13, '2025-07-13 12:32:22'), -- Breakfast
+(36, 10, 17, '2025-07-13 12:32:22'), -- Healthy
+(37, 10, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+
+-- Recipe 11: Sheet Pan Lemon Herb Salmon and Asparagus
+(38, 11, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(39, 11, 17, '2025-07-13 12:32:22'), -- Healthy
+(40, 11, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 12: Chicken and Vegetable Skewers
+(41, 12, 17, '2025-07-13 12:32:22'), -- Healthy
+(42, 12, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 13: Simple Cheese Omelette
+(43, 13, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(44, 13, 13, '2025-07-13 12:32:22'), -- Breakfast
+(45, 13, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+
+-- Recipe 14: Veggie Fried Rice
+(46, 14, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(47, 14, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(48, 14, 11, '2025-07-13 12:32:22'), -- Asian
+(49, 14, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 15: Simple Guacamole
+(50, 15, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(51, 15, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(52, 15, 2, '2025-07-13 12:32:22'),  -- Vegan
+(53, 15, 17, '2025-07-13 12:32:22'), -- Healthy
+(54, 15, 12, '2025-07-13 12:32:22'), -- Mexican
+
+-- Recipe 16: Microwave Mug Cake
+(55, 16, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(56, 16, 16, '2025-07-13 12:32:22'), -- Dessert
+(57, 16, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+
+-- Recipe 17: Classic Tomato Soup
+(58, 17, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(59, 17, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(60, 17, 17, '2025-07-13 12:32:22'), -- Healthy
+(61, 17, 14, '2025-07-13 12:32:22'), -- Lunch
+
+-- Recipe 18: Pan-Seared Pork Chops
+(62, 18, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(63, 18, 15, '2025-07-13 12:32:22'), -- Dinner
+
+-- Recipe 19: Berry Chia Pudding
+(64, 19, 17, '2025-07-13 12:32:22'), -- Healthy
+(65, 19, 13, '2025-07-13 12:32:22'), -- Breakfast
+(66, 19, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(67, 19, 2, '2025-07-13 12:32:22'),  -- Vegan
+
+-- Recipe 20: Classic Grilled Cheese Sandwich
+(68, 20, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(69, 20, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(70, 20, 14, '2025-07-13 12:32:22'), -- Lunch
+
+-- Recipe 21: Speedy Black Bean and Corn Salsa
+(71, 21, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
+(72, 21, 1, '2025-07-13 12:32:22'),  -- Vegetarian
+(73, 21, 2, '2025-07-13 12:32:22'),  -- Vegan
+(74, 21, 17, '2025-07-13 12:32:22'), -- Healthy
+(75, 21, 12, '2025-07-13 12:32:22'); -- Mexican
+
+-- --------------------------------------------------------
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `UserFavoriteRecipes`
+--
+
+DROP TABLE IF EXISTS `UserFavoriteRecipes`;
+CREATE TABLE IF NOT EXISTS `UserFavoriteRecipes` (
+  `FavoriteID` int NOT NULL AUTO_INCREMENT,
+  `UserID` int NOT NULL,
+  `RecipeID` int NOT NULL,
+  `CreatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`FavoriteID`),
+  UNIQUE KEY `unique_user_recipe` (`UserID`, `RecipeID`),
+  KEY `RecipeID` (`RecipeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `Recipes`
 --
 
@@ -768,6 +966,20 @@ ALTER TABLE `RecipeRatings`
 --
 ALTER TABLE `Recipes`
   ADD CONSTRAINT `recipes_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `RecipeTagAssignments`
+--
+ALTER TABLE `RecipeTagAssignments`
+  ADD CONSTRAINT `recipetagassignments_ibfk_1` FOREIGN KEY (`RecipeID`) REFERENCES `Recipes` (`RecipeID`) ON DELETE CASCADE,
+  ADD CONSTRAINT `recipetagassignments_ibfk_2` FOREIGN KEY (`TagID`) REFERENCES `RecipeTags` (`TagID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `UserFavoriteRecipes`
+--
+ALTER TABLE `UserFavoriteRecipes`
+  ADD CONSTRAINT `userfavoriterecipes_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE,
+  ADD CONSTRAINT `userfavoriterecipes_ibfk_2` FOREIGN KEY (`RecipeID`) REFERENCES `Recipes` (`RecipeID`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `UserAllergies`

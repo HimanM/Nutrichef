@@ -6,7 +6,7 @@ import { authenticatedFetch } from '../utils/apiUtil.js';
 import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
 import RecipeSubmissionModal from '../components/RecipeSubmissionModal.jsx';
 import FloatingLoader from '../components/FloatingLoader.jsx';
-import { HiOutlineRefresh, HiOutlineSearch, HiOutlinePlus, HiOutlineCheck, HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
+import { HiOutlineRefresh, HiOutlineSearch, HiOutlinePlus, HiOutlineCheck, HiOutlineEye, HiOutlineEyeOff, HiOutlineHeart, HiHeart, HiOutlineTag, HiOutlineX } from 'react-icons/hi';
 
 const AddIcon = ({ className = "w-5 h-5 mr-1" }) => <svg className={className} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd"></path></svg>;
 const CheckIcon = ({ className = "w-5 h-5 mr-1" }) => <svg className={className} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path></svg>;
@@ -25,7 +25,13 @@ function PublicRecipeBrowser() {
   const [totalRecipes, setTotalRecipes] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [inputValue, setInputValue] = useState('');
-  const [showPrivateRecipes, setShowPrivateRecipes] = useState(false);
+  
+  // New state for favorites and tags
+  const [currentView, setCurrentView] = useState('public'); // 'public', 'private', 'favorites'
+  const [availableTags, setAvailableTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [favoriteRecipeIds, setFavoriteRecipeIds] = useState(new Set());
+  const [showTagsFilter, setShowTagsFilter] = useState(false);
 
   const auth = useAuth();
   const { isAuthenticated, currentUser } = auth;
@@ -68,34 +74,68 @@ function PublicRecipeBrowser() {
     }
   };
 
-  const fetchRecipes = useCallback(async (currentSearchTerm, pageToFetch, limit, showPrivate, currentUserId) => {
+  const fetchRecipes = useCallback(async (currentSearchTerm, pageToFetch, limit, viewType, currentUserId, tagIds = []) => {
     setLoading(true);
     setError(null);
     let url = '';
     let fetcher = fetch;
 
-    if (showPrivate) {
-      if (!currentUserId) {
-        setError("You must be logged in to view private recipes.");
-        setLoading(false);
-        setRecipes([]);
-        setTotalRecipes(0);
-        setIsLoginModalOpen(true);
+    try {
+      if (viewType === 'favorites') {
+        if (!currentUserId) {
+          setError("You must be logged in to view your favorites.");
+          setLoading(false);
+          setRecipes([]);
+          setTotalRecipes(0);
+          setIsLoginModalOpen(true);
+          return;
+        }
+        const data = await fetchUserFavorites(currentUserId, pageToFetch, limit, currentSearchTerm);
+        setRecipes(data.recipes || []);
+        setTotalRecipes(data.pagination?.total || 0);
         return;
       }
-      url = `/api/recipes/my-private?page=${pageToFetch}&limit=${limit}&user_id=${currentUserId}`; 
-      if (currentSearchTerm) {
-        url += `&search=${encodeURIComponent(currentSearchTerm)}`;
-      }
-      fetcher = authenticatedFetch;
-    } else {
-      url = `/api/recipes?page=${pageToFetch}&limit=${limit}`;
-      if (currentSearchTerm) {
-        url += `&search=${encodeURIComponent(currentSearchTerm)}`;
-      }
-    }
 
-    try {
+      if (tagIds.length > 0) {
+        const data = await fetchRecipesByTags(tagIds, pageToFetch, limit, false);
+        let filteredRecipes = data.recipes || [];
+        
+        // Apply search filter if needed
+        if (currentSearchTerm) {
+          const searchLower = currentSearchTerm.toLowerCase();
+          filteredRecipes = filteredRecipes.filter(recipe => 
+            recipe.Title?.toLowerCase().includes(searchLower) ||
+            recipe.Description?.toLowerCase().includes(searchLower)
+          );
+        }
+        
+        setRecipes(filteredRecipes);
+        setTotalRecipes(filteredRecipes.length);
+        return;
+      }
+
+      if (viewType === 'private') {
+        if (!currentUserId) {
+          setError("You must be logged in to view private recipes.");
+          setLoading(false);
+          setRecipes([]);
+          setTotalRecipes(0);
+          setIsLoginModalOpen(true);
+          return;
+        }
+        url = `/api/recipes/my-private?page=${pageToFetch}&limit=${limit}&user_id=${currentUserId}`; 
+        if (currentSearchTerm) {
+          url += `&search=${encodeURIComponent(currentSearchTerm)}`;
+        }
+        fetcher = authenticatedFetch;
+      } else {
+        // Public recipes
+        url = `/api/recipes?page=${pageToFetch}&limit=${limit}`;
+        if (currentSearchTerm) {
+          url += `&search=${encodeURIComponent(currentSearchTerm)}`;
+        }
+      }
+
       const response = await fetcher(url, {}, auth);
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -116,12 +156,12 @@ function PublicRecipeBrowser() {
   }, [auth]);
 
   useEffect(() => {
-    fetchRecipes(searchTerm, currentPage, recipesPerPage, showPrivateRecipes, effectiveUserId);
+    fetchRecipes(searchTerm, currentPage, recipesPerPage, currentView, effectiveUserId, selectedTags);
 
     const existingPaletteString = localStorage.getItem(MEAL_PLAN_PALETTE_KEY);
     const currentPalette = existingPaletteString ? JSON.parse(existingPaletteString) : [];
     setPaletteRecipeIds(new Set(currentPalette.map(r => r.RecipeID)));
-  }, [currentPage, recipesPerPage, searchTerm, fetchRecipes, showPrivateRecipes, effectiveUserId]);
+  }, [currentPage, recipesPerPage, searchTerm, fetchRecipes, currentView, effectiveUserId, selectedTags]);
 
   useEffect(() => {
     let hasBeenHiddenOrBlurred = false;
@@ -129,7 +169,7 @@ function PublicRecipeBrowser() {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         if (hasBeenHiddenOrBlurred) {
-          fetchRecipes(searchTerm, currentPage, recipesPerPage, showPrivateRecipes, effectiveUserId);
+          fetchRecipes(searchTerm, currentPage, recipesPerPage, currentView, effectiveUserId, selectedTags);
         }
       } else {
         hasBeenHiddenOrBlurred = true;
@@ -145,7 +185,7 @@ function PublicRecipeBrowser() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [fetchRecipes, searchTerm, currentPage, recipesPerPage, showPrivateRecipes, effectiveUserId]);
+  }, [fetchRecipes, searchTerm, currentPage, recipesPerPage, currentView, effectiveUserId, selectedTags]);
 
   const handleAddToPalette = (recipeToAdd) => {
     if (isAuthenticated) {
@@ -170,6 +210,115 @@ function PublicRecipeBrowser() {
       setIsLoginModalOpen(true);
     }
   };
+
+  // Favorites API functions
+  const toggleFavorite = async (recipeId) => {
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    try {
+      const isFavorited = favoriteRecipeIds.has(recipeId);
+      const method = isFavorited ? 'DELETE' : 'POST';
+      const response = await authenticatedFetch(`/api/recipes/${recipeId}/favorite`, {
+        method
+      }, auth);
+
+      if (!response.ok) {
+        throw new Error('Failed to update favorite status');
+      }
+
+      const data = await response.json();
+      
+      // Update local state
+      setFavoriteRecipeIds(prev => {
+        const newSet = new Set(prev);
+        if (data.is_favorited) {
+          newSet.add(recipeId);
+        } else {
+          newSet.delete(recipeId);
+        }
+        return newSet;
+      });
+
+      // Update recipe in current list if needed
+      setRecipes(prev => prev.map(recipe => 
+        recipe.RecipeID === recipeId 
+          ? { ...recipe, is_favorited: data.is_favorited }
+          : recipe
+      ));
+
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      setError('Failed to update favorite status');
+    }
+  };
+
+  const fetchUserFavorites = async (userId, page = 1, limit = 12, search = '') => {
+    try {
+      let url = `/api/users/${userId}/favorites?page=${page}&limit=${limit}`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+      
+      const response = await authenticatedFetch(url, {}, auth);
+      if (!response.ok) throw new Error('Failed to fetch favorites');
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+      throw error;
+    }
+  };
+
+  // Tags API functions
+  const fetchTags = async () => {
+    try {
+      const response = await fetch('/api/tags/by-category');
+      if (!response.ok) throw new Error('Failed to fetch tags');
+      const data = await response.json();
+      return data.tags_by_category || {};
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+      return {};
+    }
+  };
+
+  const fetchRecipesByTags = async (tagIds, page = 1, limit = 12, matchAll = false) => {
+    try {
+      const response = await fetch('/api/recipes/by-tags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tag_ids: tagIds, page, limit, match_all: matchAll })
+      });
+      
+      if (!response.ok) throw new Error('Failed to fetch recipes by tags');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching recipes by tags:', error);
+      throw error;
+    }
+  };
+
+  // Load user favorites on authentication
+  useEffect(() => {
+    if (isAuthenticated && currentUser) {
+      authenticatedFetch(`/api/users/${currentUser.UserID}/favorites/ids`, {}, auth)
+        .then(response => response.json())
+        .then(data => {
+          setFavoriteRecipeIds(new Set(data.favorite_recipe_ids || []));
+        })
+        .catch(error => console.error('Error loading user favorites:', error));
+    } else {
+      setFavoriteRecipeIds(new Set());
+    }
+  }, [isAuthenticated, currentUser, auth]);
+
+  // Load available tags on component mount
+  useEffect(() => {
+    fetchTags().then(tagsData => {
+      setAvailableTags(tagsData);
+    });
+  }, []);
 
   if (loading && recipes.length === 0) {
     return (
@@ -212,16 +361,45 @@ function PublicRecipeBrowser() {
 
   const commonButtonClassNameUnused = "px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-300";
 
-  const handleToggleRecipeView = () => {
-    if (!showPrivateRecipes && !isAuthenticated) {
+  // View management functions
+  const handleViewChange = (newView) => {
+    if ((newView === 'private' || newView === 'favorites') && !isAuthenticated) {
       setIsLoginModalOpen(true);
       return;
     }
-    setShowPrivateRecipes(prev => !prev);
+    setCurrentView(newView);
+    setCurrentPage(1);
+    setSelectedTags([]); // Clear tag filters when changing views
+  };
+
+  // Tag management functions
+  const handleTagToggle = (tagId) => {
+    setSelectedTags(prev => {
+      const newTags = prev.includes(tagId) 
+        ? prev.filter(id => id !== tagId)
+        : [...prev, tagId];
+      setCurrentPage(1); // Reset to first page when filters change
+      return newTags;
+    });
+  };
+
+  const clearTagFilters = () => {
+    setSelectedTags([]);
     setCurrentPage(1);
   };
 
-  const isToggleButtonDisabled = !isAuthenticated && !showPrivateRecipes;
+  const toggleTagsFilter = () => {
+    setShowTagsFilter(prev => !prev);
+  };
+
+  // Legacy support
+  const handleToggleRecipeView = () => {
+    const nextView = currentView === 'private' ? 'public' : 'private';
+    handleViewChange(nextView);
+  };
+
+  const showPrivateRecipes = currentView === 'private'; // Legacy compatibility
+  const isToggleButtonDisabled = !isAuthenticated && currentView === 'public';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
@@ -231,36 +409,59 @@ function PublicRecipeBrowser() {
           <div className="text-center mb-12 animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               <span className="gradient-text">
-                {showPrivateRecipes ? "My Private Recipes" : "Browse Recipes"}
+                {currentView === 'private' ? "My Private Recipes" : 
+                 currentView === 'favorites' ? "My Favorite Recipes" : 
+                 "Browse Recipes"}
               </span>
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Discover delicious recipes and add them to your meal planning palette
+              {currentView === 'favorites' ? "Your saved favorite recipes" :
+               "Discover delicious recipes and add them to your meal planning palette"}
             </p>
           </div>
 
           {/* Search and Filter Section */}
           <div className="card-glass p-6 mb-8 animate-fade-in">
-            <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-4 items-center">
+            {/* View Selection Buttons */}
+            <div className="flex flex-wrap gap-3 mb-6">
               <button
-                onClick={handleToggleRecipeView}
-                disabled={isToggleButtonDisabled}
-                title={isToggleButtonDisabled ? "Log in to view your private recipes" : ""}
-                className={`btn-outline flex items-center ${isToggleButtonDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                type="button"
+                onClick={() => handleViewChange('public')}
+                className={`btn-outline flex items-center ${currentView === 'public' ? 'bg-emerald-100 text-emerald-700 border-emerald-300' : ''}`}
               >
-                {showPrivateRecipes ? (
-                  <>
-                    <HiOutlineEyeOff className="w-4 h-4 mr-2" />
-                    Public Recipes
-                  </>
-                ) : (
-                  <>
-                    <HiOutlineEye className="w-4 h-4 mr-2" />
-                    Private Recipes
-                  </>
-                )}
+                <HiOutlineEye className="w-4 h-4 mr-2" />
+                Public Recipes
               </button>
               
+              <button
+                type="button"
+                onClick={() => handleViewChange('private')}
+                disabled={!isAuthenticated}
+                title={!isAuthenticated ? "Log in to view your private recipes" : ""}
+                className={`btn-outline flex items-center ${currentView === 'private' ? 'bg-blue-100 text-blue-700 border-blue-300' : ''} ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <HiOutlineEyeOff className="w-4 h-4 mr-2" />
+                Private Recipes
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => handleViewChange('favorites')}
+                disabled={!isAuthenticated}
+                title={!isAuthenticated ? "Log in to view your favorite recipes" : ""}
+                className={`inline-flex items-center justify-center font-medium py-3 px-6 rounded-xl transition-all duration-300 ease-out transform hover:scale-105 ${
+                  currentView === 'favorites' 
+                    ? 'bg-pink-100 text-pink-700 border-2 border-pink-300' 
+                    : 'border-2 border-gray-300 text-gray-600 hover:border-pink-300 hover:text-pink-600 hover:bg-pink-50'
+                } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <HiOutlineHeart className="w-4 h-4 mr-2" />
+                Favorites
+              </button>
+            </div>
+
+            {/* Search Bar */}
+            <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-4 items-center mb-6">
               <div className="flex-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <HiOutlineSearch className="h-5 w-5 text-gray-400" />
@@ -278,6 +479,80 @@ function PublicRecipeBrowser() {
                 <HiOutlineSearch className="w-5 h-5" />
               </button>
             </form>
+
+            {/* Tag Filters Toggle & Section */}
+            {currentView === 'public' && Object.keys(availableTags).length > 0 && (
+              <div className="border-t pt-6">
+                {/* Toggle Button */}
+                <div className="flex items-center justify-between mb-4">
+                  <button
+                    type="button"
+                    onClick={toggleTagsFilter}
+                    className={`flex items-center text-lg font-semibold transition-colors ${
+                      selectedTags.length > 0 ? 'text-emerald-700' : 'text-gray-800 hover:text-gray-600'
+                    }`}
+                  >
+                    <HiOutlineTag className="w-5 h-5 mr-2" />
+                    Filter by Tags
+                    {selectedTags.length > 0 && (
+                      <span className="ml-2 px-2 py-1 text-xs bg-emerald-100 text-emerald-700 rounded-full">
+                        {selectedTags.length} active
+                      </span>
+                    )}
+                    <svg 
+                      className={`w-4 h-4 ml-2 transition-transform duration-200 ${showTagsFilter ? 'rotate-180' : ''}`}
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {showTagsFilter && selectedTags.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={clearTagFilters}
+                      className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
+                    >
+                      <HiOutlineX className="w-4 h-4 mr-1" />
+                      Clear Filters
+                    </button>
+                  )}
+                </div>
+                
+                {/* Tags Filter Content */}
+                {showTagsFilter && (
+                  <div className="animate-fade-in">
+                    {Object.entries(availableTags).map(([category, tags]) => (
+                      <div key={category} className="mb-4">
+                        <h4 className="text-sm font-medium text-gray-600 mb-2 capitalize">{category}</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {Array.isArray(tags) && tags.map((tag) => (
+                            <button
+                              key={tag.TagID}
+                              type="button"
+                              onClick={() => handleTagToggle(tag.TagID)}
+                              className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                                selectedTags.includes(tag.TagID)
+                                  ? 'text-white border-transparent'
+                                  : 'text-gray-600 border-gray-300 hover:border-gray-400'
+                              }`}
+                              style={{
+                                backgroundColor: selectedTags.includes(tag.TagID) ? tag.TagColor : 'transparent',
+                                borderColor: selectedTags.includes(tag.TagID) ? tag.TagColor : undefined
+                              }}
+                            >
+                              {tag.TagName}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Error Message */}
@@ -303,42 +578,68 @@ function PublicRecipeBrowser() {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">No recipes found</h3>
                 <p className="text-gray-600">
-                  {searchTerm ? `No ${showPrivateRecipes ? 'private' : 'public'} recipes found for "${searchTerm}".` : 
-                               `No ${showPrivateRecipes ? 'private' : 'public'} recipes available at the moment.`}
-                  {showPrivateRecipes && !isAuthenticated && " Please log in to see your private recipes."}
+                  {searchTerm ? `No ${currentView} recipes found for "${searchTerm}".` : 
+                   selectedTags.length > 0 ? "No recipes found with the selected tags." :
+                   `No ${currentView} recipes available at the moment.`}
+                  {(currentView === 'private' || currentView === 'favorites') && !isAuthenticated && " Please log in to access this feature."}
                 </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {recipes.map((recipe) => {
                   const isRecipeInPalette = paletteRecipeIds.has(recipe.RecipeID);
+                  const isFavorited = favoriteRecipeIds.has(recipe.RecipeID) || recipe.is_favorited;
+                  
                   return (
                     <RecipeCard
                       key={recipe.RecipeID}
                       recipe={recipe}
                       renderActions={(currentRecipe) => (
-                        <button
-                          type="button"
-                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToPalette(currentRecipe); }}
-                          disabled={isRecipeInPalette}
-                          className={`w-full mt-4 px-4 py-2 text-sm font-medium rounded-xl flex items-center justify-center transition-all duration-200 ${
-                            isRecipeInPalette
-                              ? 'bg-emerald-100 text-emerald-700 cursor-default'
-                              : 'btn-secondary hover:scale-105'
-                          }`}
-                        >
-                          {isRecipeInPalette ? (
-                            <>
-                              <HiOutlineCheck className="w-4 h-4 mr-2" />
-                              Added to Palette
-                            </>
-                          ) : (
-                            <>
-                              <HiOutlinePlus className="w-4 h-4 mr-2" />
-                              Add to Palette
-                            </>
+                        <div className="flex gap-2 mt-4">
+                          {/* Favorites Button - Icon Only */}
+                          {isAuthenticated && (
+                            <button
+                              type="button"
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(currentRecipe.RecipeID); }}
+                              className={`p-3 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 ${
+                                isFavorited
+                                  ? 'bg-pink-500 text-white border border-pink-500 hover:bg-pink-600 shadow-md'
+                                  : 'bg-white text-pink-500 border border-pink-300 hover:border-pink-400 hover:bg-pink-50'
+                              }`}
+                              title={isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
+                            >
+                              {isFavorited ? (
+                                <HiHeart className="w-5 h-5" />
+                              ) : (
+                                <HiOutlineHeart className="w-5 h-5" />
+                              )}
+                            </button>
                           )}
-                        </button>
+                          
+                          {/* Add to Palette Button */}
+                          <button
+                            type="button"
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToPalette(currentRecipe); }}
+                            disabled={isRecipeInPalette}
+                            className={`flex-1 px-4 py-3 text-sm font-medium rounded-xl flex items-center justify-center transition-all duration-200 ${
+                              isRecipeInPalette
+                                ? 'bg-emerald-100 text-emerald-700 cursor-default'
+                                : 'btn-secondary hover:scale-105'
+                            }`}
+                          >
+                            {isRecipeInPalette ? (
+                              <>
+                                <HiOutlineCheck className="w-4 h-4 mr-2" />
+                                Added to Palette
+                              </>
+                            ) : (
+                              <>
+                                <HiOutlinePlus className="w-4 h-4 mr-2" />
+                                Add to Palette
+                              </>
+                            )}
+                          </button>
+                        </div>
                       )}
                     />
                   );
