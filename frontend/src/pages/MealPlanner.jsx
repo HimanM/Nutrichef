@@ -746,58 +746,58 @@ function MealPlanner() {
       <div className="section-padding">
         <div className="container-modern">
           {/* Header */}
-          <div className="text-center mb-8 animate-fade-in">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <div className="text-center mb-6 animate-fade-in">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">
               <span className="gradient-text">Meal Planner</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-sm text-gray-600 max-w-2xl mx-auto">
               Plan your weekly meals, organize recipes, and create shopping lists
             </p>
           </div>
 
           {/* Action Bar */}
-          <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl p-6 mb-8 border border-emerald-100">
-            <div className="flex flex-wrap gap-4 justify-between items-center">
+          <div className="bg-white/80 backdrop-blur-sm shadow-lg rounded-xl p-4 mb-6 border border-emerald-100">
+            <div className="flex flex-wrap gap-3 justify-between items-center">
               {/* Left side - View controls */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={togglePaletteVisibility}
-                  className="btn-outline flex items-center gap-2"
+                  className="btn-outline flex items-center gap-2 text-sm py-2 px-3"
                 >
                   {isPaletteVisible ? (
                     <>
-                      <HiOutlineEyeOff className="w-4 h-4" />
+                      <HiOutlineEyeOff className="w-3 h-3" />
                       Hide Palette
                     </>
                   ) : (
                     <>
-                      <HiOutlineEye className="w-4 h-4" />
+                      <HiOutlineEye className="w-3 h-3" />
                       Show Palette
                     </>
                   )}
                 </button>
                 
-                <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
                   <button
                     onClick={() => setViewMode('week')}
-                    className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                    className={`px-2 py-1 rounded-md text-xs font-medium transition-all ${
                       viewMode === 'week' 
                         ? 'bg-white text-emerald-600 shadow-sm' 
                         : 'text-gray-600 hover:text-gray-800'
                     }`}
                   >
-                    <MdViewWeek className="w-4 h-4 inline mr-1" />
+                    <MdViewWeek className="w-3 h-3 inline mr-1" />
                     Week
                   </button>
                   <button
                     onClick={() => setViewMode('day')}
-                    className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                    className={`px-2 py-1 rounded-md text-xs font-medium transition-all ${
                       viewMode === 'day' 
                         ? 'bg-white text-emerald-600 shadow-sm' 
                         : 'text-gray-600 hover:text-gray-800'
                     }`}
                   >
-                    <MdViewDay className="w-4 h-4 inline mr-1" />
+                    <MdViewDay className="w-3 h-3 inline mr-1" />
                     2 Weeks
                   </button>
                 </div>
@@ -805,8 +805,8 @@ function MealPlanner() {
 
               {/* Center - Selected recipe indicator */}
               {recipeSelectedForPlanning && (
-                <div className="flex items-center gap-2 px-4 py-2 bg-emerald-100 border border-emerald-200 rounded-lg">
-                  <span className="text-sm text-emerald-800 font-medium">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-100 border border-emerald-200 rounded-lg">
+                  <span className="text-xs text-emerald-800 font-medium">
                     Selected: {recipeSelectedForPlanning.Title}
                   </span>
                   <button
@@ -814,31 +814,31 @@ function MealPlanner() {
                     className="text-emerald-600 hover:text-emerald-800 transition-colors"
                     title="Clear selection"
                   >
-                    <MdClose className="w-4 h-4" />
+                    <MdClose className="w-3 h-3" />
                   </button>
                 </div>
               )}
 
               {/* Right side - Action buttons */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsNutritionalTargetsModalOpen(true)}
-                  className="btn-outline flex items-center gap-2"
+                  className="btn-outline flex items-center gap-1 text-xs py-1.5 px-2"
                   title="Set nutritional targets"
                 >
-                  <MdSettings className="w-4 h-4" />
+                  <MdSettings className="w-3 h-3" />
                   Nutrition
                 </button>
                 
                 <button
                   onClick={handleAddAllToBasket}
                   disabled={isAddingToBasket || Object.keys(plannedMeals).length === 0}
-                  className="btn-primary flex items-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
+                  className="btn-primary flex items-center gap-1 text-xs py-1.5 px-2 disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   {isAddingToBasket ? (
-                    <AiOutlineLoading className="animate-spin h-4 w-4" />
+                    <AiOutlineLoading className="animate-spin h-3 w-3" />
                   ) : (
-                    <MdAddShoppingCart className="w-4 h-4" />
+                    <MdAddShoppingCart className="w-3 h-3" />
                   )}
                   Add to Basket
                 </button>
@@ -846,12 +846,12 @@ function MealPlanner() {
                 <button
                   onClick={handleSaveToCloud}
                   disabled={isSavingToCloud}
-                  className="btn-outline flex items-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
+                  className="btn-outline flex items-center gap-1 text-xs py-1.5 px-2 disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   {isSavingToCloud ? (
-                    <AiOutlineLoading className="animate-spin h-4 w-4" />
+                    <AiOutlineLoading className="animate-spin h-3 w-3" />
                   ) : (
-                    <HiOutlineCloudUpload className="w-4 h-4" />
+                    <HiOutlineCloudUpload className="w-3 h-3" />
                   )}
                   Save
                 </button>
@@ -859,12 +859,12 @@ function MealPlanner() {
                 <button
                   onClick={handleLoadFromCloudConfirmation}
                   disabled={isLoadingFromCloud}
-                  className="btn-outline flex items-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
+                  className="btn-outline flex items-center gap-1 text-xs py-1.5 px-2 disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   {isLoadingFromCloud ? (
-                    <AiOutlineLoading className="animate-spin h-4 w-4" />
+                    <AiOutlineLoading className="animate-spin h-3 w-3" />
                   ) : (
-                    <HiOutlineCalendar className="w-4 h-4" />
+                    <HiOutlineCalendar className="w-3 h-3" />
                   )}
                   Load
                 </button>
@@ -872,17 +872,17 @@ function MealPlanner() {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={handleDownloadTXT}
-                    className="btn-ghost p-2"
+                    className="flex items-center justify-center p-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200 group"
                     title="Download as TXT"
                   >
-                    <HiOutlineDocumentDownload className="w-4 h-4" />
+                    <HiOutlineDocumentDownload className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
                   </button>
                   <button
                     onClick={handleDownloadPDF}
-                    className="btn-ghost p-2"
+                    className="flex items-center justify-center p-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200 group"
                     title="Download as PDF"
                   >
-                    <MdDownload className="w-4 h-4" />
+                    <MdDownload className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
                   </button>
                 </div>
               </div>
@@ -890,20 +890,20 @@ function MealPlanner() {
 
             {/* Basket message */}
             {basketMessage && (
-              <div className="mt-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-                <p className="text-sm text-emerald-700 font-medium">{basketMessage}</p>
+              <div className="mt-3 p-2 bg-emerald-50 border border-emerald-200 rounded-lg">
+                <p className="text-xs text-emerald-700 font-medium">{basketMessage}</p>
               </div>
             )}
           </div>
 
           {/* Main Content */}
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-end mb-3">
             <button
               onClick={handleAddEmptyDay}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium shadow"
+              className="flex items-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium shadow text-sm"
               title="Add a new day to plan meals"
             >
-              <span className="text-xl font-bold">+</span> Add Day
+              <span className="text-lg font-bold">+</span> Add Day
             </button>
           </div>
           
