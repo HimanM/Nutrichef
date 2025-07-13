@@ -449,7 +449,11 @@ function PublicRecipeBrowser() {
                 onClick={() => handleViewChange('favorites')}
                 disabled={!isAuthenticated}
                 title={!isAuthenticated ? "Log in to view your favorite recipes" : ""}
-                className={`btn-outline flex items-center ${currentView === 'favorites' ? 'bg-red-100 text-red-700 border-red-300' : ''} ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`inline-flex items-center justify-center font-medium py-3 px-6 rounded-xl transition-all duration-300 ease-out transform hover:scale-105 ${
+                  currentView === 'favorites' 
+                    ? 'bg-pink-100 text-pink-700 border-2 border-pink-300' 
+                    : 'border-2 border-gray-300 text-gray-600 hover:border-pink-300 hover:text-pink-600 hover:bg-pink-50'
+                } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <HiOutlineHeart className="w-4 h-4 mr-2" />
                 Favorites
@@ -591,28 +595,23 @@ function PublicRecipeBrowser() {
                       key={recipe.RecipeID}
                       recipe={recipe}
                       renderActions={(currentRecipe) => (
-                        <div className="flex flex-col gap-2 mt-4">
-                          {/* Favorites Button */}
+                        <div className="flex gap-2 mt-4">
+                          {/* Favorites Button - Icon Only */}
                           {isAuthenticated && (
                             <button
                               type="button"
                               onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(currentRecipe.RecipeID); }}
-                              className={`w-full px-4 py-2 text-sm font-medium rounded-xl flex items-center justify-center transition-all duration-200 ${
+                              className={`p-3 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 ${
                                 isFavorited
-                                  ? 'bg-red-100 text-red-700 border border-red-200 hover:bg-red-200'
-                                  : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
+                                  ? 'bg-pink-500 text-white border border-pink-500 hover:bg-pink-600 shadow-md'
+                                  : 'bg-white text-pink-500 border border-pink-300 hover:border-pink-400 hover:bg-pink-50'
                               }`}
+                              title={isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
                             >
                               {isFavorited ? (
-                                <>
-                                  <HiHeart className="w-4 h-4 mr-2" />
-                                  Remove from Favorites
-                                </>
+                                <HiHeart className="w-5 h-5" />
                               ) : (
-                                <>
-                                  <HiOutlineHeart className="w-4 h-4 mr-2" />
-                                  Add to Favorites
-                                </>
+                                <HiOutlineHeart className="w-5 h-5" />
                               )}
                             </button>
                           )}
@@ -622,7 +621,7 @@ function PublicRecipeBrowser() {
                             type="button"
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToPalette(currentRecipe); }}
                             disabled={isRecipeInPalette}
-                            className={`w-full px-4 py-2 text-sm font-medium rounded-xl flex items-center justify-center transition-all duration-200 ${
+                            className={`flex-1 px-4 py-3 text-sm font-medium rounded-xl flex items-center justify-center transition-all duration-200 ${
                               isRecipeInPalette
                                 ? 'bg-emerald-100 text-emerald-700 cursor-default'
                                 : 'btn-secondary hover:scale-105'
