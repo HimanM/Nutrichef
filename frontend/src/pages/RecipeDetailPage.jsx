@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
+import { consolidateBasketItems } from '../utils/basketUtils.js';
 import StarRating from '../components/StarRating';
 import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
 import InteractiveModal from '../components/InteractiveModal.jsx';
@@ -221,11 +222,14 @@ function RecipeDetailPage() {
         quantity: ing.Quantity || '', unit: ing.Unit || '',
         recipeTitle: recipeData.Title, recipeId: recipeData.RecipeID, isChecked: false
       }));
+      
+      // Use consolidation logic to merge ingredients with same name and unit
       const existingBasketString = localStorage.getItem(SHOPPING_BASKET_KEY);
-      let basket = existingBasketString ? JSON.parse(existingBasketString) : [];
-      basket = [...basket, ...itemsToAdd];
-      localStorage.setItem(SHOPPING_BASKET_KEY, JSON.stringify(basket));
-      setBasketMessage(`${itemsToAdd.length} item(s) added to your shopping basket!`);
+      const existingBasket = existingBasketString ? JSON.parse(existingBasketString) : [];
+      const consolidatedBasket = consolidateBasketItems(existingBasket, itemsToAdd);
+      
+      localStorage.setItem(SHOPPING_BASKET_KEY, JSON.stringify(consolidatedBasket));
+      setBasketMessage(`Ingredients added to your shopping basket!`);
       setTimeout(() => setBasketMessage(''), 3000);
     } catch (error) {
       setBasketMessage('Failed to add items to basket.'); setTimeout(() => setBasketMessage(''), 3000);

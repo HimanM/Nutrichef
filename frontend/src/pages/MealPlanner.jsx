@@ -4,6 +4,7 @@ import { useMealPlanSelection } from '../context/MealPlanSelectionContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useModal } from '../context/ModalContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
+import { consolidateBasketItems } from '../utils/basketUtils.js';
 import MealItemCard from '../components/MealItemCard.jsx';
 import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
 import NutritionalProgress from '../components/NutritionalProgress.jsx';
@@ -354,11 +355,11 @@ function MealPlanner() {
         return;
       }
 
-      // Add to existing basket
+      // Add to existing basket using consolidation logic
       const existingBasketString = localStorage.getItem(SHOPPING_BASKET_KEY);
-      let basket = existingBasketString ? JSON.parse(existingBasketString) : [];
-      basket = [...basket, ...allIngredients];
-      localStorage.setItem(SHOPPING_BASKET_KEY, JSON.stringify(basket));
+      const existingBasket = existingBasketString ? JSON.parse(existingBasketString) : [];
+      const consolidatedBasket = consolidateBasketItems(existingBasket, allIngredients);
+      localStorage.setItem(SHOPPING_BASKET_KEY, JSON.stringify(consolidatedBasket));
 
       setBasketMessage(`${allIngredients.length} ingredients added to shopping basket!`);
       setTimeout(() => setBasketMessage(''), 3000);
