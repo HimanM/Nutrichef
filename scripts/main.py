@@ -31,7 +31,7 @@ class Colors:
 
 class NutriChefDemo:
     def __init__(self):
-        self.root_dir = Path(__file__).parent
+        self.root_dir = Path(__file__).parent.parent  # Go up to project root from scripts folder
         self.backend_dir = self.root_dir / "backend"
         self.frontend_dir = self.root_dir / "frontend"
         self.backend_process = None
@@ -222,6 +222,120 @@ class NutriChefDemo:
             print(f"  ❌ Error managing firewall: {e}")
             print(f"  💡 You may need to run as Administrator to modify firewall settings")
             return False
+
+    def show_vps_deployment_guide(self):
+        """Show VPS deployment instructions"""
+        print(f"\n{Colors.HEADER}{Colors.BOLD}🌍 VPS Deployment Guide{Colors.ENDC}")
+        print(f"""
+{Colors.OKCYAN}VPS deployment allows global access without router configuration!{Colors.ENDC}
+
+{Colors.OKGREEN}📋 Quick Steps:{Colors.ENDC}
+  1. Get a VPS from DigitalOcean, Linode, Vultr, etc.
+  2. Upload your NutriChef project to the VPS
+  3. Run the automated setup script
+  4. Access your app from anywhere!
+
+{Colors.OKBLUE}🔧 VPS Setup Commands:{Colors.ENDC}
+  # On your VPS, run:
+  cd /path/to/nutrichef
+  chmod +x vps-setup.sh
+  ./vps-setup.sh
+
+{Colors.OKCYAN}📦 What the script does:{Colors.ENDC}
+  ✅ Installs all dependencies (Python, Node.js, etc.)
+  ✅ Configures firewall (ports 5000, 5173)
+  ✅ Creates systemd services for auto-startup
+  ✅ Provides management commands
+  ✅ Shows your public access URLs
+
+{Colors.OKGREEN}🌐 After setup, your app will be accessible at:{Colors.ENDC}
+  Frontend: http://YOUR_VPS_IP:5173
+  Backend:  http://YOUR_VPS_IP:5000
+
+{Colors.WARNING}💰 VPS Costs (approximate):{Colors.ENDC}
+  • DigitalOcean: $6-12/month
+  • Linode: $5-10/month  
+  • Vultr: $6-12/month
+  • Hetzner: $4-8/month (Europe)
+
+{Colors.OKCYAN}📚 Detailed guides available:{Colors.ENDC}
+  • VPS_DEPLOYMENT_GUIDE.md - Complete setup instructions
+  • vps-setup.sh - Automated setup script
+
+{Colors.OKGREEN}✨ Benefits of VPS deployment:{Colors.ENDC}
+  🌍 Global access from any device
+  🔒 No router configuration needed
+  ⚡ Better performance than home hosting
+  📈 Easy to scale up resources
+  🛡️  Professional hosting environment
+
+{Colors.WARNING}Want to continue with local development instead?{Colors.ENDC}
+""")
+        
+        choice = input(f"{Colors.OKCYAN}Continue with local development? (y/N): {Colors.ENDC}").lower().strip()
+        if choice in ['y', 'yes']:
+            return False  # Continue with local development
+        else:
+            print(f"\n{Colors.OKGREEN}Happy VPS deployment! 🚀{Colors.ENDC}")
+            print(f"{Colors.OKCYAN}Check the VPS_DEPLOYMENT_GUIDE.md for detailed instructions.{Colors.ENDC}")
+            return True  # Exit
+
+    def show_vps_deployment_guide(self):
+        """Show VPS deployment instructions"""
+        print(f"\n{Colors.HEADER}{Colors.BOLD}🌍 VPS Deployment Guide{Colors.ENDC}")
+        print(f"""
+{Colors.OKCYAN}VPS deployment allows global access without router configuration!{Colors.ENDC}
+
+{Colors.OKGREEN}� Quick Steps:{Colors.ENDC}
+  1. Get a VPS from DigitalOcean, Linode, Vultr, etc.
+  2. Upload your NutriChef project to the VPS
+  3. Run the automated setup script
+  4. Access your app from anywhere!
+
+{Colors.OKBLUE}🔧 VPS Setup Commands:{Colors.ENDC}
+  # On your VPS, run:
+  cd /path/to/nutrichef
+  chmod +x vps-setup.sh
+  ./vps-setup.sh
+
+{Colors.OKCYAN}📦 What the script does:{Colors.ENDC}
+  ✅ Installs all dependencies (Python, Node.js, etc.)
+  ✅ Configures firewall (ports 5000, 5173)
+  ✅ Creates systemd services for auto-startup
+  ✅ Provides management commands
+  ✅ Shows your public access URLs
+
+{Colors.OKGREEN}🌐 After setup, your app will be accessible at:{Colors.ENDC}
+  Frontend: http://YOUR_VPS_IP:5173
+  Backend:  http://YOUR_VPS_IP:5000
+
+{Colors.WARNING}💰 VPS Costs (approximate):{Colors.ENDC}
+  • DigitalOcean: $6-12/month
+  • Linode: $5-10/month  
+  • Vultr: $6-12/month
+  • Hetzner: $4-8/month (Europe)
+
+{Colors.OKCYAN}📚 Detailed guides available:{Colors.ENDC}
+  • VPS_DEPLOYMENT_GUIDE.md - Complete setup instructions
+  • vps-setup.sh - Automated setup script
+
+{Colors.OKGREEN}✨ Benefits of VPS deployment:{Colors.ENDC}
+  🌍 Global access from any device
+  🔒 No router configuration needed
+  ⚡ Better performance than home hosting
+  📈 Easy to scale up resources
+  🛡️  Professional hosting environment
+
+{Colors.WARNING}Want to continue with local development instead?{Colors.ENDC}
+""")
+        
+        choice = input(f"{Colors.OKCYAN}Continue with local development? (y/N): {Colors.ENDC}").lower().strip()
+        if choice in ['y', 'yes']:
+            return False  # Continue with local development
+        else:
+            print(f"\n{Colors.OKGREEN}Happy VPS deployment! 🚀{Colors.ENDC}")
+            print(f"{Colors.OKCYAN}Check the VPS_DEPLOYMENT_GUIDE.md for detailed instructions.{Colors.ENDC}")
+            return True  # Exit
 
     def close_firewall_ports(self):
         """Close Windows firewall ports that were opened by this script"""
@@ -582,12 +696,13 @@ pause"""
                 self.install_dependencies()
             
             # Ask user if they want to enable external access
-            print(f"\n{Colors.OKCYAN}Choose access type:{Colors.ENDC}")
+            print(f"\n{Colors.OKCYAN}Choose deployment type:{Colors.ENDC}")
             print(f"  1. Local network only (friends on same WiFi)")
             print(f"  2. Public internet access (requires router setup)")
-            print(f"  3. No external access (localhost only)")
+            print(f"  3. VPS deployment (upload to server)")
+            print(f"  4. No external access (localhost only)")
             
-            access_choice = input(f"Enter choice (1/2/3): ").strip()
+            access_choice = input(f"Enter choice (1/2/3/4): ").strip()
             
             if access_choice == "1":
                 if not self.open_firewall_ports():
@@ -597,6 +712,9 @@ pause"""
             elif access_choice == "2":
                 if not self.setup_public_access():
                     print(f"{Colors.WARNING}⚠️  Continuing with local network access only...{Colors.ENDC}")
+            elif access_choice == "3":
+                self.show_vps_deployment_guide()
+                return True  # Exit after showing guide
             else:
                 print(f"  ℹ️  External access disabled. Only local access (localhost) will work.")
             
