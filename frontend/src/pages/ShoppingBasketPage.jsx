@@ -259,7 +259,10 @@ function ShoppingBasketPage() {
                           <div className="ml-3 text-sm">
                             <p className="font-medium text-gray-800">
                               {item.unit || ''} {item.name}
-                              {item.recipeSources && item.recipeSources.length > 1 && (
+                              {/* Check multiple ways to detect consolidation */}
+                              {((item.recipeSources && item.recipeSources.length > 1) || 
+                                (item.recipeTitle && item.recipeTitle.includes(',')) ||
+                                (item.recipeTitle && item.recipeTitle.split(',').length > 1)) && (
                                 <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
                                   Consolidated
                                 </span>
