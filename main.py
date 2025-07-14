@@ -15,6 +15,7 @@ import subprocess
 import threading
 import webbrowser
 from pathlib import Path
+import platform
 
 # Color codes for beautiful CLI output
 class Colors:
@@ -36,6 +37,7 @@ class NutriChefDemo:
         self.backend_process = None
         self.frontend_process = None
         self.is_running = False
+        self.firewall_rules_added = False
         
     def print_banner(self):
         """Display the NutriChef banner"""
@@ -133,6 +135,209 @@ class NutriChefDemo:
         print(f"\n{Colors.OKGREEN}✅ All requirements satisfied!{Colors.ENDC}")
         return True
 
+    def is_admin(self):
+        """Check if the script is running with administrator privileges"""
+        try:
+            return os.getuid() == 0
+        except AttributeError:
+            # Windows
+            import ctypes
+            try:
+                return ctypes.windll.shell32.IsUserAnAdmin()
+            except:
+                return False
+
+    def open_firewall_ports(self):
+        """Open Windows firewall ports for external access"""
+        if platform.system() != "Windows":
+            print(f"  ℹ️  Firewall management is only supported on Windows")
+            return True
+            
+        print(f"\n{Colors.OKCYAN}🔥 Opening firewall ports for external access...{Colors.ENDC}")
+        
+        try:
+            # Open port 5173 for Vite frontend
+            result1 = subprocess.run([
+                "netsh", "advfirewall", "firewall", "add", "rule",
+                "name=NutriChef-Frontend-5173",
+                "dir=in", "action=allow", "protocol=TCP", "localport=5173"
+            ], capture_output=True, text=True, shell=True)
+            
+            # Open port 5000 for Flask backend
+            result2 = subprocess.run([
+                "netsh", "advfirewall", "firewall", "add", "rule",
+                "name=NutriChef-Backend-5000",
+                "dir=in", "action=allow", "protocol=TCP", "localport=5000"
+            ], capture_output=True, text=True, shell=True)
+            
+            if result1.returncode == 0 and result2.returncode == 0:
+                print(f"  ✅ Firewall ports opened successfully!")
+                print(f"    • Port 5173 (Frontend) - Open")
+                print(f"    • Port 5000 (Backend) - Open")
+                self.firewall_rules_added = True
+                
+                # Get local IP address
+                try:
+                    import socket
+                    # Try multiple methods to get the correct IP
+                    local_ip = None
+                    
+                    # Method 1: Connect to a remote address to determine local IP
+                    try:
+                        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+                            s.connect(("8.8.8.8", 80))
+                            local_ip = s.getsockname()[0]
+                    except:
+                        pass
+                    
+                    # Method 2: Fallback to hostname resolution
+                    if not local_ip:
+                        hostname = socket.gethostname()
+                        local_ip = socket.gethostbyname(hostname)
+                    
+                    print(f"  🌐 Your friends can access the app at:")
+                    print(f"    • Frontend: {Colors.UNDERLINE}http://{local_ip}:5173{Colors.ENDC}")
+                    print(f"    • Backend API: {Colors.UNDERLINE}http://{local_ip}:5000{Colors.ENDC}")
+                    print(f"  💡 This should match the 'Network' URL shown by Vite")
+                except Exception as e:
+                    print(f"  ⚠️  Could not determine local IP: {e}")
+                    print(f"  💡 Check the Vite output for the 'Network' URL to share with friends")
+                    print(f"  💡 Or find your IP with: ipconfig")
+                
+                return True
+            else:
+                if "already exists" in result1.stderr or "already exists" in result2.stderr:
+                    print(f"  ℹ️  Firewall rules already exist")
+                    self.firewall_rules_added = False  # Don't remove rules we didn't create
+                    return True
+                else:
+                    print(f"  ❌ Failed to open firewall ports")
+                    if result1.stderr:
+                        print(f"    Frontend error: {result1.stderr}")
+                    if result2.stderr:
+                        print(f"    Backend error: {result2.stderr}")
+                    return False
+                    
+        except Exception as e:
+            print(f"  ❌ Error managing firewall: {e}")
+            print(f"  💡 You may need to run as Administrator to modify firewall settings")
+            return False
+
+    def close_firewall_ports(self):
+        """Close Windows firewall ports that were opened by this script"""
+        if not self.firewall_rules_added or platform.system() != "Windows":
+            return
+            
+        print(f"  🔥 Closing firewall ports...")
+        
+        try:
+            # Remove the firewall rules we created
+            result1 = subprocess.run([
+                "netsh", "advfirewall", "firewall", "delete", "rule",
+                "name=NutriChef-Frontend-5173"
+            ], capture_output=True, text=True, shell=True)
+            
+            result2 = subprocess.run([
+                "netsh", "advfirewall", "firewall", "delete", "rule",
+                "name=NutriChef-Backend-5000"
+            ], capture_output=True, text=True, shell=True)
+            
+            if result1.returncode == 0 and result2.returncode == 0:
+                print(f"  ✅ Firewall ports closed successfully!")
+            else:
+                print(f"  ⚠️  Some firewall rules may not have been removed")
+                
+        except Exception as e:
+            print(f"  ⚠️  Error closing firewall ports: {e}")
+
+    def get_public_ip(self):
+        """Get the public IP address"""
+        try:
+            import urllib.request
+            import json
+            
+            # Try multiple services to get public IP
+            services = [
+                "https://api.ipify.org?format=json",
+                "https://httpbin.org/ip",
+                "https://api.myip.com"
+            ]
+            
+            for service in services:
+                try:
+                    with urllib.request.urlopen(service, timeout=5) as response:
+                        data = json.loads(response.read().decode())
+                        if 'ip' in data:
+                            return data['ip']
+                        elif 'origin' in data:
+                            return data['origin']
+                except:
+                    continue
+                    
+            return None
+        except Exception:
+            return None
+
+    def setup_public_access(self):
+        """Setup public internet access"""
+        print(f"\n{Colors.WARNING}🌍 Setting up PUBLIC INTERNET access...{Colors.ENDC}")
+        print(f"{Colors.WARNING}⚠️  SECURITY WARNING: This will expose your app to the internet!{Colors.ENDC}")
+        
+        confirm = input(f"\n{Colors.FAIL}Are you sure you want to expose your app to the internet? (yes/NO): {Colors.ENDC}")
+        if confirm.lower() != "yes":
+            print(f"  ℹ️  Public access cancelled. Switching to local network access.")
+            return self.open_firewall_ports()
+        
+        # Open firewall ports first
+        if not self.open_firewall_ports():
+            print(f"  ❌ Failed to open firewall ports")
+            return False
+        
+        # Get public IP
+        print(f"  🔍 Getting your public IP address...")
+        public_ip = self.get_public_ip()
+        
+        if public_ip:
+            print(f"  ✅ Your public IP: {Colors.BOLD}{public_ip}{Colors.ENDC}")
+            
+            # Get local IP for router configuration
+            try:
+                import socket
+                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+                    s.connect(("8.8.8.8", 80))
+                    local_ip = s.getsockname()[0]
+            except:
+                local_ip = "YOUR_LOCAL_IP"
+            
+            print(f"\n{Colors.WARNING}🔧 ROUTER CONFIGURATION REQUIRED:{Colors.ENDC}")
+            print(f"  You need to configure port forwarding in your router:")
+            print(f"    • Port 5173 → {Colors.BOLD}{local_ip}:5173{Colors.ENDC} (Frontend)")
+            print(f"    • Port 5000 → {Colors.BOLD}{local_ip}:5000{Colors.ENDC} (Backend)")
+            print(f"")
+            print(f"  📋 Router setup steps:")
+            print(f"    1. Open your router admin panel (usually http://192.168.1.1)")
+            print(f"    2. Find 'Port Forwarding' or 'Virtual Servers' section")
+            print(f"    3. Add two rules:")
+            print(f"       - External Port 5173 → Internal {local_ip}:5173")
+            print(f"       - External Port 5000 → Internal {local_ip}:5000")
+            print(f"    4. Enable the rules and save")
+            print(f"")
+            print(f"  🌐 After router setup, share these URLs:")
+            print(f"    • Frontend: {Colors.UNDERLINE}http://{public_ip}:5173{Colors.ENDC}")
+            print(f"    • Backend API: {Colors.UNDERLINE}http://{public_ip}:5000{Colors.ENDC}")
+            print(f"")
+            print(f"  {Colors.FAIL}⚠️  SECURITY RISKS:{Colors.ENDC}")
+            print(f"    • Your app will be accessible by ANYONE on the internet")
+            print(f"    • No authentication or encryption by default")
+            print(f"    • Consider this for temporary demos only")
+            print(f"    • Monitor your router logs for suspicious activity")
+            print(f"")
+            return True
+        else:
+            print(f"  ❌ Could not determine public IP address")
+            print(f"  💡 You can find it manually at: https://whatismyipaddress.com/")
+            return False
+
     def install_dependencies(self):
         """Install backend and frontend dependencies"""
         print(f"\n{Colors.OKCYAN}📦 Installing dependencies...{Colors.ENDC}")
@@ -181,6 +386,7 @@ class NutriChefDemo:
 title NutriChef Backend Server
 echo Starting NutriChef Backend Server...
 echo Backend will be available at: http://localhost:5000
+echo Backend will also be accessible externally on port 5000
 echo.
 cd /d "{self.backend_dir}"
 set FLASK_APP=app.py
@@ -226,6 +432,7 @@ pause"""
 title NutriChef Frontend Server
 echo Starting NutriChef Frontend Server...
 echo Frontend will be available at: http://localhost:5173
+echo Frontend will also be accessible externally on port 5173
 echo.
 cd /d "{self.frontend_dir}"
 npm run dev
@@ -304,6 +511,9 @@ pause"""
         print(f"    • Backend terminal (Flask server)")
         print(f"    • Frontend terminal (Vite server)")
         
+        # Close firewall ports
+        self.close_firewall_ports()
+        
         # Clean up batch files
         try:
             backend_batch = self.root_dir / "start_backend.bat"
@@ -370,6 +580,25 @@ pause"""
             install_deps = input(f"\n{Colors.OKCYAN}Install/update dependencies? (y/N): {Colors.ENDC}").lower().strip()
             if install_deps in ['y', 'yes']:
                 self.install_dependencies()
+            
+            # Ask user if they want to enable external access
+            print(f"\n{Colors.OKCYAN}Choose access type:{Colors.ENDC}")
+            print(f"  1. Local network only (friends on same WiFi)")
+            print(f"  2. Public internet access (requires router setup)")
+            print(f"  3. No external access (localhost only)")
+            
+            access_choice = input(f"Enter choice (1/2/3): ").strip()
+            
+            if access_choice == "1":
+                if not self.open_firewall_ports():
+                    print(f"{Colors.WARNING}⚠️  Continuing without external access...{Colors.ENDC}")
+                    print(f"{Colors.WARNING}💡 To enable external access, run this script as Administrator{Colors.ENDC}")
+                    print(f"{Colors.WARNING}   Or manually open ports 5173 and 5000 in Windows Firewall{Colors.ENDC}")
+            elif access_choice == "2":
+                if not self.setup_public_access():
+                    print(f"{Colors.WARNING}⚠️  Continuing with local network access only...{Colors.ENDC}")
+            else:
+                print(f"  ℹ️  External access disabled. Only local access (localhost) will work.")
             
             # Start backend
             if not self.start_backend():

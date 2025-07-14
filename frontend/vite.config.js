@@ -6,6 +6,8 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(),tailwindcss(),],
   server: {
+    host: '0.0.0.0', // Allow external connections
+    port: 5173, // Default Vite port
     proxy: {
       '/api': {
         target: 'http://localhost:5000', // Your Flask backend address
