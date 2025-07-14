@@ -36,8 +36,11 @@ from .routes.favorites_routes import favorites_bp
 from .routes.tags_routes import tags_bp
 
 log_header("Application Startup")
-app = Flask(__name__, static_folder='static', static_url_path='/static')
-log_info("Flask app initialized.", "Startup")
+app = Flask(__name__, 
+           static_folder='static', 
+           static_url_path='/static',
+           template_folder='templates')
+log_info("Flask app initialized with template folder.", "Startup")
 app.config.from_object(Config)
 log_info("Configuration loaded from object.", "Startup")
 app.extensions = {}

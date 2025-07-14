@@ -1,0 +1,73 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}Verify Your Email - NutriChef{% endblock %}
+
+{% block content %}
+<div class="content-section">
+    <div class="greeting">
+        Hello {{ user_name }}! 👋
+    </div>
+    
+    <div class="message-text">
+        Welcome to <strong>NutriChef</strong>! We're thrilled to have you join our community of food enthusiasts and home chefs.
+    </div>
+    
+    <div class="message-text">
+        To get started with your personalized cooking experience, please verify your email address by clicking the button below:
+    </div>
+    
+    <div class="btn-container">
+        <a href="{{ verification_url }}" class="btn-primary">
+            ✓ Verify My Email
+        </a>
+    </div>
+    
+    <div class="message-text" style="font-size: 14px; color: #64748b; text-align: center;">
+        If the button doesn't work, you can copy and paste this link into your browser:
+        <br>
+        <a href="{{ verification_url }}" style="color: #10b981; word-break: break-all;">{{ verification_url }}</a>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="content-section">
+    <div class="message-text" style="font-size: 15px;">
+        <strong>What's next?</strong>
+    </div>
+    
+    <div class="message-text" style="font-size: 14px;">
+        Once verified, you'll be able to:
+        <ul style="color: #475569; padding-left: 20px; margin: 16px 0;">
+            <li>🍳 Get personalized recipe recommendations</li>
+            <li>📱 Use our AI-powered ingredient classifier</li>
+            <li>🥗 Plan your meals with our smart meal planner</li>
+            <li>🛒 Generate shopping lists automatically</li>
+            <li>💬 Chat with our AI cooking assistant</li>
+        </ul>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="content-section">
+    <div class="message-text" style="font-size: 14px; color: #64748b;">
+        <strong>Didn't create an account?</strong><br>
+        If you didn't sign up for NutriChef, you can safely ignore this email. The verification link will expire in 24 hours.
+    </div>
+    
+    <div class="message-text" style="font-size: 14px; color: #64748b;">
+        <strong>Need help?</strong><br>
+        If you have any questions, feel free to <a href="{{ frontend_url }}/contact-us" style="color: #10b981;">contact our support team</a>. We're here to help!
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 30px;">
+    <div style="font-size: 16px; color: #475569; margin-bottom: 8px;">
+        Happy cooking!
+    </div>
+    <div style="font-size: 16px; font-weight: 600; color: #10b981;">
+        The NutriChef Team 👨‍🍳👩‍🍳
+    </div>
+</div>
+{% endblock %}
