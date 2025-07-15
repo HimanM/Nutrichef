@@ -663,3 +663,133 @@ h3 {
   font-weight: bold;
   animation: none !important;
 }
+
+/* Mobile Modal Enhancements */
+.mobile-modal-backdrop {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.mobile-modal-content {
+  /* Ensure smooth scrolling on mobile */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.mobile-modal-drag-handle {
+  /* Make drag handle more visible and touch-friendly */
+  min-height: 44px; /* iOS recommended touch target size */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.mobile-modal-drag-handle:active {
+  cursor: grabbing;
+}
+
+.mobile-modal-drag-indicator {
+  width: 48px;
+  height: 6px;
+  background-color: #d1d5db;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.mobile-modal-drag-handle:hover .mobile-modal-drag-indicator,
+.mobile-modal-drag-handle:active .mobile-modal-drag-indicator {
+  background-color: #9ca3af;
+}
+
+/* Touch-friendly button enhancements */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Prevent zoom on input focus on iOS */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Mobile modal animations */
+@keyframes slideUpFromBottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDownToBottom {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.mobile-modal-enter {
+  animation: slideUpFromBottom 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.mobile-modal-exit {
+  animation: slideDownToBottom 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Improved mobile scrolling */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* Safe area handling for devices with notches */
+@supports (padding: max(0px)) {
+  .mobile-modal-content {
+    padding-left: max(1.5rem, env(safe-area-inset-left));
+    padding-right: max(1.5rem, env(safe-area-inset-right));
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* Enhanced focus states for mobile */
+@media (max-width: 768px) {
+  .focus-ring:focus {
+    outline: 2px solid #10b981;
+    outline-offset: 2px;
+  }
+  
+  button:focus,
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: 2px solid #10b981;
+    outline-offset: 2px;
+  }
+}
+
+/* Prevent body scroll when mobile modal is open */
+.mobile-modal-open {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+}

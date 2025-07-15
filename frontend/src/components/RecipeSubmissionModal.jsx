@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import InteractiveModal from './InteractiveModal.jsx';
+import ResponsiveModal from './ResponsiveModal.jsx';
 import { MdAddCircleOutline, MdDelete } from 'react-icons/md';
 
 const initialIngredient = { name: '', quantity: '', unit: '' };
@@ -85,7 +86,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
 
     if (mode === 'structured') {
       const finalIngredients = ingredients.filter(ing => ing.name.trim() || ing.quantity.trim() || ing.unit.trim())
-                                      .map(ing => ({ Ingredient: ing.name, Quantity: ing.quantity, Unit: ing.unit }));
+        .map(ing => ({ Ingredient: ing.name, Quantity: ing.quantity, Unit: ing.unit }));
       if (finalIngredients.length === 0) {
         setErrorModalTitle("Missing Information");
         setErrorModalMessage('At least one complete ingredient is required for a structured recipe.');
@@ -94,14 +95,14 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
         return;
       }
       payload = {
-        user_id: userId, 
-        Title: recipeName, 
-        ImageURL: uploadedImageUrl, 
+        user_id: userId,
+        Title: recipeName,
+        ImageURL: uploadedImageUrl,
         Description: description,
-        Instructions: instructions, 
+        Instructions: instructions,
         PreparationTimeMinutes: preparationTimeMinutes || null,
-        CookingTimeMinutes: cookingTimeMinutes || null, 
-        Servings: servings || null, 
+        CookingTimeMinutes: cookingTimeMinutes || null,
+        Servings: servings || null,
         Ingredients: finalIngredients,
         is_public: isPublic
       };
@@ -138,7 +139,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
 
     try {
       const response = await authenticatedFetch(endpoint, {
-        method: 'POST', 
+        method: 'POST',
         body: JSON.stringify(payload)
       }, auth);
       const data = await response.json();
@@ -177,13 +178,13 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
     setImageUploadSuccessMsg('');
     const formData = new FormData();
     formData.append('file', fileToUpload);
-    
+
     try {
       const response = await authenticatedFetch('/api/recipes/upload_image', {
         method: 'POST',
         body: formData
       }, auth);
-      
+
       const data = await response.json();
       if (response.ok) {
         setUploadedImageUrl(data.imageUrl);
@@ -200,32 +201,21 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
     }
   };
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 bg-white/60 backdrop-blur-md overflow-y-auto h-full w-full flex justify-center items-start z-40 px-4 py-6">
-      <div className="bg-white/90 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-emerald-100 mt-20">
-        {/* Header */}
-        <div className="px-8 py-6 border-b border-emerald-100 bg-gradient-to-r from-emerald-50 to-blue-50">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-emerald-700">Add New Recipe</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 transition-colors duration-200 p-2 rounded-lg hover:bg-gray-100"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="px-8 py-6 overflow-y-auto space-y-6 flex-grow">
+    <>
+      <ResponsiveModal
+        isOpen={open}
+        onClose={onClose}
+        title="Add New Recipe"
+        maxWidth="max-w-2xl"
+        dragToClose={true}
+        desktopClassName="bg-gradient-to-r from-emerald-50 to-blue-50"
+      >
+        <div className="space-y-6">
           {/* Basic Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-emerald-700 border-b border-emerald-100 pb-2">Basic Information</h3>
-            
+
             <div>
               <label htmlFor="recipeName" className="block text-sm font-medium text-gray-700 mb-2">
                 Recipe Name <span className="text-red-500">*</span>
@@ -236,7 +226,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
                 value={recipeName}
                 onChange={(e) => setRecipeName(e.target.value)}
                 disabled={isLoading || isUploadingImage}
-                className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75"
+                className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75 touch-manipulation"
                 placeholder="Enter recipe name..."
               />
             </div>
@@ -320,7 +310,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
           {/* Input Mode Selection */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-emerald-700 border-b border-emerald-100 pb-2">Input Method</h3>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Choose Input Method
@@ -357,7 +347,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
             <div className="space-y-4">
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-emerald-700 border-b border-emerald-100 pb-2">Recipe Details</h3>
-                
+
                 <div>
                   <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
                     Description
@@ -368,7 +358,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
                     onChange={(e) => setDescription(e.target.value)}
                     disabled={isLoading || isUploadingImage}
                     rows="3"
-                    className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75"
+                    className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75 touch-manipulation"
                     placeholder="Enter recipe description..."
                   />
                 </div>
@@ -383,7 +373,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
                     onChange={(e) => setInstructions(e.target.value)}
                     disabled={isLoading || isUploadingImage}
                     rows="4"
-                    className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75"
+                    className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75 touch-manipulation"
                     placeholder="Enter cooking instructions..."
                   />
                 </div>
@@ -400,7 +390,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
                       onChange={(e) => setPreparationTimeMinutes(e.target.value)}
                       disabled={isLoading || isUploadingImage}
                       min="0"
-                      className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75"
+                      className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75 touch-manipulation"
                       placeholder="30"
                     />
                   </div>
@@ -416,7 +406,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
                       onChange={(e) => setCookingTimeMinutes(e.target.value)}
                       disabled={isLoading || isUploadingImage}
                       min="0"
-                      className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75"
+                      className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75 touch-manipulation"
                       placeholder="45"
                     />
                   </div>
@@ -432,7 +422,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
                       onChange={(e) => setServings(e.target.value)}
                       disabled={isLoading || isUploadingImage}
                       min="1"
-                      className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75"
+                      className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75 touch-manipulation"
                       placeholder="4"
                     />
                   </div>
@@ -441,44 +431,85 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
 
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-emerald-700 border-b border-emerald-100 pb-2">Ingredients</h3>
-                
+
                 {ingredients.map((ingredient, index) => (
-                  <div key={index} className="flex space-x-2">
-                    <input
-                      type="text"
-                      value={ingredient.name}
-                      onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
-                      disabled={isLoading || isUploadingImage}
-                      placeholder="Ingredient name"
-                      className="flex-1 px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75"
-                    />
-                    <input
-                      type="text"
-                      value={ingredient.quantity}
-                      onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
-                      disabled={isLoading || isUploadingImage}
-                      placeholder="Quantity"
-                      className="w-24 px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75"
-                    />
-                    <input
-                      type="text"
-                      value={ingredient.unit}
-                      onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
-                      disabled={isLoading || isUploadingImage}
-                      placeholder="Unit"
-                      className="w-24 px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveIngredient(index)}
-                      disabled={isLoading || isUploadingImage || ingredients.length === 1}
-                      className="px-3 py-3 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <MdDelete className="w-5 h-5" />
-                    </button>
+                  <div key={index} className="space-y-2">
+                    {/* Mobile Layout - Stacked */}
+                    <div className="block sm:hidden space-y-2">
+                      <input
+                        type="text"
+                        value={ingredient.name}
+                        onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
+                        disabled={isLoading || isUploadingImage}
+                        placeholder="Ingredient name"
+                        className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75 touch-manipulation"
+                      />
+                      <div className="flex space-x-2">
+                        <input
+                          type="text"
+                          value={ingredient.quantity}
+                          onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
+                          disabled={isLoading || isUploadingImage}
+                          placeholder="Quantity"
+                          className="flex-1 px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75 touch-manipulation"
+                        />
+                        <input
+                          type="text"
+                          value={ingredient.unit}
+                          onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
+                          disabled={isLoading || isUploadingImage}
+                          placeholder="Unit"
+                          className="flex-1 px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75 touch-manipulation"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveIngredient(index)}
+                          disabled={isLoading || isUploadingImage || ingredients.length === 1}
+                          className="px-3 py-3 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                        >
+                          <MdDelete className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {/* Desktop Layout - Horizontal */}
+                    <div className="hidden sm:flex space-x-2">
+                      <input
+                        type="text"
+                        value={ingredient.name}
+                        onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
+                        disabled={isLoading || isUploadingImage}
+                        placeholder="Ingredient name"
+                        className="flex-1 px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75"
+                      />
+                      <input
+                        type="text"
+                        value={ingredient.quantity}
+                        onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
+                        disabled={isLoading || isUploadingImage}
+                        placeholder="Quantity"
+                        className="w-24 px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75"
+                      />
+                      <input
+                        type="text"
+                        value={ingredient.unit}
+                        onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
+                        disabled={isLoading || isUploadingImage}
+                        placeholder="Unit"
+                        className="w-24 px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveIngredient(index)}
+                        disabled={isLoading || isUploadingImage || ingredients.length === 1}
+                        className="px-3 py-3 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <MdDelete className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 ))}
-                
+
                 <button
                   type="button"
                   onClick={handleAddIngredient}
@@ -493,7 +524,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
           ) : (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-emerald-700 border-b border-emerald-100 pb-2">Recipe Text</h3>
-              
+
               <div>
                 <label htmlFor="rawRecipeText" className="block text-sm font-medium text-gray-700 mb-2">
                   Paste Recipe Text <span className="text-red-500">*</span>
@@ -504,28 +535,26 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
                   onChange={(e) => setRawRecipeText(e.target.value)}
                   disabled={isLoading || isUploadingImage}
                   rows="8"
-                  className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75"
+                  className="w-full px-4 py-3 bg-white border border-emerald-200 text-gray-900 placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:bg-gray-50 disabled:opacity-75 touch-manipulation"
                   placeholder="Paste your recipe text here. The AI will automatically parse ingredients, instructions, and other details..."
                 />
               </div>
             </div>
           )}
-        </div>
 
-        {/* Footer */}
-        <div className="px-8 py-6 border-t border-emerald-100 bg-gradient-to-r from-emerald-50 to-blue-50">
-          <div className="flex justify-end space-x-4">
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-6 border-t border-gray-200">
             <button
               onClick={onClose}
               disabled={isLoading || isUploadingImage}
-              className="px-6 py-3 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-6 py-3 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmit}
               disabled={isLoading || isUploadingImage || !recipeName.trim() || !uploadedImageUrl}
-              className="px-6 py-3 text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-6 py-3 text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <div className="flex items-center space-x-2">
@@ -538,7 +567,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
             </button>
           </div>
         </div>
-      </div>
+      </ResponsiveModal>
 
       {/* Error Modal */}
       <InteractiveModal
@@ -546,7 +575,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
         onClose={handleCloseErrorModal}
         title={errorModalTitle}
         message={errorModalMessage}
-        type="error"
+        iconType="error"
       />
 
       {/* Success Modal */}
@@ -555,9 +584,9 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
         onClose={handleCloseSuccessModal}
         title={successModalTitle}
         message={successModalMessage}
-        type="success"
+        iconType="success"
       />
-    </div>
+    </>
   );
 }
 

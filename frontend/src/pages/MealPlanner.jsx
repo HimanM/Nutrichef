@@ -26,7 +26,7 @@ import {
 const MEAL_PLAN_PALETTE_KEY = 'mealPlanPaletteRecipes';
 const PLANNED_MEALS_KEY = 'plannedMealsData';
 const SHOPPING_BASKET_KEY = 'shoppingBasketItems';
-const PALETTE_POSITION_KEY = 'floatingPalettePosition';
+
 
 function MealPlanner() {
   const [paletteRecipes, setPaletteRecipes] = useState([]);
@@ -49,6 +49,7 @@ function MealPlanner() {
   const isInitialMount = useRef(true);
   const isInitializing = useRef(true);
   const [visibleEmptyDays, setVisibleEmptyDays] = useState([]);
+  const paletteRef = useRef(null);
 
   const { recipeSelectedForPlanning, setRecipeSelectedForPlanning, clearRecipeSelection } = useMealPlanSelection();
   const auth = useAuth();
@@ -90,6 +91,36 @@ function MealPlanner() {
     setSelectedRecipe(null);
     clearRecipeSelection();
   };
+
+  // Handle clicks outside palette to close it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!isPaletteVisible) return;
+      
+      // Don't close if clicking on the palette itself
+      if (paletteRef.current && paletteRef.current.contains(event.target)) {
+        return;
+      }
+      
+      // Don't close if clicking on the show/hide recipes button
+      if (event.target.closest('[data-palette-toggle]')) {
+        return;
+      }
+      
+      // Don't close if clicking on a day card (to assign recipe)
+      if (event.target.closest('[data-day-card]')) {
+        return;
+      }
+      
+      // Close palette for any other clicks
+      setIsPaletteVisible(false);
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isPaletteVisible]);
 
   // Fetch user nutritional targets
   const fetchUserNutritionalTargets = useCallback(async () => {
@@ -546,6 +577,7 @@ function MealPlanner() {
             : 'border-gray-100'
         }`}
         onClick={handleDayClick}
+        data-day-card
       >
         {/* Day Header */}
         <div className="p-4 border-b border-gray-50">
@@ -692,13 +724,15 @@ function MealPlanner() {
     if (!isPaletteVisible) return null;
 
     const PaletteContent = () => (
-      <div className="bg-white/95 backdrop-blur-sm shadow-xl rounded-2xl border border-emerald-200 overflow-hidden">
+      <div ref={paletteRef} className="bg-white/95 backdrop-blur-sm shadow-xl rounded-2xl border border-emerald-200 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
         {/* Header */}
-        <div className="bg-emerald-50 border-b border-emerald-200 px-4 py-3 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-emerald-50 to-emerald-100 border-b border-emerald-200 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <MdList className="w-5 h-5 text-emerald-600" />
+            <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
+              <MdList className="w-4 h-4 text-white" />
+            </div>
             <h3 className="font-semibold text-emerald-800">Recipe Palette</h3>
-            <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-medium">
+            <span className="text-xs bg-emerald-600 text-white px-2 py-1 rounded-full font-medium">
               {paletteRecipes.length}
             </span>
           </div>
@@ -706,14 +740,14 @@ function MealPlanner() {
             {paletteRecipes.length > 0 && (
               <button
                 onClick={handleClearPalette}
-                className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded-md transition-colors font-medium"
+                className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-1 rounded-md transition-all duration-200 font-medium"
               >
                 Clear All
               </button>
             )}
             <button
               onClick={() => setIsPaletteVisible(false)}
-              className="text-emerald-600 hover:text-emerald-800 hover:bg-emerald-100 p-1 rounded-md transition-colors"
+              className="text-emerald-600 hover:text-emerald-800 hover:bg-emerald-200 p-1.5 rounded-md transition-all duration-200"
             >
               <MdClose className="w-4 h-4" />
             </button>
@@ -721,7 +755,7 @@ function MealPlanner() {
         </div>
 
         {/* Content */}
-        <div className="p-4 max-h-80 overflow-y-auto">
+        <div className="p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-300 scrollbar-track-emerald-50" style={{ maxHeight: `${Math.min(600, Math.max(200, paletteRecipes.length * 80 + 100))}px` }}>
           {loadingPalette && (
             <div className="flex items-center justify-center py-8">
               <AiOutlineLoading className="animate-spin h-8 w-8 text-emerald-500" />
@@ -745,7 +779,7 @@ function MealPlanner() {
           )}
           
           {!loadingPalette && paletteRecipes.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {paletteRecipes.map((recipe) => (
                 <div
                   key={recipe.RecipeID}
@@ -761,7 +795,7 @@ function MealPlanner() {
                 >
                   <div className="flex items-start gap-3">
                     {/* Recipe Thumbnail */}
-                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                    <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                       {recipe.ImageURL ? (
                         <img
                           src={recipe.ImageURL}
@@ -774,7 +808,7 @@ function MealPlanner() {
                         />
                       ) : null}
                       <div className={`w-full h-full flex items-center justify-center ${recipe.ImageURL ? 'hidden' : 'flex'}`}>
-                        <span className="text-gray-400 text-xs font-medium">
+                        <span className="text-gray-400 text-lg font-semibold">
                           {recipe.Title?.charAt(0)?.toUpperCase() || 'R'}
                         </span>
                       </div>
@@ -782,14 +816,24 @@ function MealPlanner() {
                     
                     {/* Recipe Info */}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-sm text-gray-800 line-clamp-2 leading-tight">
+                      <h4 className="font-medium text-sm text-gray-800 leading-tight mb-1" style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden'
+                      }}>
                         {recipe.Title}
                       </h4>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500">
                         {recipe.CookingTime ? `${recipe.CookingTime} min` : 'Quick recipe'} • {recipe.Servings || 1} servings
                       </p>
                       {recipe.Description && (
-                        <p className="text-xs text-gray-400 mt-1 line-clamp-1">
+                        <p className="text-xs text-gray-400 mt-1" style={{
+                          display: '-webkit-box',
+                          WebkitLineClamp: 1,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden'
+                        }}>
                           {recipe.Description}
                         </p>
                       )}
@@ -801,7 +845,7 @@ function MealPlanner() {
                         e.stopPropagation();
                         handleRemoveFromPalette(recipe.RecipeID);
                       }}
-                      className="text-gray-400 hover:text-red-500 p-1 transition-colors flex-shrink-0"
+                      className="text-gray-400 hover:text-red-500 p-1 transition-colors flex-shrink-0 mt-1"
                       title="Remove from palette"
                     >
                       <HiOutlineTrash className="w-4 h-4" />
@@ -810,7 +854,7 @@ function MealPlanner() {
                   
                   {/* Selection Indicator */}
                   {(selectedRecipe || recipeSelectedForPlanning)?.RecipeID === recipe.RecipeID && (
-                    <div className="mt-2 text-xs text-emerald-600 font-medium">
+                    <div className="mt-2 pt-2 border-t border-emerald-200 text-xs text-emerald-600 font-medium">
                       ✓ Selected • Click on a day to add
                     </div>
                   )}
@@ -825,9 +869,152 @@ function MealPlanner() {
     // Mobile: Full screen overlay
     if (isMobile) {
       return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-md max-h-[80vh] overflow-hidden">
-            <PaletteContent />
+        <div className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300 ${
+          isPaletteVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}>
+          <div className={`w-full max-w-md max-h-[80vh] overflow-hidden transition-all duration-500 transform ${
+            isPaletteVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-8'
+          }`}>
+            <div ref={paletteRef} className="bg-white/95 backdrop-blur-sm shadow-xl rounded-2xl border border-emerald-200 overflow-hidden">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-emerald-50 to-emerald-100 border-b border-emerald-200 px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
+                    <MdList className="w-4 h-4 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-emerald-800">Recipe Palette</h3>
+                  <span className="text-xs bg-emerald-600 text-white px-2 py-1 rounded-full font-medium">
+                    {paletteRecipes.length}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {paletteRecipes.length > 0 && (
+                    <button
+                      onClick={handleClearPalette}
+                      className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-1 rounded-md transition-all duration-200 font-medium"
+                    >
+                      Clear All
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setIsPaletteVisible(false)}
+                    className="text-emerald-600 hover:text-emerald-800 hover:bg-emerald-200 p-1.5 rounded-md transition-all duration-200"
+                  >
+                    <MdClose className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-300 scrollbar-track-emerald-50" style={{ maxHeight: `${Math.min(600, Math.max(200, paletteRecipes.length * 80 + 100))}px` }}>
+                {loadingPalette && (
+                  <div className="flex items-center justify-center py-8">
+                    <AiOutlineLoading className="animate-spin h-8 w-8 text-emerald-500" />
+                  </div>
+                )}
+                
+                {paletteError && (
+                  <div className="text-red-600 text-sm mb-4 p-3 bg-red-50 rounded-lg">{paletteError}</div>
+                )}
+                
+                {!loadingPalette && paletteRecipes.length === 0 && (
+                  <div className="text-center py-8">
+                    <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <HiOutlinePlus className="w-6 h-6 text-emerald-400" />
+                    </div>
+                    <p className="text-gray-500 text-sm mb-3">No recipes in palette</p>
+                    <RouterLink to="/recipes" className="btn-primary text-sm px-4 py-2 inline-block">
+                      Browse Recipes
+                    </RouterLink>
+                  </div>
+                )}
+                
+                {!loadingPalette && paletteRecipes.length > 0 && (
+                  <div className="space-y-2">
+                    {paletteRecipes.map((recipe) => (
+                      <div
+                        key={recipe.RecipeID}
+                        className={`relative border rounded-lg p-3 cursor-pointer transition-all duration-200 ${
+                          (selectedRecipe || recipeSelectedForPlanning)?.RecipeID === recipe.RecipeID
+                            ? 'border-emerald-500 bg-emerald-50 shadow-md'
+                            : 'border-gray-200 hover:border-emerald-300 hover:shadow-sm'
+                        }`}
+                        onClick={() => {
+                          handleRecipeSelect(recipe);
+                          setRecipeSelectedForPlanning(recipe);
+                        }}
+                      >
+                        <div className="flex items-start gap-3">
+                          {/* Recipe Thumbnail */}
+                          <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                            {recipe.ImageURL ? (
+                              <img
+                                src={recipe.ImageURL}
+                                alt={recipe.Title}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
+                              />
+                            ) : null}
+                            <div className={`w-full h-full flex items-center justify-center ${recipe.ImageURL ? 'hidden' : 'flex'}`}>
+                              <span className="text-gray-400 text-lg font-semibold">
+                                {recipe.Title?.charAt(0)?.toUpperCase() || 'R'}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* Recipe Info */}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-sm text-gray-800 leading-tight mb-1" style={{
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden'
+                            }}>
+                              {recipe.Title}
+                            </h4>
+                            <p className="text-xs text-gray-500">
+                              {recipe.CookingTime ? `${recipe.CookingTime} min` : 'Quick recipe'} • {recipe.Servings || 1} servings
+                            </p>
+                            {recipe.Description && (
+                              <p className="text-xs text-gray-400 mt-1" style={{
+                                display: '-webkit-box',
+                                WebkitLineClamp: 1,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden'
+                              }}>
+                                {recipe.Description}
+                              </p>
+                            )}
+                          </div>
+                          
+                          {/* Remove Button */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveFromPalette(recipe.RecipeID);
+                            }}
+                            className="text-gray-400 hover:text-red-500 p-1 transition-colors flex-shrink-0 mt-1"
+                            title="Remove from palette"
+                          >
+                            <HiOutlineTrash className="w-4 h-4" />
+                          </button>
+                        </div>
+                        
+                        {/* Selection Indicator */}
+                        {(selectedRecipe || recipeSelectedForPlanning)?.RecipeID === recipe.RecipeID && (
+                          <div className="mt-2 pt-2 border-t border-emerald-200 text-xs text-emerald-600 font-medium">
+                            ✓ Selected • Click on a day to add
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       );
@@ -835,7 +1022,11 @@ function MealPlanner() {
 
     // Desktop: Sidebar
     return (
-      <div className="fixed left-4 top-20 bottom-4 w-80 z-40">
+      <div className={`fixed left-16 top-1/2 z-40 w-96 transition-all duration-500 ease-in-out ${
+        isPaletteVisible 
+          ? 'transform -translate-y-1/2 translate-x-0 opacity-100' 
+          : 'transform -translate-y-1/2 -translate-x-full opacity-0'
+      }`}>
         <PaletteContent />
       </div>
     );
@@ -844,7 +1035,7 @@ function MealPlanner() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
       {/* Main Content */}
-      <div className={`transition-all duration-300 ${isPaletteVisible && !isMobile ? 'lg:ml-80' : ''}`}>
+      <div className={`transition-all duration-300 ${isPaletteVisible && !isMobile ? 'lg:ml-[25rem]' : ''}`}>
         <div className="section-padding">
           <div className="container-modern max-w-7xl">
             {/* Header */}
@@ -891,6 +1082,7 @@ function MealPlanner() {
                   <button
                     onClick={togglePaletteVisibility}
                     className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium shadow-sm"
+                    data-palette-toggle
                   >
                     <MdList className="w-4 h-4" />
                     {isPaletteVisible ? 'Hide' : 'Show'} Recipes
@@ -899,25 +1091,27 @@ function MealPlanner() {
                   <div className="flex items-center bg-gray-100 rounded-lg p-1">
                     <button
                       onClick={() => setViewMode('week')}
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                      className={`px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all ${
                         viewMode === 'week' 
                           ? 'bg-white text-emerald-600 shadow-sm' 
                           : 'text-gray-600 hover:text-gray-800'
                       }`}
                     >
-                      <MdViewWeek className="w-4 h-4 inline mr-2" />
-                      Week View
+                      <MdViewWeek className="w-4 h-4 inline mr-1 sm:mr-2" />
+                      <span className="hidden xs:inline sm:hidden md:inline">Week View</span>
+                      <span className="inline xs:hidden sm:inline md:hidden">Week</span>
                     </button>
                     <button
                       onClick={() => setViewMode('day')}
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                      className={`px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all ${
                         viewMode === 'day' 
                           ? 'bg-white text-emerald-600 shadow-sm' 
                           : 'text-gray-600 hover:text-gray-800'
                       }`}
                     >
-                      <MdViewDay className="w-4 h-4 inline mr-2" />
-                      2 Week View
+                      <MdViewDay className="w-4 h-4 inline mr-1 sm:mr-2" />
+                      <span className="hidden xs:inline sm:hidden md:inline">2 Week View</span>
+                      <span className="inline xs:hidden sm:inline md:hidden">2 Week</span>
                     </button>
                   </div>
                 </div>
@@ -930,7 +1124,7 @@ function MealPlanner() {
                     title="Set nutritional targets"
                   >
                     <MdSettings className="w-4 h-4" />
-                    <span className="hidden sm:inline">Nutrition</span>
+                    <span>Nutrition</span>
                   </button>
                   
                   <button
