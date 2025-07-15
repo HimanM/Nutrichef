@@ -8,3 +8,6 @@
 /backend/.pytest_cache
 /start_frontend.bat
 /start_backend.bat
+/.kiro
+/.kiro/hooks
+/.kiro/specs
