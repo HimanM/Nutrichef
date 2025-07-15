@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { useMealPlanSelection } from '../context/MealPlanSelectionContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useModal } from '../context/ModalContext.jsx';
@@ -57,6 +57,19 @@ function MealPlanner() {
   const auth = useAuth();
   const { showModal } = useModal();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // Redirect unauthenticated users to login page
+  useEffect(() => {
+    if (!auth.token) {
+      setIsRequireLoginModalOpen(true);
+    }
+  }, [auth.token]);
+
+  const handleRequireLoginModalClose = () => {
+    setIsRequireLoginModalOpen(false);
+    navigate('/login', { state: { from: location } });
+  };
 
   // Load palette position from localStorage
   useEffect(() => {
@@ -1020,7 +1033,7 @@ function MealPlanner() {
 
       <RequireLoginModal
         isOpen={isRequireLoginModalOpen}
-        onClose={() => setIsRequireLoginModalOpen(false)}
+        onClose={handleRequireLoginModalClose}
         title="Login Required"
         message="You need to be logged in to save and load meal plans from the cloud."
         redirectState={{ from: location }}

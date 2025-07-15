@@ -1,9 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { HiOutlineUserCircle, HiMenu, HiOutlineSparkles, HiOutlineLogin, HiOutlineUserAdd, HiOutlineLogout, HiX } from 'react-icons/hi';
+import { HiOutlineUserCircle, HiMenu, HiOutlineSparkles, HiOutlineLogin, HiOutlineUserAdd, HiOutlineLogout, HiX, HiChevronDown } from 'react-icons/hi';
 import { RiAdminFill } from "react-icons/ri";
-import { FaShoppingCart } from "react-icons/fa";
 
 const NavigationBar = () => {
   const { isAuthenticated, currentUser, isAdmin, logout, loading } = useAuth();
@@ -11,6 +10,7 @@ const NavigationBar = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
   const toolsDropdownTimeout = useRef(null);
 
   const handleLogout = () => {
@@ -92,10 +92,10 @@ const NavigationBar = () => {
               >
                 <button className="nav-link flex items-center gap-1" aria-haspopup="true" aria-expanded={toolsDropdownOpen}>
                   Tools
-                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  <HiChevronDown className={`w-4 h-4 ml-1 transition-transform duration-200 ${toolsDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {toolsDropdownOpen && (
-                  <div 
+                  <div
                     className="absolute left-0 mt-2 w-48 bg-white/90 rounded-xl shadow-lg border border-gray-100 z-50 animate-fade-in"
                     onMouseEnter={() => {
                       clearTimeout(toolsDropdownTimeout.current);
@@ -176,53 +176,63 @@ const NavigationBar = () => {
                     key={link.to}
                     to={link.to}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                      location.pathname === link.to
+                    className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 ${location.pathname === link.to
                         ? 'text-emerald-600 bg-emerald-50'
                         : 'text-gray-600 hover:text-emerald-600 hover:bg-emerald-50'
-                    }`}
+                      }`}
                   >
                     {link.icon && <span className="mr-2">{link.icon}</span>}
                     {link.label}
                   </Link>
                 ))}
-                
+
                 {isAuthenticated && (
-                  <div
-                    className="relative group"
-                    onMouseEnter={() => {
-                      clearTimeout(toolsDropdownTimeout.current);
-                      setToolsDropdownOpen(true);
-                    }}
-                    onMouseLeave={() => {
-                      toolsDropdownTimeout.current = setTimeout(() => setToolsDropdownOpen(false), 300);
-                    }}
-                    onFocus={() => setToolsDropdownOpen(true)}
-                    onBlur={() => toolsDropdownTimeout.current = setTimeout(() => setToolsDropdownOpen(false), 300)}
-                    tabIndex={0}
-                  >
-                    <button className="nav-link flex items-center gap-1" aria-haspopup="true" aria-expanded={toolsDropdownOpen}>
-                      Tools
-                      <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  <div className="border-t border-gray-200 my-2"></div>
+                )}
+
+                {isAuthenticated && (
+                  <>
+                    <button
+                      onClick={() => setMobileToolsOpen(!mobileToolsOpen)}
+                      className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
+                    >
+                      <span>Tools</span>
+                      <HiChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileToolsOpen ? 'rotate-180' : ''}`} />
                     </button>
-                    {toolsDropdownOpen && (
-                      <div 
-                        className="absolute left-0 mt-2 w-48 bg-white/90 rounded-xl shadow-lg border border-gray-100 z-50 animate-fade-in"
-                        onMouseEnter={() => {
-                          clearTimeout(toolsDropdownTimeout.current);
-                          setToolsDropdownOpen(true);
-                        }}
-                        onMouseLeave={() => {
-                          toolsDropdownTimeout.current = setTimeout(() => setToolsDropdownOpen(false), 300);
-                        }}
-                      >
-                        <Link to="/personalized-recipes" className="block px-4 py-3 text-gray-700 hover:bg-emerald-50 rounded-t-xl transition-colors duration-200">For You</Link>
-                        <Link to="/meal-planner" className="block px-4 py-3 text-gray-700 hover:bg-emerald-50 transition-colors duration-200">Meal Plan</Link>
-                        <Link to="/pantry" className="block px-4 py-3 text-gray-700 hover:bg-emerald-50 transition-colors duration-200">My Pantry</Link>
-                        <Link to="/basket" className="block px-4 py-3 text-gray-700 hover:bg-emerald-50 rounded-b-xl transition-colors duration-200">Basket</Link>
+
+                    {mobileToolsOpen && (
+                      <div className="ml-4 space-y-1 animate-fade-in">
+                        <Link
+                          to="/personalized-recipes"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="block px-4 py-2 rounded-lg text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
+                        >
+                          For You
+                        </Link>
+                        <Link
+                          to="/meal-planner"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="block px-4 py-2 rounded-lg text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
+                        >
+                          Meal Plan
+                        </Link>
+                        <Link
+                          to="/pantry"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="block px-4 py-2 rounded-lg text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
+                        >
+                          My Pantry
+                        </Link>
+                        <Link
+                          to="/basket"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="block px-4 py-2 rounded-lg text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
+                        >
+                          Basket
+                        </Link>
                       </div>
                     )}
-                  </div>
+                  </>
                 )}
 
                 {isAdmin && (
