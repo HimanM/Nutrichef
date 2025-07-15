@@ -751,9 +751,19 @@ function PublicRecipeBrowser() {
         type="button"
         aria-label="add recipe"
         onClick={handleOpenRecipeSubmissionModal}
-        className="fixed bottom-6 left-6 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200 ease-in-out hover:scale-110 z-40"
+        className="fixed bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-full shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200 ease-in-out hover:scale-110 z-40
+          
+          /* Mobile positioning - bottom left, proper spacing */
+          bottom-4 left-4 p-3
+          sm:bottom-6 sm:left-6 sm:p-4
+          
+          /* Touch-friendly mobile sizing */
+          touch-manipulation
+          min-h-[56px] min-w-[56px]
+          sm:min-h-[60px] sm:min-w-[60px]
+        "
       >
-        <HiOutlinePlus className="w-6 h-6"/>
+        <HiOutlinePlus className="w-5 h-5 sm:w-6 sm:h-6"/>
       </button>
 
       {/* Modals */}

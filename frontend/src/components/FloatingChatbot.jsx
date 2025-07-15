@@ -243,18 +243,36 @@ const FloatingChatbot = () => {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-18 right-6 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-300 ease-out hover:scale-110 z-40 group"
+        className="fixed bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-full shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-300 ease-out hover:scale-110 z-40 group
+          
+          /* Mobile positioning - bottom right, above scroll button */
+          bottom-20 right-4 p-3
+          sm:bottom-6 sm:right-6 sm:p-4
+          
+          /* Touch-friendly mobile sizing */
+          touch-manipulation
+          min-h-[56px] min-w-[5-fr]
+          sm:min-h-[60px] sm:min-w-[60px]
+        "
         aria-label="Open chatbot"
       >
-        <HiOutlineChatAlt2 className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" />
+        <HiOutlineChatAlt2 className="w-5 h-5 sm:w-6 sm:h-6 group-hover:rotate-12 transition-transform duration-300" />
         <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
       </button>
     );
   }
 
   return (
-    <div className="fixed bottom-18 right-6 z-50" ref={chatWindowRef}>
-      <div className="bg-white/95 backdrop-blur-xl w-96 h-[600px] flex flex-col shadow-2xl rounded-3xl border border-white/20 animate-slide-in">
+    <div className="fixed z-50
+      /* Mobile positioning - better spacing from edges */
+      bottom-4 right-4 
+      w-[calc(100vw-2rem)] h-[calc(100vh-6rem)]
+      max-w-sm max-h-[500px]
+      
+      /* Desktop positioning */
+      sm:bottom-6 sm:right-6 sm:w-96 sm:h-[600px] sm:max-w-none sm:max-h-none
+    " ref={chatWindowRef}>
+      <div className="bg-white/95 backdrop-blur-xl w-full h-full flex flex-col shadow-2xl rounded-3xl border border-white/20 animate-slide-in">
         {/* Header */}
         <div className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-t-3xl">
           <div className="flex items-center">
