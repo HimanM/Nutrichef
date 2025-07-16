@@ -93,7 +93,7 @@ const IngredientClassifier = () => {
                     {/* Header */}
                     <div className="text-center mb-8 sm:mb-12 animate-fade-in">
                         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 px-4">
-                            <span className="gradient-text">Ingredient Classifier</span>
+                            <span className="gradient-text">Ingredient / Food Classifier</span>
                         </h1>
                         <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto px-4">
                             Upload an image to classify it as an ingredient or food item and get nutritional information
