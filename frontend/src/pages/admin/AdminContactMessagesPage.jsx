@@ -282,12 +282,7 @@ const AdminContactMessagesPage = () => {
               )}
 
               <div className="flex justify-end space-x-3 pt-4">
-                <button
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                >
-                  {selectedMessage.Replied ? 'Close' : 'Cancel'}
-                </button>
+                
                 {!selectedMessage.Replied && (
                   <button
                     onClick={handleSendReply}
