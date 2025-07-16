@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useModal } from '../context/ModalContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { ButtonSpinner, InlineSpinner, PageLoaderSpinner } from '../components/common/LoadingComponents.jsx';
-import { HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
+import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLockClosed, HiOutlinePlus } from 'react-icons/hi';
 
 const UserSettingsPage = () => {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -19,9 +19,6 @@ const UserSettingsPage = () => {
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    
-    // Mobile tab state
-    const [activeTab, setActiveTab] = useState('password');
 
     const auth = useAuth();
     const { currentUser: authContextUser, token, showExpiryMessageAndLogout, loading: authLoading } = auth;
@@ -163,216 +160,75 @@ const UserSettingsPage = () => {
                         </p>
                     </div>
 
-                    {/* Mobile Tab Navigation */}
-                    <div className="flex md:hidden mb-6">
-                        <button
-                            onClick={() => setActiveTab('password')}
-                            className={`flex-1 py-3 px-4 text-sm font-medium rounded-l-lg border-2 transition-all duration-200 ${
-                                activeTab === 'password' 
-                                    ? 'bg-emerald-500 text-white border-emerald-500' 
-                                    : 'bg-white text-emerald-600 border-emerald-200 hover:bg-emerald-50'
-                            }`}
-                        >
-                            Password
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('allergies')}
-                            className={`flex-1 py-3 px-4 text-sm font-medium rounded-r-lg border-2 border-l-0 transition-all duration-200 ${
-                                activeTab === 'allergies' 
-                                    ? 'bg-emerald-500 text-white border-emerald-500' 
-                                    : 'bg-white text-emerald-600 border-emerald-200 hover:bg-emerald-50'
-                            }`}
-                        >
-                            Allergies
-                        </button>
-                    </div>
-
                     {/* Content */}
-                    <div className="card-glass shadow-xl rounded-3xl overflow-hidden">
+                    <div className="max-w-6xl mx-auto">
                         {/* Desktop Layout */}
-                        <div className="hidden md:grid md:grid-cols-2">
-                            {/* Password Section */}
-                            <div className="p-8 border-r border-emerald-100">
-                                <h2 className="text-xl font-semibold mb-6 text-emerald-700 flex items-center">
-                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                    </svg>
-                                    Change Password
-                                </h2>
-                                <form onSubmit={handleChangePassword} className="space-y-4">
-                                    <div>
-                                        <label htmlFor="currentPassword" className="block text-sm font-medium text-emerald-700 mb-2">Current Password</label>
-                                        <div className="relative">
-                                            <input 
-                                                type={showCurrentPassword ? "text" : "password"} 
-                                                id="currentPassword" 
-                                                value={currentPassword} 
-                                                onChange={(e) => setCurrentPassword(e.target.value)} 
-                                                required 
-                                                className="block w-full px-3 py-3 pr-12 bg-white border border-emerald-200 text-emerald-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 sm:text-sm disabled:bg-emerald-50 disabled:opacity-75 transition-all duration-200" 
-                                            />
-                                            <button
-                                                type="button"
-                                                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                                onMouseDown={() => setShowCurrentPassword(true)}
-                                                onMouseUp={() => setShowCurrentPassword(false)}
-                                                onMouseLeave={() => setShowCurrentPassword(false)}
-                                                onTouchStart={() => setShowCurrentPassword(true)}
-                                                onTouchEnd={() => setShowCurrentPassword(false)}
-                                                disabled={isLoadingPassword}
-                                            >
-                                                {showCurrentPassword ? (
-                                                    <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
-                                                ) : (
-                                                    <HiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
-                                                )}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label htmlFor="newPassword" className="block text-sm font-medium text-emerald-700 mb-2">New Password</label>
-                                        <div className="relative">
-                                            <input 
-                                                type={showNewPassword ? "text" : "password"} 
-                                                id="newPassword" 
-                                                value={newPassword} 
-                                                onChange={(e) => setNewPassword(e.target.value)} 
-                                                required 
-                                                className="block w-full px-3 py-3 pr-12 bg-white border border-emerald-200 text-emerald-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 sm:text-sm disabled:bg-emerald-50 disabled:opacity-75 transition-all duration-200" 
-                                            />
-                                            <button
-                                                type="button"
-                                                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                                onMouseDown={() => setShowNewPassword(true)}
-                                                onMouseUp={() => setShowNewPassword(false)}
-                                                onMouseLeave={() => setShowNewPassword(false)}
-                                                onTouchStart={() => setShowNewPassword(true)}
-                                                onTouchEnd={() => setShowNewPassword(false)}
-                                                disabled={isLoadingPassword}
-                                            >
-                                                {showNewPassword ? (
-                                                    <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
-                                                ) : (
-                                                    <HiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
-                                                )}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label htmlFor="confirmNewPassword" className="block text-sm font-medium text-emerald-700 mb-2">Confirm New Password</label>
-                                        <div className="relative">
-                                            <input 
-                                                type={showConfirmPassword ? "text" : "password"} 
-                                                id="confirmNewPassword" 
-                                                value={confirmNewPassword} 
-                                                onChange={(e) => setConfirmNewPassword(e.target.value)} 
-                                                required 
-                                                className="block w-full px-3 py-3 pr-12 bg-white border border-emerald-200 text-emerald-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 sm:text-sm disabled:bg-emerald-50 disabled:opacity-75 transition-all duration-200" 
-                                            />
-                                            <button
-                                                type="button"
-                                                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                                onMouseDown={() => setShowConfirmPassword(true)}
-                                                onMouseUp={() => setShowConfirmPassword(false)}
-                                                onMouseLeave={() => setShowConfirmPassword(false)}
-                                                onTouchStart={() => setShowConfirmPassword(true)}
-                                                onTouchEnd={() => setShowConfirmPassword(false)}
-                                                disabled={isLoadingPassword}
-                                            >
-                                                {showConfirmPassword ? (
-                                                    <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
-                                                ) : (
-                                                    <HiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
-                                                )}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <button 
-                                        type="submit" 
-                                        disabled={isLoadingPassword} 
-                                        className="w-full btn-primary px-6 py-3 rounded-xl font-semibold shadow-md flex items-center justify-center gap-2 disabled:opacity-60 transition-all duration-200 hover:scale-105"
-                                    >
-                                        {isLoadingPassword ? <InlineSpinner /> : null} 
-                                        {isLoadingPassword ? "Updating..." : "Update Password"}
-                                    </button>
-                                    
-                                    {passwordMessage.text && (
-                                        <div className={`mt-3 p-3 rounded-xl text-sm ${passwordMessage.type === 'error' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
-                                            {passwordMessage.text}
-                                        </div>
-                                    )}
-                                </form>
-                            </div>
-
-                            {/* Allergies Section */}
-                            <div className="p-8">
-                                <h2 className="text-xl font-semibold mb-6 text-emerald-700 flex items-center">
-                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Dietary Restrictions
-                                </h2>
-                                <form onSubmit={handleSaveAllergies} className="space-y-4">
-                                    {allAllergies.length > 0 && (
-                                        <div className="space-y-3">
-                                            <p className="text-sm text-gray-600">Select your dietary restrictions and allergies:</p>
-                                            <div className="grid grid-cols-1 gap-3 max-h-64 overflow-y-auto p-3 bg-gray-50 rounded-xl border border-emerald-100">
-                                                {allAllergies.map((allergy) => (
-                                                    <label key={allergy.id} className="flex items-center space-x-3 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors duration-150">
-                                                        <input
-                                                            type="checkbox"
-                                                            value={allergy.id}
-                                                            checked={selectedAllergyIds.includes(allergy.id)}
-                                                            onChange={() => handleAllergySelectionChange(allergy.id)}
-                                                            className="form-checkbox h-4 w-4 text-emerald-500 border-emerald-300 rounded focus:ring-emerald-400 accent-emerald-500"
-                                                        />
-                                                        <span className="text-sm text-emerald-700">{allergy.name}</span>
-                                                    </label>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                    <button 
-                                        type="submit" 
-                                        disabled={isLoadingAllergies} 
-                                        className="w-full btn-primary px-6 py-3 rounded-xl font-semibold shadow-md flex items-center justify-center gap-2 disabled:opacity-60 transition-all duration-200 hover:scale-105"
-                                    >
-                                        {isLoadingAllergies ? <InlineSpinner /> : null} 
-                                        {isLoadingAllergies ? "Saving..." : "Save Preferences"}
-                                    </button>
-                                    {allergiesMessage.text && (
-                                        <div className={`mt-3 p-3 rounded-xl text-sm ${allergiesMessage.type === 'error' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
-                                            {allergiesMessage.text}
-                                        </div>
-                                    )}
-                                </form>
-                            </div>
-                        </div>
-
-                        {/* Mobile Layout */}
-                        <div className="md:hidden">
-                            {activeTab === 'password' && (
-                                <div className="p-6">
+                        <div className="hidden md:block">
+                            <div className="space-y-8 max-w-4xl mx-auto">
+                                {/* Dietary Restrictions Section */}
+                                <div className="bg-white rounded-2xl shadow-lg border border-emerald-100 p-8">
                                     <h2 className="text-xl font-semibold mb-6 text-emerald-700 flex items-center">
-                                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                        </svg>
+                                        <HiOutlinePlus className="w-5 h-5 mr-2" />
+                                        Dietary Restrictions
+                                    </h2>
+                                    <form onSubmit={handleSaveAllergies}>
+                                        {allAllergies.length > 0 && (
+                                            <div className="space-y-4">
+                                                <p className="text-sm text-gray-600">Select your dietary restrictions and allergies:</p>
+                                                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                                                    {allAllergies.map((allergy) => (
+                                                        <label key={allergy.id} className="flex items-center space-x-3 cursor-pointer hover:bg-emerald-50 p-3 rounded-lg transition-colors duration-150 border border-emerald-100">
+                                                            <input
+                                                                type="checkbox"
+                                                                value={allergy.id}
+                                                                checked={selectedAllergyIds.includes(allergy.id)}
+                                                                onChange={() => handleAllergySelectionChange(allergy.id)}
+                                                                className="form-checkbox h-4 w-4 text-emerald-500 border-emerald-300 rounded focus:ring-emerald-400 accent-emerald-500"
+                                                            />
+                                                            <span className="text-sm text-emerald-700">{allergy.name}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        <div className="mt-8 flex justify-end">
+                                            <button 
+                                                type="submit" 
+                                                disabled={isLoadingAllergies} 
+                                                className="btn-primary px-8 py-3 rounded-xl font-semibold shadow-md flex items-center justify-center gap-2 disabled:opacity-60 transition-all duration-200 hover:scale-105"
+                                            >
+                                                {isLoadingAllergies ? <InlineSpinner /> : null} 
+                                                {isLoadingAllergies ? "Saving..." : "Save Preferences"}
+                                            </button>
+                                        </div>
+                                        
+                                        {allergiesMessage.text && (
+                                            <div className={`mt-4 p-3 rounded-xl text-sm ${allergiesMessage.type === 'error' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
+                                                {allergiesMessage.text}
+                                            </div>
+                                        )}
+                                    </form>
+                                </div>
+
+                                {/* Password Section */}
+                                <div className="bg-white rounded-2xl shadow-lg border border-emerald-100 p-8">
+                                    <h2 className="text-xl font-semibold mb-6 text-emerald-700 flex items-center">
+                                        <HiOutlineLockClosed className="w-5 h-5 mr-2" />
                                         Change Password
                                     </h2>
-                                    <form onSubmit={handleChangePassword} className="space-y-4">
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                         <div>
-                                            <label htmlFor="currentPasswordMobile" className="block text-sm font-medium text-emerald-700 mb-2">Current Password</label>
+                                            <label htmlFor="currentPassword" className="block text-sm font-medium text-emerald-700 mb-2">Current Password</label>
                                             <div className="relative">
                                                 <input 
                                                     type={showCurrentPassword ? "text" : "password"} 
-                                                    id="currentPasswordMobile" 
+                                                    id="currentPassword" 
                                                     value={currentPassword} 
                                                     onChange={(e) => setCurrentPassword(e.target.value)} 
                                                     required 
-                                                    className="block w-full px-3 py-3 pr-12 bg-white border border-emerald-200 text-emerald-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 sm:text-sm disabled:bg-emerald-50 disabled:opacity-75 transition-all duration-200" 
+                                                    className="block w-full px-3 py-3 pr-12 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 sm:text-sm disabled:bg-amber-100 disabled:opacity-75 transition-all duration-200 placeholder-amber-500" 
+                                                    placeholder="Enter current password"
                                                 />
                                                 <button
                                                     type="button"
@@ -385,9 +241,175 @@ const UserSettingsPage = () => {
                                                     disabled={isLoadingPassword}
                                                 >
                                                     {showCurrentPassword ? (
+                                                        <HiOutlineEyeOff className="h-5 w-5 text-amber-500 hover:text-amber-700 transition-colors" />
+                                                    ) : (
+                                                        <HiOutlineEye className="h-5 w-5 text-amber-500 hover:text-amber-700 transition-colors" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label htmlFor="newPassword" className="block text-sm font-medium text-emerald-700 mb-2">New Password</label>
+                                            <div className="relative">
+                                                <input 
+                                                    type={showNewPassword ? "text" : "password"} 
+                                                    id="newPassword" 
+                                                    value={newPassword} 
+                                                    onChange={(e) => setNewPassword(e.target.value)} 
+                                                    required 
+                                                    className="block w-full px-3 py-3 pr-12 bg-white border border-emerald-200 text-emerald-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 sm:text-sm disabled:bg-emerald-50 disabled:opacity-75 transition-all duration-200" 
+                                                    placeholder="Enter new password"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                                    onMouseDown={() => setShowNewPassword(true)}
+                                                    onMouseUp={() => setShowNewPassword(false)}
+                                                    onMouseLeave={() => setShowNewPassword(false)}
+                                                    onTouchStart={() => setShowNewPassword(true)}
+                                                    onTouchEnd={() => setShowNewPassword(false)}
+                                                    disabled={isLoadingPassword}
+                                                >
+                                                    {showNewPassword ? (
                                                         <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
                                                     ) : (
                                                         <HiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label htmlFor="confirmNewPassword" className="block text-sm font-medium text-emerald-700 mb-2">Confirm New Password</label>
+                                            <div className="relative">
+                                                <input 
+                                                    type={showConfirmPassword ? "text" : "password"} 
+                                                    id="confirmNewPassword" 
+                                                    value={confirmNewPassword} 
+                                                    onChange={(e) => setConfirmNewPassword(e.target.value)} 
+                                                    required 
+                                                    className="block w-full px-3 py-3 pr-12 bg-white border border-emerald-200 text-emerald-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 sm:text-sm disabled:bg-emerald-50 disabled:opacity-75 transition-all duration-200" 
+                                                    placeholder="Confirm new password"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                                    onMouseDown={() => setShowConfirmPassword(true)}
+                                                    onMouseUp={() => setShowConfirmPassword(false)}
+                                                    onMouseLeave={() => setShowConfirmPassword(false)}
+                                                    onTouchStart={() => setShowConfirmPassword(true)}
+                                                    onTouchEnd={() => setShowConfirmPassword(false)}
+                                                    disabled={isLoadingPassword}
+                                                >
+                                                    {showConfirmPassword ? (
+                                                        <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                                                    ) : (
+                                                        <HiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="mt-8 flex justify-end">
+                                        <button 
+                                            onClick={handleChangePassword}
+                                            disabled={isLoadingPassword} 
+                                            className="btn-primary px-8 py-3 rounded-xl font-semibold shadow-md flex items-center justify-center gap-2 disabled:opacity-60 transition-all duration-200 hover:scale-105"
+                                        >
+                                            {isLoadingPassword ? <InlineSpinner /> : null} 
+                                            {isLoadingPassword ? "Updating..." : "Update Password"}
+                                        </button>
+                                    </div>
+                                    
+                                    {passwordMessage.text && (
+                                        <div className={`mt-4 p-3 rounded-xl text-sm ${passwordMessage.type === 'error' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
+                                            {passwordMessage.text}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>                        {/* Mobile Layout */}
+                        <div className="md:hidden">
+                            <div className="space-y-6">
+                                {/* Dietary Restrictions Section */}
+                                <div className="bg-white rounded-2xl shadow-lg border border-emerald-100 p-6">
+                                    <h2 className="text-lg font-semibold mb-4 text-emerald-700 flex items-center">
+                                        <HiOutlinePlus className="w-5 h-5 mr-2" />
+                                        Dietary Restrictions
+                                    </h2>
+                                    <form onSubmit={handleSaveAllergies} className="space-y-4">
+                                        {allAllergies.length > 0 && (
+                                            <div className="space-y-3">
+                                                <p className="text-sm text-gray-600">Select your dietary restrictions and allergies:</p>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    {allAllergies.map((allergy) => (
+                                                        <label key={allergy.id} className="flex items-center space-x-2 cursor-pointer hover:bg-emerald-50 p-2 rounded-lg transition-colors duration-150 min-h-[40px] touch-manipulation border border-emerald-100">
+                                                            <input
+                                                                type="checkbox"
+                                                                value={allergy.id}
+                                                                checked={selectedAllergyIds.includes(allergy.id)}
+                                                                onChange={() => handleAllergySelectionChange(allergy.id)}
+                                                                className="form-checkbox h-4 w-4 text-emerald-500 border-emerald-300 rounded focus:ring-emerald-400 accent-emerald-500 flex-shrink-0"
+                                                            />
+                                                            <span className="text-xs text-emerald-700 leading-tight">{allergy.name}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        <button 
+                                            type="submit" 
+                                            disabled={isLoadingAllergies} 
+                                            className="w-full btn-primary px-6 py-3 rounded-xl font-semibold shadow-md flex items-center justify-center gap-2 disabled:opacity-60 transition-all duration-200 min-h-[44px] touch-manipulation"
+                                        >
+                                            {isLoadingAllergies ? <InlineSpinner /> : null} 
+                                            {isLoadingAllergies ? "Saving..." : "Save Preferences"}
+                                        </button>
+                                        
+                                        {allergiesMessage.text && (
+                                            <div className={`mt-3 p-3 rounded-xl text-sm ${allergiesMessage.type === 'error' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
+                                                {allergiesMessage.text}
+                                            </div>
+                                        )}
+                                    </form>
+                                </div>
+
+                                {/* Password Section */}
+                                <div className="bg-white rounded-2xl shadow-lg border border-emerald-100 p-6">
+                                    <h2 className="text-lg font-semibold mb-4 text-emerald-700 flex items-center">
+                                        <HiOutlineLockClosed className="w-5 h-5 mr-2" />
+                                        Change Password
+                                    </h2>
+                                    <form onSubmit={handleChangePassword} className="space-y-4">
+                                        <div>
+                                            <label htmlFor="currentPasswordMobile" className="block text-sm font-medium text-emerald-700 mb-2">Current Password</label>
+                                            <div className="relative">
+                                                <input 
+                                                    type={showCurrentPassword ? "text" : "password"} 
+                                                    id="currentPasswordMobile" 
+                                                    value={currentPassword} 
+                                                    onChange={(e) => setCurrentPassword(e.target.value)} 
+                                                    required 
+                                                    className="block w-full px-3 py-3 pr-12 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 sm:text-sm disabled:bg-amber-100 disabled:opacity-75 transition-all duration-200 placeholder-amber-500" 
+                                                    placeholder="Enter current password"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                                    onMouseDown={() => setShowCurrentPassword(true)}
+                                                    onMouseUp={() => setShowCurrentPassword(false)}
+                                                    onMouseLeave={() => setShowCurrentPassword(false)}
+                                                    onTouchStart={() => setShowCurrentPassword(true)}
+                                                    onTouchEnd={() => setShowCurrentPassword(false)}
+                                                    disabled={isLoadingPassword}
+                                                >
+                                                    {showCurrentPassword ? (
+                                                        <HiOutlineEyeOff className="h-5 w-5 text-amber-500 hover:text-amber-700 transition-colors" />
+                                                    ) : (
+                                                        <HiOutlineEye className="h-5 w-5 text-amber-500 hover:text-amber-700 transition-colors" />
                                                     )}
                                                 </button>
                                             </div>
@@ -403,6 +425,7 @@ const UserSettingsPage = () => {
                                                     onChange={(e) => setNewPassword(e.target.value)} 
                                                     required 
                                                     className="block w-full px-3 py-3 pr-12 bg-white border border-emerald-200 text-emerald-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 sm:text-sm disabled:bg-emerald-50 disabled:opacity-75 transition-all duration-200" 
+                                                    placeholder="Enter new password"
                                                 />
                                                 <button
                                                     type="button"
@@ -433,6 +456,7 @@ const UserSettingsPage = () => {
                                                     onChange={(e) => setConfirmNewPassword(e.target.value)} 
                                                     required 
                                                     className="block w-full px-3 py-3 pr-12 bg-white border border-emerald-200 text-emerald-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 sm:text-sm disabled:bg-emerald-50 disabled:opacity-75 transition-all duration-200" 
+                                                    placeholder="Confirm new password"
                                                 />
                                                 <button
                                                     type="button"
@@ -469,52 +493,7 @@ const UserSettingsPage = () => {
                                         )}
                                     </form>
                                 </div>
-                            )}
-
-                            {activeTab === 'allergies' && (
-                                <div className="p-6">
-                                    <h2 className="text-xl font-semibold mb-6 text-emerald-700 flex items-center">
-                                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Dietary Restrictions
-                                    </h2>
-                                    <form onSubmit={handleSaveAllergies} className="space-y-4">
-                                        {allAllergies.length > 0 && (
-                                            <div className="space-y-3">
-                                                <p className="text-sm text-gray-600">Select your dietary restrictions and allergies:</p>
-                                                <div className="grid grid-cols-1 gap-3 max-h-64 overflow-y-auto p-3 bg-gray-50 rounded-xl border border-emerald-100">
-                                                    {allAllergies.map((allergy) => (
-                                                        <label key={allergy.id} className="flex items-center space-x-3 cursor-pointer hover:bg-white p-3 rounded-lg transition-colors duration-150 min-h-[44px] touch-manipulation">
-                                                            <input
-                                                                type="checkbox"
-                                                                value={allergy.id}
-                                                                checked={selectedAllergyIds.includes(allergy.id)}
-                                                                onChange={() => handleAllergySelectionChange(allergy.id)}
-                                                                className="form-checkbox h-5 w-5 text-emerald-500 border-emerald-300 rounded focus:ring-emerald-400 accent-emerald-500"
-                                                            />
-                                                            <span className="text-sm text-emerald-700">{allergy.name}</span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                        <button 
-                                            type="submit" 
-                                            disabled={isLoadingAllergies} 
-                                            className="w-full btn-primary px-6 py-3 rounded-xl font-semibold shadow-md flex items-center justify-center gap-2 disabled:opacity-60 transition-all duration-200 min-h-[44px] touch-manipulation"
-                                        >
-                                            {isLoadingAllergies ? <InlineSpinner /> : null} 
-                                            {isLoadingAllergies ? "Saving..." : "Save Preferences"}
-                                        </button>
-                                        {allergiesMessage.text && (
-                                            <div className={`mt-3 p-3 rounded-xl text-sm ${allergiesMessage.type === 'error' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
-                                                {allergiesMessage.text}
-                                            </div>
-                                        )}
-                                    </form>
-                                </div>
-                            )}
+                            </div>
                         </div>
                     </div>
                 </div>
