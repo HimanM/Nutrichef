@@ -147,10 +147,11 @@ function MealPlanner() {
         };
         setUserNutritionalTargets(targets);
       } else {
-        // Failed to fetch user preferences
+        console.error('Failed to fetch user preferences. Response status:', response.status);
       }
     } catch (error) {
-      // Error fetching user nutritional targets
+      console.error('Error fetching user nutritional targets:', error);
+      showModal('alert', 'Error', 'Failed to fetch user nutritional targets. Please try again later.', {iconType: 'error'});
     }
   }, [auth]);
 

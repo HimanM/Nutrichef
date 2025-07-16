@@ -36,7 +36,8 @@ const UserSettingsPage = () => {
                 effectiveUserId = String(u.UserID || u.id); userIdSource = 'localStorage';
                 resolvedUserName = u.Name || u.Email?.split('@')[0] || `User ID: ${effectiveUserId}`;
             } catch (e) { 
-                // Error parsing stored user data - continue with auth context
+                console.error("Error parsing stored user data:", e);
+                // Continue with auth context
             }
         }
         if (!effectiveUserId && authContextUser) {
@@ -46,7 +47,8 @@ const UserSettingsPage = () => {
         if (effectiveUserId) { 
             setUserId(effectiveUserId);
         } else {
-            // UserID could not be determined
+            console.error('Error: UserID could not be determined. Falling back to default user settings.');
+            showModal('Error', 'We could not determine your user information. Some features may not work as expected.');
         }
         setUserName(resolvedUserName);
     }, [authContextUser]);
@@ -217,111 +219,113 @@ const UserSettingsPage = () => {
                                         <HiOutlineLockClosed className="w-5 h-5 mr-2" />
                                         Change Password
                                     </h2>
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                        <div>
-                                            <label htmlFor="currentPassword" className="block text-sm font-medium text-emerald-700 mb-2">Current Password</label>
-                                            <div className="relative">
-                                                <input 
-                                                    type={showCurrentPassword ? "text" : "password"} 
-                                                    id="currentPassword" 
-                                                    value={currentPassword} 
-                                                    onChange={(e) => setCurrentPassword(e.target.value)} 
-                                                    required 
-                                                    className="block w-full px-3 py-3 pr-12 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 sm:text-sm disabled:bg-amber-100 disabled:opacity-75 transition-all duration-200 placeholder-amber-500" 
-                                                    placeholder="Enter current password"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                                    onMouseDown={() => setShowCurrentPassword(true)}
-                                                    onMouseUp={() => setShowCurrentPassword(false)}
-                                                    onMouseLeave={() => setShowCurrentPassword(false)}
-                                                    onTouchStart={() => setShowCurrentPassword(true)}
-                                                    onTouchEnd={() => setShowCurrentPassword(false)}
-                                                    disabled={isLoadingPassword}
-                                                >
-                                                    {showCurrentPassword ? (
-                                                        <HiOutlineEyeOff className="h-5 w-5 text-amber-500 hover:text-amber-700 transition-colors" />
-                                                    ) : (
-                                                        <HiOutlineEye className="h-5 w-5 text-amber-500 hover:text-amber-700 transition-colors" />
-                                                    )}
-                                                </button>
+                                    <form onSubmit={handleChangePassword}>
+                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                            <div>
+                                                <label htmlFor="currentPassword" className="block text-sm font-medium text-emerald-700 mb-2">Current Password</label>
+                                                <div className="relative">
+                                                    <input 
+                                                        type={showCurrentPassword ? "text" : "password"} 
+                                                        id="currentPassword" 
+                                                        value={currentPassword} 
+                                                        onChange={(e) => setCurrentPassword(e.target.value)} 
+                                                        required 
+                                                        className="block w-full px-3 py-3 pr-12 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 sm:text-sm disabled:bg-amber-100 disabled:opacity-75 transition-all duration-200 placeholder-amber-500" 
+                                                        placeholder="Enter current password"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                                        onMouseDown={() => setShowCurrentPassword(true)}
+                                                        onMouseUp={() => setShowCurrentPassword(false)}
+                                                        onMouseLeave={() => setShowCurrentPassword(false)}
+                                                        onTouchStart={() => setShowCurrentPassword(true)}
+                                                        onTouchEnd={() => setShowCurrentPassword(false)}
+                                                        disabled={isLoadingPassword}
+                                                    >
+                                                        {showCurrentPassword ? (
+                                                            <HiOutlineEyeOff className="h-5 w-5 text-amber-500 hover:text-amber-700 transition-colors" />
+                                                        ) : (
+                                                            <HiOutlineEye className="h-5 w-5 text-amber-500 hover:text-amber-700 transition-colors" />
+                                                        )}
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div>
-                                            <label htmlFor="newPassword" className="block text-sm font-medium text-emerald-700 mb-2">New Password</label>
-                                            <div className="relative">
-                                                <input 
-                                                    type={showNewPassword ? "text" : "password"} 
-                                                    id="newPassword" 
-                                                    value={newPassword} 
-                                                    onChange={(e) => setNewPassword(e.target.value)} 
-                                                    required 
-                                                    className="block w-full px-3 py-3 pr-12 bg-white border border-emerald-200 text-emerald-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 sm:text-sm disabled:bg-emerald-50 disabled:opacity-75 transition-all duration-200" 
-                                                    placeholder="Enter new password"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                                    onMouseDown={() => setShowNewPassword(true)}
-                                                    onMouseUp={() => setShowNewPassword(false)}
-                                                    onMouseLeave={() => setShowNewPassword(false)}
-                                                    onTouchStart={() => setShowNewPassword(true)}
-                                                    onTouchEnd={() => setShowNewPassword(false)}
-                                                    disabled={isLoadingPassword}
-                                                >
-                                                    {showNewPassword ? (
-                                                        <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
-                                                    ) : (
-                                                        <HiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
-                                                    )}
-                                                </button>
+                                            <div>
+                                                <label htmlFor="newPassword" className="block text-sm font-medium text-emerald-700 mb-2">New Password</label>
+                                                <div className="relative">
+                                                    <input 
+                                                        type={showNewPassword ? "text" : "password"} 
+                                                        id="newPassword" 
+                                                        value={newPassword} 
+                                                        onChange={(e) => setNewPassword(e.target.value)} 
+                                                        required 
+                                                        className="block w-full px-3 py-3 pr-12 bg-white border border-emerald-200 text-emerald-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 sm:text-sm disabled:bg-emerald-50 disabled:opacity-75 transition-all duration-200" 
+                                                        placeholder="Enter new password"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                                        onMouseDown={() => setShowNewPassword(true)}
+                                                        onMouseUp={() => setShowNewPassword(false)}
+                                                        onMouseLeave={() => setShowNewPassword(false)}
+                                                        onTouchStart={() => setShowNewPassword(true)}
+                                                        onTouchEnd={() => setShowNewPassword(false)}
+                                                        disabled={isLoadingPassword}
+                                                    >
+                                                        {showNewPassword ? (
+                                                            <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                                                        ) : (
+                                                            <HiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                                                        )}
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div>
-                                            <label htmlFor="confirmNewPassword" className="block text-sm font-medium text-emerald-700 mb-2">Confirm New Password</label>
-                                            <div className="relative">
-                                                <input 
-                                                    type={showConfirmPassword ? "text" : "password"} 
-                                                    id="confirmNewPassword" 
-                                                    value={confirmNewPassword} 
-                                                    onChange={(e) => setConfirmNewPassword(e.target.value)} 
-                                                    required 
-                                                    className="block w-full px-3 py-3 pr-12 bg-white border border-emerald-200 text-emerald-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 sm:text-sm disabled:bg-emerald-50 disabled:opacity-75 transition-all duration-200" 
-                                                    placeholder="Confirm new password"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                                    onMouseDown={() => setShowConfirmPassword(true)}
-                                                    onMouseUp={() => setShowConfirmPassword(false)}
-                                                    onMouseLeave={() => setShowConfirmPassword(false)}
-                                                    onTouchStart={() => setShowConfirmPassword(true)}
-                                                    onTouchEnd={() => setShowConfirmPassword(false)}
-                                                    disabled={isLoadingPassword}
-                                                >
-                                                    {showConfirmPassword ? (
-                                                        <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
-                                                    ) : (
-                                                        <HiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
-                                                    )}
-                                                </button>
+                                            <div>
+                                                <label htmlFor="confirmNewPassword" className="block text-sm font-medium text-emerald-700 mb-2">Confirm New Password</label>
+                                                <div className="relative">
+                                                    <input 
+                                                        type={showConfirmPassword ? "text" : "password"} 
+                                                        id="confirmNewPassword" 
+                                                        value={confirmNewPassword} 
+                                                        onChange={(e) => setConfirmNewPassword(e.target.value)} 
+                                                        required 
+                                                        className="block w-full px-3 py-3 pr-12 bg-white border border-emerald-200 text-emerald-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 sm:text-sm disabled:bg-emerald-50 disabled:opacity-75 transition-all duration-200" 
+                                                        placeholder="Confirm new password"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                                        onMouseDown={() => setShowConfirmPassword(true)}
+                                                        onMouseUp={() => setShowConfirmPassword(false)}
+                                                        onMouseLeave={() => setShowConfirmPassword(false)}
+                                                        onTouchStart={() => setShowConfirmPassword(true)}
+                                                        onTouchEnd={() => setShowConfirmPassword(false)}
+                                                        disabled={isLoadingPassword}
+                                                    >
+                                                        {showConfirmPassword ? (
+                                                            <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                                                        ) : (
+                                                            <HiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                                                        )}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    
-                                    <div className="mt-8 flex justify-end">
-                                        <button 
-                                            onClick={handleChangePassword}
-                                            disabled={isLoadingPassword} 
-                                            className="btn-primary px-8 py-3 rounded-xl font-semibold shadow-md flex items-center justify-center gap-2 disabled:opacity-60 transition-all duration-200 hover:scale-105"
-                                        >
-                                            {isLoadingPassword ? <InlineSpinner /> : null} 
-                                            {isLoadingPassword ? "Updating..." : "Update Password"}
-                                        </button>
-                                    </div>
+                                        
+                                        <div className="mt-8 flex justify-end">
+                                            <button 
+                                                type="submit"
+                                                disabled={isLoadingPassword} 
+                                                className="btn-primary px-8 py-3 rounded-xl font-semibold shadow-md flex items-center justify-center gap-2 disabled:opacity-60 transition-all duration-200 hover:scale-105"
+                                            >
+                                                {isLoadingPassword ? <InlineSpinner /> : null} 
+                                                {isLoadingPassword ? "Updating..." : "Update Password"}
+                                            </button>
+                                        </div>
+                                    </form>
                                     
                                     {passwordMessage.text && (
                                         <div className={`mt-4 p-3 rounded-xl text-sm ${passwordMessage.type === 'error' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
