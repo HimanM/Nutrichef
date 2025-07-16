@@ -3,11 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useModal } from '../context/ModalContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
+import { ButtonSpinner, InlineSpinner, PageLoaderSpinner } from '../components/common/LoadingComponents.jsx';
 import { HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
 
-const SpinnerIcon = () => <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>;
-const InlineSpinner = () => <svg className="animate-spin h-5 w-5 text-indigo-400 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>;
-const PageLoaderSpinner = () => <svg className="animate-spin h-10 w-10 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>;
 
 const UserSettingsPage = () => {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -38,14 +36,19 @@ const UserSettingsPage = () => {
                 const u = JSON.parse(storedUser);
                 effectiveUserId = String(u.UserID || u.id); userIdSource = 'localStorage';
                 resolvedUserName = u.Name || u.Email?.split('@')[0] || `User ID: ${effectiveUserId}`;
-            } catch (e) { console.error('Failed to parse stored user:', e); }
+            } catch (e) { 
+                // Error parsing stored user data - continue with auth context
+            }
         }
         if (!effectiveUserId && authContextUser) {
             effectiveUserId = String(authContextUser.UserID || authContextUser.id); userIdSource = 'AuthContext';
             resolvedUserName = authContextUser.Name || authContextUser.Email?.split('@')[0] || `User ID: ${effectiveUserId}`;
         }
-        if (effectiveUserId) { setUserId(effectiveUserId); console.log(`UserID ${effectiveUserId} from ${userIdSource}`);}
-        else console.warn('UserID could not be determined.');
+        if (effectiveUserId) { 
+            setUserId(effectiveUserId);
+        } else {
+            // UserID could not be determined
+        }
         setUserName(resolvedUserName);
     }, [authContextUser]);
 
@@ -252,7 +255,7 @@ const UserSettingsPage = () => {
                                         </div>
                                     </div>
                                     <button type="submit" disabled={isLoadingPassword} className="btn-primary px-6 py-2 rounded-lg font-semibold shadow-md flex items-center gap-2 disabled:opacity-60">
-                                        {isLoadingPassword ? <SpinnerIcon /> : null} {isLoadingPassword ? "Changing..." : "Change Password"}
+                                        {isLoadingPassword ? <ButtonSpinner /> : null} {isLoadingPassword ? "Changing..." : "Change Password"}
                                     </button>
                                     {passwordMessage.text && (
                                         <div className={`mt-3 p-3 rounded-md text-sm ${passwordMessage.type === 'error' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
@@ -266,7 +269,7 @@ const UserSettingsPage = () => {
                                 <h2 className="text-xl font-semibold border-b border-emerald-100 pb-3 mb-6 text-emerald-700">Allergies/Intolerances</h2>
                                 <form onSubmit={handleSaveAllergies} className="space-y-4">
                                     {isLoadingAllergies && !allAllergies.length ? (
-                                        <div className="flex items-center text-emerald-700"><InlineSpinner /> Loading available allergies...</div>
+                                        <div className="flex items-center text-emerald-700"><InlineSpinner className="mr-2" /> Loading available allergies...</div>
                                     ) : (
                                         <>
                                             <p className="text-sm text-gray-500 mb-2">Select any items you are allergic or intolerant to:</p>

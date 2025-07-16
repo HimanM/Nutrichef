@@ -136,7 +136,6 @@ function MealPlanner() {
       
       if (response.ok) {
         const userData = await response.json();
-        console.log('Raw user data from preferences:', userData);
         const targets = {
           DailyCalories: userData.DailyCalories,
           DailyProtein: userData.DailyProtein,
@@ -147,13 +146,11 @@ function MealPlanner() {
           DailySodium: userData.DailySodium
         };
         setUserNutritionalTargets(targets);
-        console.log('Fetched nutritional targets:', targets);
-        console.log('Has targets:', Object.values(targets).some(target => target && target > 0));
       } else {
-        console.error('Failed to fetch user preferences:', response.status, response.statusText);
+        // Failed to fetch user preferences
       }
     } catch (error) {
-      console.error('Error fetching user nutritional targets:', error);
+      // Error fetching user nutritional targets
     }
   }, [auth]);
 
@@ -171,7 +168,6 @@ function MealPlanner() {
       return;
     }
 
-    console.log('Saving nutritional targets:', targets);
     try {
       const response = await authenticatedFetch('/api/user/nutritional-targets', {
         method: 'PUT',
@@ -181,14 +177,9 @@ function MealPlanner() {
         body: JSON.stringify(targets),
       }, auth);
 
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
-
       if (response.ok) {
         const result = await response.json();
-        console.log('Response result:', result);
         setUserNutritionalTargets(targets);
-        console.log('Updated nutritional targets:', targets);
         showModal('alert', 'Success', 'Nutritional targets updated successfully!', {iconType: 'success'});
         
         // Refresh the targets to ensure they're up to date
@@ -197,11 +188,9 @@ function MealPlanner() {
         }, 100);
       } else {
         const error = await response.json();
-        console.error('Error response:', error);
         showModal('alert', 'Error', error.error || 'Failed to update nutritional targets', {iconType: 'error'});
       }
     } catch (error) {
-      console.error('Error saving nutritional targets:', error);
       showModal('alert', 'Error', 'Failed to save nutritional targets', {iconType: 'error'});
     }
   };

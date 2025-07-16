@@ -51,7 +51,11 @@ function PublicRecipeBrowser() {
   const effectiveUserId = isAuthenticated && currentUser ? String(currentUser.UserID) : null;
 
   const handleOpenRecipeSubmissionModal = () => {
-    if (isAuthenticated) setIsRecipeSubmissionModalOpen(true); else setIsLoginModalOpen(true);
+    if (isAuthenticated) {
+      setIsRecipeSubmissionModalOpen(true);
+    } else {
+      setIsLoginModalOpen(true);
+    }
   };
   const handleCloseRecipeSubmissionModal = () => {
     setIsRecipeSubmissionModalOpen(false);
@@ -142,7 +146,6 @@ function PublicRecipeBrowser() {
         throw new Error(errorData.error || `Failed to fetch recipes: ${response.status}`);
       }
       const data = await response.json();
-      console.log('Fetched recipes data with average_rating check:', data.recipes); 
       setRecipes(data.recipes || []);
       setTotalRecipes(data.pagination?.total || 0);
     } catch (err) {
@@ -200,7 +203,6 @@ function PublicRecipeBrowser() {
           currentPalette.push(recipeForPalette);
           localStorage.setItem(MEAL_PLAN_PALETTE_KEY, JSON.stringify(currentPalette));
           setPaletteRecipeIds(prevIds => new Set(prevIds).add(recipeToAdd.RecipeID));
-          console.log('Added recipe to palette with full data:', recipeForPalette);
         }
       } catch (error) {
         console.error("Error adding recipe to palette:", error);
