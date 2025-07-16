@@ -64,23 +64,23 @@ const UserRegistration = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gradient-to-br from-emerald-50 via-white to-blue-50">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="card-glass py-8 px-6 sm:px-10 animate-fade-in">
-                    <div className="sm:mx-auto sm:w-full sm:max-w-md mb-8 text-center">
-                        <div className="mx-auto h-16 w-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg mb-4">
-                            <HiOutlineSparkles className="h-8 w-8 text-white" />
+        <div className="min-h-screen flex flex-col justify-center py-4 px-4 sm:py-8 sm:px-6 lg:px-8 bg-gradient-to-br from-emerald-50 via-white to-blue-50">
+            <div className="w-full max-w-md mx-auto">
+                <div className="card-glass py-6 px-4 sm:py-8 sm:px-8 animate-fade-in">
+                    <div className="text-center mb-6">
+                        <div className="mx-auto h-12 w-12 sm:h-16 sm:w-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg mb-3">
+                            <HiOutlineSparkles className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                         </div>
-                        <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                             Join NutriChef
                         </h2>
-                        <p className="text-gray-600">
+                        <p className="text-sm sm:text-base text-gray-600">
                             Create your account and start your healthy journey
                         </p>
                     </div>
 
                     {message && (
-                        <div className={`mb-6 p-4 rounded-xl text-sm animate-slide-in ${
+                        <div className={`mb-4 p-3 rounded-xl text-sm animate-slide-in ${
                             isError 
                                 ? 'bg-red-50 border border-red-200 text-red-700' 
                                 : 'bg-emerald-50 border border-emerald-200 text-emerald-700'
@@ -89,7 +89,7 @@ const UserRegistration = () => {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-4">{/* Reduced space */}
                         <div>
                             <label htmlFor="name" className="form-label">Full name</label>
                             <div className="relative">
@@ -105,7 +105,7 @@ const UserRegistration = () => {
                                     value={name} 
                                     onChange={(e) => setName(e.target.value)} 
                                     disabled={isLoading} 
-                                    className="form-input pl-12" 
+                                    className="form-input pl-12 py-2.5" 
                                     placeholder="Your full name" 
                                 />
                             </div>
@@ -126,7 +126,7 @@ const UserRegistration = () => {
                                     value={email} 
                                     onChange={(e) => setEmail(e.target.value)} 
                                     disabled={isLoading} 
-                                    className="form-input pl-12" 
+                                    className="form-input pl-12 py-2.5" 
                                     placeholder="you@example.com" 
                                 />
                             </div>
@@ -147,7 +147,7 @@ const UserRegistration = () => {
                                     value={password} 
                                     onChange={(e) => setPassword(e.target.value)} 
                                     disabled={isLoading} 
-                                    className="form-input pl-12 pr-12" 
+                                    className="form-input pl-12 pr-12 py-2.5" 
                                     placeholder="Create a strong password"
                                 />
                                 <button
@@ -184,7 +184,7 @@ const UserRegistration = () => {
                                     value={confirmPassword} 
                                     onChange={(e) => setConfirmPassword(e.target.value)} 
                                     disabled={isLoading} 
-                                    className="form-input pl-12 pr-12" 
+                                    className="form-input pl-12 pr-12 py-2.5" 
                                     placeholder="Confirm your password"
                                 />
                                 <button
@@ -210,7 +210,7 @@ const UserRegistration = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="btn-primary w-full flex justify-center items-center disabled:opacity-75 disabled:cursor-not-allowed"
+                                className="btn-primary w-full flex justify-center items-center py-2.5 disabled:opacity-75 disabled:cursor-not-allowed"
                             >
                                 {isLoading ? (
                                     <>
@@ -230,7 +230,7 @@ const UserRegistration = () => {
                         </div>
                     </form>
 
-                    <div className="mt-8">
+                    <div className="mt-6">
                         <div className="relative">
                             <div className="absolute inset-0 flex items-center">
                                 <div className="w-full border-t border-gray-200"></div>
@@ -242,10 +242,10 @@ const UserRegistration = () => {
                             </div>
                         </div>
 
-                        <div className="mt-6 text-center">
+                        <div className="mt-4 text-center">
                             <RouterLink
                                 to="/login"
-                                className="btn-outline w-full"
+                                className="btn-outline w-full py-2.5"
                             >
                                 Sign in to your account
                             </RouterLink>

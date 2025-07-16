@@ -29,8 +29,8 @@ const FloatingScroller = () => {
       className={`fixed bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-full shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200 ease-in-out hover:scale-110 z-30 
         ${showScrollButton ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}
         
-        /* Mobile positioning - bottom right, below chatbot */
-        bottom-4 right-4 p-3
+        /* Mobile positioning - bottom right, above chatbot */
+        bottom-20 right-4 p-3
         sm:bottom-22 sm:right-6 sm:p-4
         
         /* Touch-friendly mobile sizing */

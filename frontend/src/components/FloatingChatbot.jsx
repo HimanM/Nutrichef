@@ -245,13 +245,13 @@ const FloatingChatbot = () => {
         onClick={() => setOpen(true)}
         className="fixed bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-full shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-300 ease-out hover:scale-110 z-40 group
           
-          /* Mobile positioning - bottom right, above scroll button */
-          bottom-20 right-4 p-3
+          /* Mobile positioning - bottom right, lower position */
+          bottom-4 right-4 p-3
           sm:bottom-6 sm:right-6 sm:p-4
           
           /* Touch-friendly mobile sizing */
           touch-manipulation
-          min-h-[56px] min-w-[5-fr]
+          min-h-[56px] min-w-[56px]
           sm:min-h-[60px] sm:min-w-[60px]
         "
         aria-label="Open chatbot"
@@ -265,7 +265,7 @@ const FloatingChatbot = () => {
   return (
     <div className="fixed z-50
       /* Mobile positioning - better spacing from edges */
-      bottom-4 right-4 
+      bottom-20 right-4 
       w-[calc(100vw-2rem)] h-[calc(100vh-6rem)]
       max-w-sm max-h-[500px]
       

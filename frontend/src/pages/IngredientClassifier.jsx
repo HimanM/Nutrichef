@@ -91,22 +91,22 @@ const IngredientClassifier = () => {
             <div className="section-padding">
                 <div className="container-modern">
                     {/* Header */}
-                    <div className="text-center mb-12 animate-fade-in">
-                        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                    <div className="text-center mb-8 sm:mb-12 animate-fade-in">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 px-4">
                             <span className="gradient-text">Ingredient Classifier</span>
                         </h1>
-                        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                        <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto px-4">
                             Upload an image to classify it as an ingredient or food item and get nutritional information
                         </p>
                     </div>
 
                     {/* Main Form */}
-                    <div className="card-glass p-8 mb-8 animate-fade-in">
-                        <div className="space-y-8">
+                    <div className="card-glass p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-fade-in">
+                        <div className="space-y-6 sm:space-y-8">
                             {/* Classification Type Selection */}
                             <div className="text-center">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-4">Select Classification Type</h3>
-                                <div className="flex justify-center space-x-6">
+                                <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Select Classification Type</h3>
+                                <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
                                     <label className="inline-flex items-center">
                                         <input 
                                             type="radio" 
@@ -116,7 +116,7 @@ const IngredientClassifier = () => {
                                             checked={classificationMode === 'ingredient'} 
                                             onChange={(e) => setClassificationMode(e.target.value)} 
                                         />
-                                        <span className="ml-2 text-sm text-gray-700">Ingredient</span>
+                                        <span className="ml-2 text-sm sm:text-base text-gray-700">Ingredient</span>
                                     </label>
                                     <label className="inline-flex items-center">
                                         <input 
@@ -127,7 +127,7 @@ const IngredientClassifier = () => {
                                             checked={classificationMode === 'food'} 
                                             onChange={(e) => setClassificationMode(e.target.value)} 
                                         />
-                                        <span className="ml-2 text-sm text-gray-700">Food Item</span>
+                                        <span className="ml-2 text-sm sm:text-base text-gray-700">Food Item</span>
                                     </label>
                                 </div>
                             </div>
@@ -144,12 +144,12 @@ const IngredientClassifier = () => {
                                 />
                                 <label 
                                     htmlFor="imageUploadInput" 
-                                    className="cursor-pointer inline-flex items-center px-6 py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 bg-white hover:border-emerald-400 hover:text-emerald-600 transition-all duration-200"
+                                    className="cursor-pointer inline-flex items-center justify-center px-4 sm:px-6 py-3 sm:py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 bg-white hover:border-emerald-400 hover:text-emerald-600 transition-all duration-200 w-full sm:w-auto min-h-[44px] touch-manipulation"
                                 >
-                                    <HiOutlineCloudUpload className="h-6 w-6 mr-2" /> 
+                                    <HiOutlineCloudUpload className="h-5 w-5 sm:h-6 sm:w-6 mr-2" /> 
                                     Upload Image
                                 </label>
-                                <p className="text-sm text-gray-500 mt-2">{fileName}</p>
+                                <p className="text-xs sm:text-sm text-gray-500 mt-2 px-4 break-all">{fileName}</p>
                             </div>
 
                             {/* Classify Button */}
@@ -158,7 +158,7 @@ const IngredientClassifier = () => {
                                     type="button"
                                     onClick={handleClassify}
                                     disabled={!selectedImage || isLoading}
-                                    className="btn-primary disabled:opacity-75 disabled:cursor-not-allowed"
+                                    className="btn-primary w-full sm:w-auto min-h-[44px] touch-manipulation disabled:opacity-75 disabled:cursor-not-allowed"
                                 >
                                     {isLoading ? (
                                         <>
@@ -186,16 +186,16 @@ const IngredientClassifier = () => {
 
                     {/* Error Message */}
                     {error && (
-                        <div className="card p-6 border-red-200 bg-red-50 mb-8 animate-fade-in">
-                            <div className="flex items-center">
+                        <div className="card p-4 sm:p-6 border-red-200 bg-red-50 mb-6 sm:mb-8 animate-fade-in">
+                            <div className="flex items-start">
                                 <div className="flex-shrink-0">
-                                    <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                                        <HiOutlineExclamation className="w-5 h-5 text-red-600" />
+                                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-red-100 rounded-full flex items-center justify-center">
+                                        <HiOutlineExclamation className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
                                     </div>
                                 </div>
                                 <div className="ml-3">
                                     <h3 className="text-sm font-medium text-red-800">Classification Error</h3>
-                                    <p className="text-sm text-red-700 mt-1">{error}</p>
+                                    <p className="text-sm text-red-700 mt-1 break-words">{error}</p>
                                 </div>
                             </div>
                         </div>
@@ -203,14 +203,14 @@ const IngredientClassifier = () => {
 
                     {/* Image Preview */}
                     {imagePreviewUrl && !isLoading && !error && (
-                        <div className="card-glass p-8 mb-8 animate-fade-in">
+                        <div className="card-glass p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-fade-in">
                             <div className="text-center">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-4">Image Preview</h3>
+                                <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Image Preview</h3>
                                 <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 bg-white">
                                     <img 
                                         src={imagePreviewUrl} 
                                         alt="Selected preview" 
-                                        className="max-w-full max-h-80 mx-auto rounded-lg shadow-sm" 
+                                        className="max-w-full max-h-60 sm:max-h-80 mx-auto rounded-lg shadow-sm" 
                                     />
                                 </div>
                             </div>
@@ -219,25 +219,25 @@ const IngredientClassifier = () => {
 
                     {/* Classification Results */}
                     {classificationResult && !isLoading && (
-                        <div className="card-glass p-8 animate-fade-in">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6">Classification & Nutrition Results</h2>
+                        <div className="card-glass p-4 sm:p-6 lg:p-8 animate-fade-in">
+                            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Classification & Nutrition Results</h2>
 
                             {/* Classification Results */}
                             {classificationResult.classification?.allPredictions && classificationResult.classification.allPredictions.length > 0 ? (
-                                <div className="mb-6">
+                                <div className="mb-4 sm:mb-6">
                                     <div className="flex items-center mb-2">
-                                        <HiOutlineCheckCircle className="w-5 h-5 text-emerald-500 mr-2" />
-                                        <p className="text-lg font-semibold text-emerald-700">
+                                        <HiOutlineCheckCircle className="w-5 h-5 text-emerald-500 mr-2 flex-shrink-0" />
+                                        <p className="text-base sm:text-lg font-semibold text-emerald-700 break-words">
                                             Food Identified: {classificationResult.classification.allPredictions[0].name}
                                         </p>
                                     </div>
-                                    <p className="text-sm text-gray-600">
+                                    <p className="text-sm text-gray-600 ml-7">
                                         Confidence: {(classificationResult.classification.allPredictions[0].confidence * 100).toFixed(2)}%
                                     </p>
                                 </div>
                             ) : (
-                                <div className="mb-6">
-                                    <p className="text-lg font-semibold text-emerald-700">
+                                <div className="mb-4 sm:mb-6">
+                                    <p className="text-base sm:text-lg font-semibold text-emerald-700 break-words">
                                         Food Identified: {classificationResult.classification?.finalFoodNameUsed || classificationResult.classification?.imagePredictedFoodName || "N/A"}
                                     </p>
                                 </div>
@@ -245,11 +245,11 @@ const IngredientClassifier = () => {
 
                             {/* Other Possible Matches */}
                             {classificationResult.classification?.allPredictions && classificationResult.classification.allPredictions.length > 1 && (
-                                <div className="mb-6">
-                                    <h3 className="text-md font-semibold text-gray-800 mb-2">Other Possible Matches:</h3>
+                                <div className="mb-4 sm:mb-6">
+                                    <h3 className="text-sm sm:text-base font-semibold text-gray-800 mb-2">Other Possible Matches:</h3>
                                     <div className="space-y-1">
                                         {classificationResult.classification.allPredictions.slice(1, 3).map((prediction, index) => (
-                                            <p key={index} className="text-sm text-gray-600">
+                                            <p key={index} className="text-sm text-gray-600 break-words">
                                                 {prediction.name} - Confidence: {(prediction.confidence * 100).toFixed(2)}%
                                             </p>
                                         ))}
@@ -259,26 +259,26 @@ const IngredientClassifier = () => {
 
                             {/* Nutrition Results */}
                             {classificationResult.nutrition && (
-                                <div className="mt-6">
+                                <div className="mt-4 sm:mt-6">
                                     {classificationResult.nutrition.success && classificationResult.nutrition.matched_item?.description &&
                                      classificationResult.classification?.finalFoodNameUsed?.toLowerCase() !== classificationResult.nutrition.matched_item.description.toLowerCase() && (
-                                        <p className="text-sm text-gray-600 italic mb-4">
+                                        <p className="text-sm text-gray-600 italic mb-4 break-words">
                                             Nutrition data for: <strong>{classificationResult.nutrition.matched_item.description}</strong> 
                                             (Matched at {classificationResult.nutrition.matched_item.match_score?.toFixed(0)}%)
                                         </p>
                                     )}
 
                                     {!classificationResult.nutrition.success && (
-                                        <div className="card p-4 border-red-200 bg-red-50 mb-4">
-                                            <p className="text-sm text-red-700">
+                                        <div className="card p-3 sm:p-4 border-red-200 bg-red-50 mb-4">
+                                            <p className="text-sm text-red-700 break-words">
                                                 {classificationResult.nutrition.error || "Could not retrieve nutrition information."}
                                             </p>
                                         </div>
                                     )}
 
                                     {classificationResult.nutrition.success && classificationResult.nutrition.warning && (
-                                        <div className="card p-4 border-amber-200 bg-amber-50 mb-4">
-                                            <p className="text-sm text-amber-700">
+                                        <div className="card p-3 sm:p-4 border-amber-200 bg-amber-50 mb-4">
+                                            <p className="text-sm text-amber-700 break-words">
                                                 {classificationResult.nutrition.warning}
                                             </p>
                                         </div>
@@ -286,14 +286,14 @@ const IngredientClassifier = () => {
 
                                     {classificationResult.nutrition.success && Object.keys(classificationResult.nutrition.nutrition || {}).length > 0 && (
                                         <div>
-                                            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                                            <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
                                                 Nutritional Information (per 100g/100ml approx.)
                                             </h3>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                                                 {Object.entries(classificationResult.nutrition.nutrition).map(([name, details]) => (
-                                                    <div key={name} className="bg-white border border-gray-200 rounded-lg p-4">
-                                                        <h4 className="font-semibold text-gray-800 text-sm">{name}</h4>
-                                                        <p className="text-emerald-600 font-medium">
+                                                    <div key={name} className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4">
+                                                        <h4 className="font-semibold text-gray-800 text-sm break-words">{name}</h4>
+                                                        <p className="text-emerald-600 font-medium text-sm sm:text-base">
                                                             {details.amount} {details.unit}
                                                         </p>
                                                     </div>

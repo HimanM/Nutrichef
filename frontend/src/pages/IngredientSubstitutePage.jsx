@@ -119,33 +119,33 @@ const IngredientSubstitutePage = () => {
       <div className="section-padding">
         <div className="container-modern">
           {/* Header */}
-          <div className="text-center mb-12 animate-fade-in">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <div className="text-center mb-8 sm:mb-12 animate-fade-in">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 px-4">
               <span className="gradient-text">Find Ingredient Substitutes</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto px-4">
               Enter an ingredient to discover potential substitutes and their nutritional information
             </p>
           </div>
 
           {/* Search Section */}
-          <div className="card-glass p-8 mb-8 animate-fade-in">
+          <div className="card-glass p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 animate-fade-in">
             <div className="max-w-lg mx-auto">
               <label htmlFor="ingredientName" className="form-label">Ingredient Name</label>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <input
                   type="text"
                   id="ingredientName"
                   value={ingredientName}
                   onChange={(e) => setIngredientName(e.target.value)}
-                  className="form-input flex-1"
+                  className="form-input flex-1 text-base"
                   placeholder="e.g., Butter, Flour, Egg"
                   onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSearch()}
                 />
                 <button
                   onClick={handleSearch}
                   disabled={isLoading}
-                  className="btn-primary disabled:opacity-75 disabled:cursor-not-allowed"
+                  className="btn-primary w-full sm:w-auto min-h-[44px] touch-manipulation disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <HiOutlineRefresh className="animate-spin h-5 w-5" />
@@ -162,16 +162,16 @@ const IngredientSubstitutePage = () => {
 
           {/* Error Message */}
           {error && (
-            <div className="card p-6 border-red-200 bg-red-50 mb-8 animate-fade-in">
-              <div className="flex items-center">
+            <div className="card p-4 sm:p-6 border-red-200 bg-red-50 mb-6 sm:mb-8 animate-fade-in">
+              <div className="flex items-start">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                    <HiOutlineExclamation className="w-5 h-5 text-red-600" />
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-red-100 rounded-full flex items-center justify-center">
+                    <HiOutlineExclamation className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
                   </div>
                 </div>
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-red-800">Search Error</h3>
-                  <p className="text-sm text-red-700 mt-1">{error}</p>
+                  <p className="text-sm text-red-700 mt-1 break-words">{error}</p>
                 </div>
               </div>
             </div>
@@ -179,16 +179,16 @@ const IngredientSubstitutePage = () => {
 
           {/* Results */}
           {results.length > 0 && (
-            <div className="space-y-6 animate-fade-in">
-              <h2 className="text-2xl font-bold text-gray-800 text-center">
+            <div className="space-y-4 sm:space-y-6 animate-fade-in">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center px-4">
                 Suggested Substitutes for "{toTitleCase(searchedIngredient)}"
               </h2>
               {results.map((substitute, index) => (
-                <div key={index} className="card-glass p-6">
-                  <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
+                <div key={index} className="card-glass p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-3 sm:mb-4">
                     <div className="flex items-center mb-2 sm:mb-0">
-                      <HiOutlineCheckCircle className="w-5 h-5 text-emerald-500 mr-2" />
-                      <span className={`inline-block px-4 py-2 text-lg font-semibold text-white rounded-full ${
+                      <HiOutlineCheckCircle className="w-5 h-5 text-emerald-500 mr-2 flex-shrink-0" />
+                      <span className={`inline-block px-3 sm:px-4 py-2 text-base sm:text-lg font-semibold text-white rounded-full break-words ${
                         substitute.score > 0.7 ? 'bg-emerald-500' : substitute.score > 0.4 ? 'bg-amber-500' : 'bg-red-500'
                       }`}>
                         {toTitleCase(substitute.name)}
@@ -229,19 +229,19 @@ const IngredientSubstitutePage = () => {
                   )}
 
                   {substitute.nutrition && !substitute.isLoadingNutrition && !substitute.nutritionError && (
-                    <div className="mt-4">
-                      <h4 className="text-sm font-semibold text-gray-800 mb-3">Nutritional Information (per 100g approx.)</h4>
+                    <div className="mt-3 sm:mt-4">
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2 sm:mb-3">Nutritional Information (per 100g approx.)</h4>
                       {Object.keys(substitute.nutrition).length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
                           {Object.entries(substitute.nutrition).map(([nutrientName, nutrientDetails]) => {
                             if (nutrientDetails && typeof nutrientDetails.amount !== 'undefined' && nutrientDetails.unit) {
                               const amountDisplay = typeof nutrientDetails.amount === 'number'
                                 ? nutrientDetails.amount.toFixed(1)
                                 : nutrientDetails.amount;
                               return (
-                                <div key={nutrientName} className="bg-white border border-gray-200 rounded-lg p-3">
-                                  <h5 className="font-semibold text-gray-800 text-sm">{toTitleCase(nutrientName)}</h5>
-                                  <p className="text-emerald-600 font-medium">
+                                <div key={nutrientName} className="bg-white border border-gray-200 rounded-lg p-2 sm:p-3">
+                                  <h5 className="font-semibold text-gray-800 text-sm break-words">{toTitleCase(nutrientName)}</h5>
+                                  <p className="text-emerald-600 font-medium text-sm">
                                     {amountDisplay} {nutrientDetails.unit}
                                   </p>
                                 </div>

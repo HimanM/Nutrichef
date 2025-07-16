@@ -64,42 +64,42 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gradient-to-br from-emerald-50 via-white to-blue-50">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="card-glass py-8 px-6 sm:px-10 animate-fade-in">
-          <div className="sm:mx-auto sm:w-full sm:max-w-md mb-8 text-center">
-            <div className="mx-auto h-16 w-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg mb-4">
-              <HiOutlineSparkles className="h-8 w-8 text-white" />
+    <div className="min-h-screen flex flex-col justify-center py-4 px-4 sm:py-8 sm:px-6 lg:px-8 bg-gradient-to-br from-emerald-50 via-white to-blue-50">
+      <div className="w-full max-w-md mx-auto">
+        <div className="card-glass py-6 px-4 sm:py-8 sm:px-8 animate-fade-in">
+          <div className="text-center mb-6">
+            <div className="mx-auto h-12 w-12 sm:h-16 sm:w-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg mb-3">
+              <HiOutlineSparkles className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
               Welcome back
             </h2>
-            <p className="text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600">
               Sign in to your NutriChef account
             </p>
           </div>
 
           {authError && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm animate-slide-in">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm animate-slide-in">
               {authError}
             </div>
           )}
 
           {formError && !showEmailNotVerified && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm animate-slide-in">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm animate-slide-in">
               {formError}
             </div>
           )}
 
           {showEmailNotVerified && (
-            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-sm animate-slide-in">
-              <div className="mb-3">
+            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-sm animate-slide-in">
+              <div className="mb-2">
                 <p className="font-medium">{formError}</p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col gap-2">
                 <RouterLink
                   to="/register"
-                  className="btn-primary text-sm px-4 py-2 text-center"
+                  className="btn-primary text-sm px-3 py-2 text-center"
                 >
                   Register Again
                 </RouterLink>
@@ -108,7 +108,7 @@ export default function LoginPage() {
                     setShowEmailNotVerified(false);
                     setFormError('');
                   }}
-                  className="btn-outline text-sm px-4 py-2"
+                  className="btn-outline text-sm px-3 py-2"
                 >
                   Try Different Email
                 </button>
@@ -116,7 +116,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">{/* Reduced space */}
             <div>
               <label htmlFor="email" className="form-label">
                 Email address
@@ -134,7 +134,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={authLoading || isSubmitting}
-                  className="form-input pl-12"
+                  className="form-input pl-12 py-2.5"
                   placeholder="you@example.com"
                 />
               </div>
@@ -157,7 +157,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={authLoading || isSubmitting}
-                  className="form-input pl-12 pr-12"
+                  className="form-input pl-12 pr-12 py-2.5"
                   placeholder="Enter your password"
                 />
                 <button
@@ -183,7 +183,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isSubmitting || authLoading}
-                className="btn-primary w-full flex justify-center items-center disabled:opacity-75 disabled:cursor-not-allowed"
+                className="btn-primary w-full flex justify-center items-center py-2.5 disabled:opacity-75 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
@@ -203,7 +203,7 @@ export default function LoginPage() {
             </div>
           </form>
 
-          <div className="mt-8">
+          <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200"></div>
@@ -215,10 +215,10 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="mt-6 text-center">
+            <div className="mt-4 text-center">
               <RouterLink
                 to="/register"
-                className="btn-outline w-full"
+                className="btn-outline w-full py-2.5"
               >
                 Create an account
               </RouterLink>
