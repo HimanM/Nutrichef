@@ -4,15 +4,15 @@ import { HiUsers, HiOutlineBookOpen, HiOutlineChartBar, HiOutlineMail } from 're
 
 // FeatureCard Component (adapted from HomePage.jsx)
 const FeatureCard = ({ title, description, link = "#", icon, ctaText = "Go" }) => (
-  <a href={link} className="card-glass group hover-lift p-6 text-center animate-fade-in block">
-    <div className="mb-4 flex items-center justify-center">
-      <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:shadow-emerald-500/25 transition-all duration-300">
+  <a href={link} className="card-glass group hover-lift p-4 sm:p-6 text-center animate-fade-in h-full flex flex-col feature-card-mobile sm:feature-card-desktop border border-white/20 hover:border-emerald-200/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300 ease-out">
+    <div className="mb-3 sm:mb-4 flex items-center justify-center">
+      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:shadow-emerald-500/30 group-hover:scale-105 transition-all duration-300 feature-icon border border-emerald-400/20">
         {icon}
       </div>
     </div>
-    <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-emerald-600 transition-colors duration-200">{title}</h3>
-    <p className="text-gray-600 text-sm mb-4 leading-relaxed">{description}</p>
-    <div className="flex items-center justify-center text-emerald-600 group-hover:text-emerald-700 font-medium transition-colors duration-200">
+    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 group-hover:text-emerald-600 transition-colors duration-200">{title}</h3>
+    <p className="text-gray-600 text-sm mb-3 sm:mb-4 leading-relaxed flex-grow">{description}</p>
+    <div className="flex items-center justify-center text-emerald-600 group-hover:text-emerald-700 font-medium transition-colors duration-200 mt-auto cta-button px-3 py-1.5 rounded-lg border border-emerald-200/50 group-hover:border-emerald-300 group-hover:bg-emerald-50/50 text-sm">
       <span className="mr-2">{ctaText}</span>
     </div>
   </a>
@@ -48,20 +48,33 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="section-padding">
-      <div className="container-modern">
-        <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">Admin Dashboard</h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+    <div className="py-8 sm:py-12 md:py-16 lg:py-20 relative">
+      <div className="absolute inset-0 opacity-30" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2310b981' fill-opacity='0.03'%3E%3Cpath d='M20 20c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20zm-30 0c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10-10-4.477-10-10z'/%3E%3C/g%3E%3C/svg%3E")`
+      }}></div>
+      <div className="container-modern px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-8 sm:mb-12 animate-fade-in">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 gradient-text">Admin Dashboard</h1>
+          <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto px-4">
             Welcome to the Admin Panel. Use the links below or the navigation bar to manage different sections of NutriChef.
           </p>
+          <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full mx-auto mt-6"></div>
         </div>
-        <div className="card-glass p-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {adminFeatures.map((feature, index) => (
-              <FeatureCard key={index} {...feature} />
-            ))}
+        <div className="card-container bg-none p-4 sm:p-6 md:p-8">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6 flex items-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white mr-3 shadow-sm">
+              <span className="text-sm font-bold">⚡</span>
+            </div>
+            Quick Actions
+          </h2>
+          <div className="bg-gradient-to-br from-gray-50/50 to-emerald-50/30 rounded-3xl p-4 sm:p-6 md:p-8 border border-gray-100/50 shadow-soft">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 quick-links-grid">
+              {adminFeatures.map((feature, index) => (
+                <div key={index} className="h-full">
+                  <FeatureCard {...feature} />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

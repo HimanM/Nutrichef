@@ -1,52 +1,70 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { HiOutlineHome, HiOutlineExclamation } from 'react-icons/hi';
+import { HiOutlineHome, HiOutlineExclamation, HiOutlineCollection, HiOutlineCamera, HiOutlineMail } from 'react-icons/hi';
 
 const NotFoundPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="container-modern text-center max-w-2xl animate-fade-in">
-        <div className="card-glass p-12">
-          <div className="mb-8">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
-              <HiOutlineExclamation className="w-12 h-12 text-white" />
-            </div>
-            <h1 className="text-6xl sm:text-8xl font-extrabold gradient-text mb-4">
-              404
-            </h1>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
-              Oops! Page Not Found
-            </h2>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              The page you are looking for might have been moved, renamed, or is temporarily unavailable.
-              Don't worry, let's get you back on track!
-            </p>
+      <div className="container-modern text-center max-w-4xl animate-fade-in">
+        <div className="mb-8 relative">
+          <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-2xl">
+            <HiOutlineExclamation className="w-16 h-16 text-white" />
           </div>
+        </div>
+
+        {/* Error Message */}
+        <div className="mb-12">
+          <h1 className="text-8xl sm:text-9xl font-extrabold gradient-text mb-6 drop-shadow-lg">
+            404
+          </h1>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-6">
+            Oops! Page Not Found
+          </h2>
+          <p className="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
+            The page you are looking for might have been moved, renamed, or is temporarily unavailable.
+            Don't worry, let's get you back on track!
+          </p>
+        </div>
+        
+        {/* Action Buttons */}
+        <div className="mb-12">
+          <RouterLink
+            to="/"
+            className="btn-primary inline-flex items-center justify-center text-lg px-8 py-4 mb-6 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+          >
+            <HiOutlineHome className="w-6 h-6 mr-3" />
+            Go to Homepage
+          </RouterLink>
+        </div>
+
+        {/* Popular Pages Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+          <RouterLink 
+            to="/recipes" 
+            className="group p-6 rounded-2xl bg-white/60 backdrop-blur-sm border border-emerald-500/30 hover:bg-white/80 hover:border-emerald-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+          >
+            <HiOutlineCollection className="w-8 h-8 text-emerald-600 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-semibold text-gray-800 mb-2">Browse Recipes</h3>
+            <p className="text-sm text-gray-600">Discover delicious recipes</p>
+          </RouterLink>
           
-          <div className="space-y-4">
-            <RouterLink
-              to="/"
-              className="btn-primary inline-flex items-center justify-center"
-            >
-              <HiOutlineHome className="w-5 h-5 mr-2" />
-              Go to Homepage
-            </RouterLink>
-            
-            <div className="text-sm text-gray-500">
-              <p>Or try one of these popular pages:</p>
-              <div className="flex flex-wrap justify-center gap-4 mt-2">
-                <RouterLink to="/recipes" className="text-emerald-600 hover:text-emerald-700 transition-colors">
-                  Browse Recipes
-                </RouterLink>
-                <RouterLink to="/classifier" className="text-emerald-600 hover:text-emerald-700 transition-colors">
-                  Ingredient Classifier
-                </RouterLink>
-                <RouterLink to="/contact-us" className="text-emerald-600 hover:text-emerald-700 transition-colors">
-                  Contact Us
-                </RouterLink>
-              </div>
-            </div>
-          </div>
+          <RouterLink 
+            to="/classifier" 
+            className="group p-6 rounded-2xl bg-white/60 backdrop-blur-sm border border-emerald-500/30 hover:bg-white/80 hover:border-emerald-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+          >
+            <HiOutlineCamera className="w-8 h-8 text-emerald-600 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-semibold text-gray-800 mb-2">Ingredient Classifier</h3>
+            <p className="text-sm text-gray-600">Classify food items with AI</p>
+          </RouterLink>
+          
+          <RouterLink 
+            to="/contact-us" 
+            className="group p-6 rounded-2xl bg-white/60 backdrop-blur-sm border border-emerald-500/30 hover:bg-white/80 hover:border-emerald-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+          >
+            <HiOutlineMail className="w-8 h-8 text-emerald-600 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-semibold text-gray-800 mb-2">Contact Us</h3>
+            <p className="text-sm text-gray-600">Get help and support</p>
+          </RouterLink>
         </div>
       </div>
     </div>

@@ -21,14 +21,9 @@ const NutritionalProgress = ({
       sodium: 0
     };
 
-    console.log('Calculating nutrition for meals:', meals);
-
     meals.forEach(meal => {
-      console.log('Processing meal:', meal.Title, 'NutritionInfo:', meal.NutritionInfo);
-      
       if (meal.NutritionInfo && meal.NutritionInfo.nutrition) {
         const nutrition = meal.NutritionInfo.nutrition;
-        console.log('Using nested nutrition structure:', nutrition);
         
         // Handle the nested structure from the database
         totals.calories += nutrition.calories?.amount || 0;
@@ -40,7 +35,6 @@ const NutritionalProgress = ({
         totals.sodium += nutrition.sodium?.amount || 0;
       } else if (meal.NutritionInfo) {
         // Handle flat structure (fallback)
-        console.log('Using flat nutrition structure:', meal.NutritionInfo);
         totals.calories += meal.NutritionInfo.calories || 0;
         totals.protein += meal.NutritionInfo.protein || 0;
         totals.carbs += meal.NutritionInfo.carbs || 0;
@@ -49,11 +43,10 @@ const NutritionalProgress = ({
         totals.sugar += meal.NutritionInfo.sugar || 0;
         totals.sodium += meal.NutritionInfo.sodium || 0;
       } else {
-        console.log('No nutrition info found for meal:', meal.Title);
+        // No nutrition info available for this meal
       }
     });
 
-    console.log('Calculated totals:', totals);
     return totals;
   };
 
@@ -83,9 +76,6 @@ const NutritionalProgress = ({
 
   const hasTargets = Object.values(userNutritionalTargets).some(target => target && target > 0);
   const hasMeals = dayMeals.length > 0;
-
-  console.log('NutritionalProgress - hasTargets:', hasTargets, 'userNutritionalTargets:', userNutritionalTargets);
-  console.log('NutritionalProgress - hasMeals:', hasMeals, 'dayMeals:', dayMeals);
 
   if (!hasTargets && !hasMeals) {
     return null;
