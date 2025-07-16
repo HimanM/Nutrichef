@@ -106,29 +106,41 @@ const IngredientClassifier = () => {
                             {/* Classification Type Selection */}
                             <div className="text-center">
                                 <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Select Classification Type</h3>
-                                <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
-                                    <label className="inline-flex items-center">
-                                        <input 
-                                            type="radio" 
-                                            className="form-radio text-emerald-500 h-4 w-4 focus:ring-emerald-500" 
-                                            name="classificationMode" 
-                                            value="ingredient" 
-                                            checked={classificationMode === 'ingredient'} 
-                                            onChange={(e) => setClassificationMode(e.target.value)} 
+                                <div className="flex justify-center">
+                                    <div className="relative inline-flex items-center bg-gray-100 rounded-full p-1 w-64 sm:w-72">
+                                        {/* Background slider */}
+                                        <div 
+                                            className={`absolute top-1 bottom-1 w-1/2 bg-emerald-500 rounded-full transition-all duration-300 ease-in-out ${
+                                                classificationMode === 'ingredient' ? 'left-1' : 'left-1/2'
+                                            }`}
                                         />
-                                        <span className="ml-2 text-sm sm:text-base text-gray-700">Ingredient</span>
-                                    </label>
-                                    <label className="inline-flex items-center">
-                                        <input 
-                                            type="radio" 
-                                            className="form-radio text-emerald-500 h-4 w-4 focus:ring-emerald-500" 
-                                            name="classificationMode" 
-                                            value="food" 
-                                            checked={classificationMode === 'food'} 
-                                            onChange={(e) => setClassificationMode(e.target.value)} 
-                                        />
-                                        <span className="ml-2 text-sm sm:text-base text-gray-700">Food Item</span>
-                                    </label>
+                                        
+                                        {/* Ingredient option */}
+                                        <button
+                                            type="button"
+                                            onClick={() => setClassificationMode('ingredient')}
+                                            className={`relative z-10 flex-1 py-2 px-4 text-sm sm:text-base font-medium rounded-full transition-all duration-300 ${
+                                                classificationMode === 'ingredient' 
+                                                    ? 'text-white' 
+                                                    : 'text-gray-600 hover:text-gray-800'
+                                            }`}
+                                        >
+                                            Ingredient
+                                        </button>
+                                        
+                                        {/* Food Item option */}
+                                        <button
+                                            type="button"
+                                            onClick={() => setClassificationMode('food')}
+                                            className={`relative z-10 flex-1 py-2 px-4 text-sm sm:text-base font-medium rounded-full transition-all duration-300 ${
+                                                classificationMode === 'food' 
+                                                    ? 'text-white' 
+                                                    : 'text-gray-600 hover:text-gray-800'
+                                            }`}
+                                        >
+                                            Food Item
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
