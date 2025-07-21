@@ -278,59 +278,149 @@ function PantryPage() {
                                 </button>
                             </div>
                         ) : (
-                            /* Scrollable Pantry Items */
-                            <div className="max-h-96 overflow-y-auto rounded-xl border border-emerald-100">
-                                <table className="min-w-full bg-white/70">
-                                    <thead className="sticky top-0 bg-emerald-50 border-b border-emerald-200">
-                                        <tr>
-                                            <th className="px-4 py-3 text-left text-emerald-700 font-semibold text-sm">Ingredient</th>
-                                            <th className="px-4 py-3 text-left text-emerald-700 font-semibold text-sm">Quantity</th>
-                                            <th className="px-4 py-3 text-left text-emerald-700 font-semibold text-sm">Unit</th>
-                                            <th className="px-4 py-3 text-right text-emerald-700 font-semibold text-sm">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-emerald-100">
-                                        {pantryItems.map((item) => (
-                                            <tr key={item.UserPantryIngredientID} className="hover:bg-emerald-50/50 transition-colors">
-                                                <td className="px-4 py-3 text-emerald-700 font-medium">{item.IngredientName}</td>
-                                                <td className="px-4 py-3 text-emerald-700">
-                                                    {editingItemId === item.UserPantryIngredientID ? (
-                                                        <input 
-                                                            type="text" 
-                                                            value={editQuantity} 
-                                                            onChange={(e) => setEditQuantity(e.target.value)} 
-                                                            className="w-20 px-2 py-1 border border-emerald-200 rounded-md bg-white text-emerald-700 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent" 
-                                                        />
-                                                    ) : (
-                                                        item.Quantity
-                                                    )}
-                                                </td>
-                                                <td className="px-4 py-3 text-emerald-700">
-                                                    {editingItemId === item.UserPantryIngredientID ? (
-                                                        <input 
-                                                            type="text" 
-                                                            value={editUnit} 
-                                                            onChange={(e) => setEditUnit(e.target.value)} 
-                                                            className="w-20 px-2 py-1 border border-emerald-200 rounded-md bg-white text-emerald-700 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent" 
-                                                        />
-                                                    ) : (
-                                                        item.Unit || '-'
-                                                    )}
-                                                </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <div className="inline-flex justify-end w-full gap-1">
+                            /* Responsive Pantry Items */
+                            <div className="space-y-3 max-h-96 overflow-y-auto">
+                                {/* Desktop Table View - Hidden on Mobile */}
+                                <div className="hidden md:block">
+                                    <div className="rounded-xl border border-emerald-100 overflow-hidden">
+                                        <table className="min-w-full bg-white/70">
+                                            <thead className="bg-emerald-50 border-b border-emerald-200">
+                                                <tr>
+                                                    <th className="px-4 py-3 text-left text-emerald-700 font-semibold text-sm">Ingredient</th>
+                                                    <th className="px-4 py-3 text-left text-emerald-700 font-semibold text-sm">Quantity</th>
+                                                    <th className="px-4 py-3 text-left text-emerald-700 font-semibold text-sm">Unit</th>
+                                                    <th className="px-4 py-3 text-right text-emerald-700 font-semibold text-sm">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-emerald-100">
+                                                {pantryItems.map((item) => (
+                                                    <tr key={item.UserPantryIngredientID} className="hover:bg-emerald-50/50 transition-colors">
+                                                        <td className="px-4 py-3 text-emerald-700 font-medium">{item.IngredientName}</td>
+                                                        <td className="px-4 py-3 text-emerald-700">
+                                                            {editingItemId === item.UserPantryIngredientID ? (
+                                                                <input 
+                                                                    type="text" 
+                                                                    value={editQuantity} 
+                                                                    onChange={(e) => setEditQuantity(e.target.value)} 
+                                                                    className="w-20 px-2 py-1 border border-emerald-200 rounded-md bg-white text-emerald-700 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent" 
+                                                                />
+                                                            ) : (
+                                                                item.Quantity
+                                                            )}
+                                                        </td>
+                                                        <td className="px-4 py-3 text-emerald-700">
+                                                            {editingItemId === item.UserPantryIngredientID ? (
+                                                                <input 
+                                                                    type="text" 
+                                                                    value={editUnit} 
+                                                                    onChange={(e) => setEditUnit(e.target.value)} 
+                                                                    className="w-20 px-2 py-1 border border-emerald-200 rounded-md bg-white text-emerald-700 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent" 
+                                                                />
+                                                            ) : (
+                                                                item.Unit || '-'
+                                                            )}
+                                                        </td>
+                                                        <td className="px-4 py-3 text-right">
+                                                            <div className="inline-flex justify-end w-full gap-1">
+                                                                {editingItemId === item.UserPantryIngredientID ? (
+                                                                    <>
+                                                                        <button 
+                                                                            onClick={() => handleUpdateItem(item.UserPantryIngredientID)} 
+                                                                            className="btn-primary px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 hover:scale-105 transition-transform"
+                                                                            title="Save changes"
+                                                                        >
+                                                                            <SaveIcon />
+                                                                        </button>
+                                                                        <button 
+                                                                            onClick={cancelEdit} 
+                                                                            className="btn-outline px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 hover:scale-105 transition-transform"
+                                                                            title="Cancel editing"
+                                                                        >
+                                                                            <CancelIcon />
+                                                                        </button>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <button 
+                                                                            onClick={() => startEditItem(item)} 
+                                                                            className="btn-success px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 hover:scale-105 transition-transform"
+                                                                            title="Edit item"
+                                                                        >
+                                                                            <EditIcon />
+                                                                        </button>
+                                                                        <button 
+                                                                            onClick={() => handleDeleteItem(item.UserPantryIngredientID, item.IngredientName)} 
+                                                                            className="btn-danger px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 hover:scale-105 transition-transform"
+                                                                            title="Delete item"
+                                                                        >
+                                                                            <DeleteIcon />
+                                                                        </button>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                {/* Mobile Card View - Hidden on Desktop */}
+                                <div className="md:hidden space-y-3">
+                                    {pantryItems.map((item) => (
+                                        <div key={item.UserPantryIngredientID} className="bg-white/80 rounded-xl border border-emerald-100 p-4 hover:bg-emerald-50/50 transition-colors">
+                                            <div className="flex items-start justify-between gap-3">
+                                                {/* Item Info */}
+                                                <div className="flex-grow min-w-0">
+                                                    <h4 className="font-medium text-emerald-700 text-base break-words">{item.IngredientName}</h4>
+                                                    <div className="flex flex-wrap gap-2 mt-2">
+                                                        {editingItemId === item.UserPantryIngredientID ? (
+                                                            <>
+                                                                <div className="flex items-center gap-1">
+                                                                    <span className="text-xs text-gray-500">Qty:</span>
+                                                                    <input 
+                                                                        type="text" 
+                                                                        value={editQuantity} 
+                                                                        onChange={(e) => setEditQuantity(e.target.value)} 
+                                                                        className="w-16 px-2 py-1 border border-emerald-200 rounded-md bg-white text-emerald-700 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent" 
+                                                                    />
+                                                                </div>
+                                                                <div className="flex items-center gap-1">
+                                                                    <span className="text-xs text-gray-500">Unit:</span>
+                                                                    <input 
+                                                                        type="text" 
+                                                                        value={editUnit} 
+                                                                        onChange={(e) => setEditUnit(e.target.value)} 
+                                                                        className="w-16 px-2 py-1 border border-emerald-200 rounded-md bg-white text-emerald-700 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent" 
+                                                                        placeholder="unit"
+                                                                    />
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <div className="flex gap-4 text-sm text-gray-600">
+                                                                <span><span className="font-medium">Quantity:</span> {item.Quantity}</span>
+                                                                <span><span className="font-medium">Unit:</span> {item.Unit || 'N/A'}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* Action Buttons */}
+                                                <div className="flex-shrink-0">
+                                                    <div className="flex gap-2">
                                                         {editingItemId === item.UserPantryIngredientID ? (
                                                             <>
                                                                 <button 
                                                                     onClick={() => handleUpdateItem(item.UserPantryIngredientID)} 
-                                                                    className="btn-primary px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 hover:scale-105 transition-transform"
+                                                                    className="btn-primary p-2 rounded-lg text-sm font-medium flex items-center hover:scale-105 transition-transform touch-manipulation"
                                                                     title="Save changes"
                                                                 >
                                                                     <SaveIcon />
                                                                 </button>
                                                                 <button 
                                                                     onClick={cancelEdit} 
-                                                                    className="btn-outline px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 hover:scale-105 transition-transform"
+                                                                    className="btn-outline p-2 rounded-lg text-sm font-medium flex items-center hover:scale-105 transition-transform touch-manipulation"
                                                                     title="Cancel editing"
                                                                 >
                                                                     <CancelIcon />
@@ -340,14 +430,14 @@ function PantryPage() {
                                                             <>
                                                                 <button 
                                                                     onClick={() => startEditItem(item)} 
-                                                                    className="btn-success px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 hover:scale-105 transition-transform"
+                                                                    className="btn-success p-2 rounded-lg text-sm font-medium flex items-center hover:scale-105 transition-transform touch-manipulation"
                                                                     title="Edit item"
                                                                 >
                                                                     <EditIcon />
                                                                 </button>
                                                                 <button 
                                                                     onClick={() => handleDeleteItem(item.UserPantryIngredientID, item.IngredientName)} 
-                                                                    className="btn-danger px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 hover:scale-105 transition-transform"
+                                                                    className="btn-danger p-2 rounded-lg text-sm font-medium flex items-center hover:scale-105 transition-transform touch-manipulation"
                                                                     title="Delete item"
                                                                 >
                                                                     <DeleteIcon />
@@ -355,11 +445,11 @@ function PantryPage() {
                                                             </>
                                                         )}
                                                     </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>

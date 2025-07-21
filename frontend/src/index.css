@@ -1047,3 +1047,68 @@ h3 {
     border: 1px solid #ccc !important;
   }
 }
+
+/* Mobile safe area padding */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Mobile Modal styles */
+.mobile-modal-open {
+  overflow: hidden;
+  touch-action: none;
+}
+
+.mobile-modal-backdrop {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.mobile-modal-drag-handle {
+  padding: 12px 0 8px 0;
+  display: flex;
+  justify-content: center;
+  cursor: grab;
+  touch-action: none;
+}
+
+.mobile-modal-drag-handle:active {
+  cursor: grabbing;
+}
+
+.mobile-modal-drag-indicator {
+  width: 36px;
+  height: 4px;
+  background-color: #d1d5db;
+  border-radius: 2px;
+  transition: background-color 200ms ease;
+}
+
+.mobile-modal-drag-handle:hover .mobile-modal-drag-indicator,
+.mobile-modal-drag-handle:active .mobile-modal-drag-indicator {
+  background-color: #9ca3af;
+}
+
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.mobile-modal-content {
+  overscroll-behavior: contain;
+}

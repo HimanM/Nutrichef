@@ -245,9 +245,10 @@ function ShoppingBasketPage() {
                 {/* Basket List */}
                 <ul className="divide-y divide-emerald-100">
                   {basketItems.map((item) => (
-                    <li key={item.id} className="px-4 py-3 sm:px-6 hover:bg-emerald-50 transition ease-in-out duration-150">
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-                        <div className="flex items-center mb-2 sm:mb-0">
+                    <li key={item.id} className="px-4 py-4 sm:px-6 hover:bg-emerald-50 transition ease-in-out duration-150">
+                      <div className="flex items-start gap-3">
+                        {/* Quantity Input */}
+                        <div className="flex-shrink-0">
                           <input
                             type="text"
                             value={item.quantity}
@@ -256,35 +257,41 @@ function ShoppingBasketPage() {
                             placeholder="1"
                             aria-label={`Quantity for ${item.name}`}
                           />
-                          <div className="ml-3 text-sm">
-                            <p className="font-medium text-gray-800">
-                              {item.unit || ''} {item.name}
-                              {/* Check multiple ways to detect consolidation */}
-                              {((item.recipeSources && item.recipeSources.length > 1) || 
-                                (item.recipeTitle && item.recipeTitle.includes(',')) ||
-                                (item.recipeTitle && item.recipeTitle.split(',').length > 1)) && (
-                                <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-                                  Consolidated
-                                </span>
-                              )}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {item.originalName && item.originalName !== item.name && (
-                                <span className="italic">(Substituted for: {item.originalName}) </span>
-                              )}
-                              From: {item.recipeSources && item.recipeSources.length > 1 
-                                ? item.recipeSources.join(', ') 
-                                : (item.recipeTitle || 'Unknown Recipe')}
-                            </p>
-                          </div>
                         </div>
-                        <button
-                          onClick={() => handleRemoveItem(item.id)}
-                          className="p-1.5 text-red-500 hover:text-white hover:bg-red-500 rounded-md self-start sm:self-center transition-all duration-200 hover:scale-110 active:scale-95"
-                          aria-label={`Remove ${item.name}`}
-                        >
-                          <HiTrash className="w-5 h-5" />
-                        </button>
+                        
+                        {/* Item Details */}
+                        <div className="flex-grow min-w-0 text-sm">
+                          <p className="font-medium text-gray-800 break-words">
+                            {item.unit || ''} {item.name}
+                            {/* Check multiple ways to detect consolidation */}
+                            {((item.recipeSources && item.recipeSources.length > 1) || 
+                              (item.recipeTitle && item.recipeTitle.includes(',')) ||
+                              (item.recipeTitle && item.recipeTitle.split(',').length > 1)) && (
+                              <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                Consolidated
+                              </span>
+                            )}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1 break-words">
+                            {item.originalName && item.originalName !== item.name && (
+                              <span className="italic">(Substituted for: {item.originalName}) </span>
+                            )}
+                            From: {item.recipeSources && item.recipeSources.length > 1 
+                              ? item.recipeSources.join(', ') 
+                              : (item.recipeTitle || 'Unknown Recipe')}
+                          </p>
+                        </div>
+                        
+                        {/* Delete Button */}
+                        <div className="flex-shrink-0">
+                          <button
+                            onClick={() => handleRemoveItem(item.id)}
+                            className="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95 touch-manipulation"
+                            aria-label={`Remove ${item.name}`}
+                          >
+                            <HiTrash className="w-5 h-5" />
+                          </button>
+                        </div>
                       </div>
                     </li>
                   ))}
