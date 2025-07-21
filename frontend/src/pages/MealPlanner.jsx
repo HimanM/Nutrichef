@@ -9,6 +9,7 @@ import MealItemCard from '../components/MealItemCard.jsx';
 import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
 import NutritionalProgress from '../components/NutritionalProgress.jsx';
 import NutritionalTargetsModal from '../components/NutritionalTargetsModal.jsx';
+import MealSuggestions from '../components/MealSuggestions.jsx';
 import jsPDF from 'jspdf';
 import { format, addDays, startOfToday as getStartOfToday, isToday, isTomorrow, isBefore, parseISO } from 'date-fns';
 import { 
@@ -20,7 +21,7 @@ import { AiOutlineLoading } from 'react-icons/ai';
 import { 
   HiOutlineCalendar, HiOutlineCloudUpload, HiOutlineDocumentDownload, 
   HiOutlineEye, HiOutlineEyeOff, HiOutlineShoppingBag, HiOutlinePlus,
-  HiOutlineMinus, HiOutlineTrash, HiOutlineRefresh, HiOutlineMenu
+  HiOutlineMinus, HiOutlineTrash, HiOutlineRefresh, HiOutlineMenu, HiOutlineSparkles
 } from 'react-icons/hi';
 
 const MEAL_PLAN_PALETTE_KEY = 'mealPlanPaletteRecipes';
@@ -46,6 +47,8 @@ function MealPlanner() {
   const [isNutritionalTargetsModalOpen, setIsNutritionalTargetsModalOpen] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null); // Simplified selection state
   const [isMobile, setIsMobile] = useState(false);
+  const [showMealSuggestions, setShowMealSuggestions] = useState(false);
+  const [suggestionDate, setSuggestionDate] = useState(null);
   const isInitialMount = useRef(true);
   const isInitializing = useRef(true);
   const [visibleEmptyDays, setVisibleEmptyDays] = useState([]);
@@ -90,6 +93,20 @@ function MealPlanner() {
   const clearSelection = () => {
     setSelectedRecipe(null);
     clearRecipeSelection();
+  };
+
+  // Handle meal suggestions
+  const handleOpenSuggestions = (date) => {
+    setSuggestionDate(date);
+    setShowMealSuggestions(true);
+  };
+
+  const handleAddSuggestionToDay = (recipe) => {
+    if (suggestionDate) {
+      const dayKey = format(suggestionDate, 'yyyy-MM-dd');
+      handleAssignRecipeToDay(dayKey, recipe);
+      setShowMealSuggestions(false);
+    }
   };
 
   // Handle clicks outside palette to close it
@@ -570,33 +587,103 @@ function MealPlanner() {
         data-day-card
       >
         {/* Day Header */}
-        <div className="p-4 border-b border-gray-50">
-          <div className="flex items-center justify-between">
-            <h3 className={`font-semibold text-sm ${
-              isToday(date) ? 'text-emerald-600' : isTomorrow(date) ? 'text-blue-600' : 'text-gray-700'
-            }`}>
-              {dayLabel}
-            </h3>
-            <div className="flex items-center gap-2">
-              <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-medium">
-                {dayItems.length} meal{dayItems.length !== 1 ? 's' : ''}
-              </span>
-              {dayItems.length > 0 && (
+        <div className="p-3 sm:p-4 border-b border-gray-50">
+          {/* Mobile layout (single row for very small screens) */}
+          <div className="sm:hidden">
+            <div className="flex items-center justify-between">
+              {/* Title and meal count together */}
+              <div className="flex items-center gap-2">
+                <h3 className={`font-semibold text-sm ${
+                  isToday(date) ? 'text-emerald-600' : isTomorrow(date) ? 'text-blue-600' : 'text-gray-700'
+                }`}>
+                  {format(date, 'EEE d')} {/* Shorter format for mobile */}
+                </h3>
+                <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">
+                  {dayItems.length}
+                </span>
+              </div>
+              {/* Action buttons */}
+              <div className="flex items-center gap-1">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    toggleExpanded(dayKey, e);
+                    handleOpenSuggestions(date);
                   }}
-                  className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                  title={isExpanded ? "Collapse" : "Expand"}
+                  className="p-1.5 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors"
+                  title="Get meal suggestions"
                 >
-                  {isExpanded ? (
-                    <MdExpandLess className="w-4 h-4" />
-                  ) : (
-                    <MdExpandMore className="w-4 h-4" />
-                  )}
+                  <HiOutlineSparkles className="w-4 h-4" />
                 </button>
-              )}
+                {dayItems.length > 0 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleExpanded(dayKey, e);
+                    }}
+                    className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={isExpanded ? "Collapse" : "Expand"}
+                  >
+                    {isExpanded ? (
+                      <MdExpandLess className="w-4 h-4" />
+                    ) : (
+                      <MdExpandMore className="w-4 h-4" />
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop/Tablet layout (two rows for better spacing) */}
+          <div className="hidden sm:block">
+            {/* Top row - Title and main actions */}
+            <div className="flex items-center justify-between mb-2">
+              <h3 className={`font-semibold text-sm ${
+                isToday(date) ? 'text-emerald-600' : isTomorrow(date) ? 'text-blue-600' : 'text-gray-700'
+              }`}>
+                {dayLabel}
+              </h3>
+              <div className="flex items-center gap-1.5">
+                {/* Suggestion Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenSuggestions(date);
+                  }}
+                  className="p-1.5 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors"
+                  title="Get meal suggestions"
+                >
+                  <HiOutlineSparkles className="w-4 h-4" />
+                </button>
+                {/* Expand/Collapse Button */}
+                {dayItems.length > 0 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleExpanded(dayKey, e);
+                    }}
+                    className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={isExpanded ? "Collapse" : "Expand"}
+                  >
+                    {isExpanded ? (
+                      <MdExpandLess className="w-4 h-4" />
+                    ) : (
+                      <MdExpandMore className="w-4 h-4" />
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+            
+            {/* Bottom row - Meal counter */}
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center text-xs bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full font-medium">
+                {dayItems.length} meal{dayItems.length !== 1 ? 's' : ''}
+              </span>
+              {/* Optional: Add more secondary info here */}
+              <div className="text-xs text-gray-400">
+                {/* Could add total calories or other quick stats */}
+              </div>
             </div>
           </div>
         </div>
@@ -1231,6 +1318,17 @@ function MealPlanner() {
         onClose={() => setIsNutritionalTargetsModalOpen(false)}
         onSave={handleSaveNutritionalTargets}
         currentTargets={userNutritionalTargets}
+      />
+
+      {/* Meal Suggestions Modal */}
+      <MealSuggestions
+        selectedDate={suggestionDate}
+        existingMeals={suggestionDate ? plannedMeals[format(suggestionDate, 'yyyy-MM-dd')] || [] : []}
+        userNutritionalTargets={userNutritionalTargets}
+        onAddSuggestion={handleAddSuggestionToDay}
+        isVisible={showMealSuggestions}
+        onClose={() => setShowMealSuggestions(false)}
+        isMobile={isMobile}
       />
     </div>
   );

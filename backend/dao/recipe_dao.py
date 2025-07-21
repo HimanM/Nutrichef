@@ -89,6 +89,18 @@ class RecipeDAO:
         where pagination is not desired.
         """
         return Recipe.query.filter_by(is_public=True).order_by(Recipe.CreatedAt.desc()).all()
+    
+    def get_all_recipes_with_nutrition(self):
+        """Get all public recipes that have nutrition information"""
+        try:
+            recipes = Recipe.query.filter(
+                Recipe.is_public == True,
+                Recipe.NutritionInfoJSON.isnot(None)
+            ).all()
+            return recipes
+        except Exception as e:
+            print(f"Error in get_all_recipes_with_nutrition: {e}")
+            return []
 
     def get_ingredients_for_recipe(self, recipe_id):
         """
