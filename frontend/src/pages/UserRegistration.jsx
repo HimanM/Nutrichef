@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { HiOutlineUser, HiOutlineMail, HiOutlineLockClosed, HiOutlineArrowRight, HiOutlineSparkles, HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
+import { HiOutlineUser, HiOutlineMail, HiOutlineLockClosed, HiOutlineArrowRight, HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
 
 const UserRegistration = () => {
     const [name, setName] = useState('');
@@ -68,8 +68,8 @@ const UserRegistration = () => {
             <div className="w-full max-w-md mx-auto">
                 <div className="card-glass py-6 px-4 sm:py-8 sm:px-8 animate-fade-in">
                     <div className="text-center mb-6">
-                        <div className="mx-auto h-12 w-12 sm:h-16 sm:w-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg mb-3">
-                            <HiOutlineSparkles className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                        <div className="mx-auto h-12 w-12 sm:h-16 sm:w-16 bg-transparent rounded-2xl flex items-center justify-center shadow-lg mb-3">
+                            <div className="nutrichef-logo nutrichef-logo-full-sm sm:nutrichef-logo-full-lg"></div>
                         </div>
                         <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                             Join NutriChef

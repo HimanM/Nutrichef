@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
-import { HiOutlineChatAlt2, HiX, HiPaperAirplane, HiOutlinePhotograph, HiOutlineRefresh, HiOutlineSparkles, HiOutlineClock } from 'react-icons/hi';
+import { HiOutlineChatAlt2, HiX, HiPaperAirplane, HiOutlinePhotograph, HiOutlineRefresh, HiOutlineClock } from 'react-icons/hi';
 
 const FloatingChatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -277,7 +277,7 @@ const FloatingChatbot = () => {
         <div className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-t-3xl">
           <div className="flex items-center">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-3 backdrop-blur-sm">
-              <HiOutlineSparkles className="w-6 h-6 text-white" />
+              <div className="nutrichef-logo nutrichef-logo-sm"></div>
             </div>
             <div>
               <h3 className="font-semibold text-white">NutriChef Assistant</h3>

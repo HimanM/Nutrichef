@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { HiOutlineUserCircle, HiMenu, HiOutlineSparkles, HiOutlineLogin, HiOutlineUserAdd, HiOutlineLogout, HiX, HiChevronDown } from 'react-icons/hi';
+import { HiOutlineUserCircle, HiMenu, HiOutlineLogin, HiOutlineUserAdd, HiOutlineLogout, HiX, HiChevronDown } from 'react-icons/hi';
 import { RiAdminFill } from "react-icons/ri";
 
 const NavigationBar = () => {
@@ -28,7 +28,7 @@ const NavigationBar = () => {
         <div className="container-modern">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center animate-fade-in">
-              <HiOutlineSparkles className="w-7 h-7 mr-2 text-emerald-500" />
+              <div className="nutrichef-logo nutrichef-logo-md mr-2"></div>
               <span className="font-bold text-xl navbar-logo">NutriChef</span>
             </div>
             <div className="animate-pulse">
@@ -56,9 +56,9 @@ const NavigationBar = () => {
           {/* Logo */}
           <div className="flex items-center animate-fade-in">
             <Link to="/" className="flex items-center hover:scale-105 transition-transform duration-200">
-              <div className="relative">
-                <HiOutlineSparkles className="w-7 h-7 mr-2 text-emerald-500" />
-                <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-sm"></div>
+              <div className="relative flex items-center">
+                <div className="nutrichef-logo nutrichef-logo-md mr-2"></div>
+                
               </div>
               <span className="font-bold text-xl navbar-logo">NutriChef</span>
             </Link>

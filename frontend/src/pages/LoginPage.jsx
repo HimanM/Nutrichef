@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link as RouterLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { HiOutlineLockClosed, HiOutlineMail, HiOutlineArrowRight, HiOutlineSparkles, HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
+import { HiOutlineLockClosed, HiOutlineMail, HiOutlineArrowRight, HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -68,8 +68,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md mx-auto">
         <div className="card-glass py-6 px-4 sm:py-8 sm:px-8 animate-fade-in">
           <div className="text-center mb-6">
-            <div className="mx-auto h-12 w-12 sm:h-16 sm:w-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg mb-3">
-              <HiOutlineSparkles className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+            <div className="mx-auto h-12 w-12 sm:h-16 sm:w-16 bg-transparent rounded-2xl flex items-center justify-center shadow-lg mb-3">
+              <div className="nutrichef-logo nutrichef-logo-full-sm sm:nutrichef-logo-full-lg"></div>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
               Welcome back

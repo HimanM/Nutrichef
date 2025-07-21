@@ -48,6 +48,62 @@ html {
   scroll-behavior: smooth;
 }
 
+/* NutriChef Logo */
+.nutrichef-logo {
+  background-image: url('./assets/logo_trans.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: white;
+  border: 2px solid #10b981; /* emerald-500 */
+  border-radius: 0.5rem; /* rounded-lg */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.nutrichef-logo-sm {
+  width: 1.5rem; /* w-6 */
+  height: 1.5rem; /* h-6 */
+}
+
+.nutrichef-logo-md {
+  width: 1.75rem; /* w-7 */
+  height: 1.75rem; /* h-7 */
+}
+
+.nutrichef-logo-lg {
+  width: 2rem; /* w-8 */
+  height: 2rem; /* h-8 */
+}
+
+.nutrichef-logo-xl {
+  width: 2.5rem; /* w-10 */
+  height: 2.5rem; /* h-10 */
+}
+
+.nutrichef-logo-2xl {
+  width: 3rem; /* w-12 */
+  height: 3rem; /* h-12 */
+}
+
+.nutrichef-logo-3xl {
+  width: 3.5rem; /* w-14 */
+  height: 3.5rem; /* h-14 */
+}
+
+.nutrichef-logo-full-sm {
+  width: 3rem; /* w-12 - matches mobile container */
+  height: 3rem; /* h-12 - matches mobile container */
+}
+
+.nutrichef-logo-full-lg {
+  width: 4rem; /* w-16 - matches desktop container */
+  height: 4rem; /* h-16 - matches desktop container */
+}
+
 /* Link styles */
 a {
   font-weight: 500;
