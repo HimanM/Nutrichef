@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 
-import NavigationBar from './components/NavigationBar.jsx';
-import Footer from './components/Footer.jsx';
+import NavigationBar from './components/layout/NavigationBar.jsx';
+import Footer from './components/layout/Footer.jsx';
 import SessionExpiredModal from './components/auth/SessionExpiredModal.jsx';
-import FloatingChatbot from './components/FloatingChatbot.jsx';
-import FloatingScroller from './components/FloatingScroller.jsx';
+import FloatingChatbot from './components/ui/FloatingChatbot.jsx';
+import FloatingScroller from './components/ui/FloatingScroller.jsx';
 import AdminRoute from './components/AdminRoute.jsx';
 import PrivateRoute from './components/PrivateRoute.jsx';
-import AnimatedBackground from './components/AnimatedBackground.jsx';
+import AnimatedBackground from './components/layout/AnimatedBackground.jsx';
 
 import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';

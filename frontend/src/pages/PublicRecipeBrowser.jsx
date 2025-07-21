@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import RecipeCard from '../components/RecipeCard.jsx';
+import RecipeCard from '../components/recipe/RecipeCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
-import RecipeSubmissionModal from '../components/RecipeSubmissionModal.jsx';
-import FloatingLoader from '../components/FloatingLoader.jsx';
+import RecipeSubmissionModal from '../components/recipe/RecipeSubmissionModal.jsx';
+import FloatingLoader from '../components/ui/FloatingLoader.jsx';
 import { HiOutlineRefresh, HiOutlineSearch, HiOutlinePlus, HiOutlineCheck, HiOutlineEye, HiOutlineEyeOff, HiOutlineHeart, HiHeart, HiOutlineTag, HiOutlineX } from 'react-icons/hi';
 
 const AddIcon = ({ className = "w-5 h-5 mr-1" }) => <svg className={className} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd"></path></svg>;

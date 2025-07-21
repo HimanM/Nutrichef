@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useAuth } from '../context/AuthContext.jsx';
-import { authenticatedFetch } from '../utils/apiUtil.js';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { authenticatedFetch } from '../../utils/apiUtil.js';
 import { HiOutlineChatAlt2 } from 'react-icons/hi';
-import MobileChatbot from './chatbot/MobileChatbot';
-import DesktopChatbot from './chatbot/DesktopChatbot';
+import MobileChatbot from '../chatbot/MobileChatbot';
+import DesktopChatbot from '../chatbot/DesktopChatbot';
 
 const FloatingChatbot = () => {
   const [messages, setMessages] = useState([]);

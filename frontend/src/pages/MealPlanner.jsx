@@ -5,11 +5,11 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useModal } from '../context/ModalContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { consolidateBasketItems } from '../utils/basketUtils.js';
-import MealItemCard from '../components/MealItemCard.jsx';
+import MealItemCard from '../components/meal-planner/MealItemCard.jsx';
 import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
-import NutritionalProgress from '../components/NutritionalProgress.jsx';
-import NutritionalTargetsModal from '../components/NutritionalTargetsModal.jsx';
-import MealSuggestions from '../components/MealSuggestions.jsx';
+import NutritionalProgress from '../components/ui/NutritionalProgress.jsx';
+import NutritionalTargetsModal from '../components/ui/NutritionalTargetsModal.jsx';
+import MealSuggestions from '../components/meal-planner/MealSuggestions.jsx';
 import jsPDF from 'jspdf';
 import { format, addDays, startOfToday as getStartOfToday, isToday, isTomorrow, isBefore, parseISO } from 'date-fns';
 import { 

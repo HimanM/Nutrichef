@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import InteractiveModal from '../InteractiveModal';
+import InteractiveModal from '../ui/InteractiveModal';
 
 const RequireLoginModal = ({
   isOpen,

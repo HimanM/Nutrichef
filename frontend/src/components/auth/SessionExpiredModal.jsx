@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import InteractiveModal from '../InteractiveModal';
+import InteractiveModal from '../ui/InteractiveModal';
 import { useAuth } from '../../context/AuthContext.jsx';
 
 const SessionExpiredModal = () => {
