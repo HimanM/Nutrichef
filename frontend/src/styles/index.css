@@ -50,7 +50,7 @@ html {
 
 /* NutriChef Logo */
 .nutrichef-logo {
-  background-image: url('./assets/logo_trans.png');
+  background-image: url('../assets/logo_trans.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;

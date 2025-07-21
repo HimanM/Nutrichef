@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import StarRating from './StarRating';
+import StarRating from '../ui/StarRating';
 import { HiOutlineClock, HiOutlineUserGroup } from 'react-icons/hi';
 
 // Portal-based Tooltip Component

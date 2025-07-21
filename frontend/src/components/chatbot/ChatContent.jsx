@@ -23,7 +23,14 @@ const ChatContent = ({
   return (
     <>
       {/* Chat Body */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-gray-50 to-white" ref={chatBodyRef}>
+      <div 
+        className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-gray-50 to-white mobile-scroll" 
+        ref={chatBodyRef}
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehaviorY: 'contain'
+        }}
+      >
         {messages.map((message, index) => (
           <div
             key={message.id}

@@ -1,5 +1,5 @@
 import React from 'react';
-import InteractiveModal from '../InteractiveModal';
+import InteractiveModal from '../ui/InteractiveModal';
 
 const RequireAdminModal = ({
   isOpen,

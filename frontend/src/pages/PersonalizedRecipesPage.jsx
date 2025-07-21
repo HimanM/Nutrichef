@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
-import RecipeCard from '../components/RecipeCard.jsx'; // Tailwind version
+import RecipeCard from '../components/recipe/RecipeCard.jsx'; // Tailwind version
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { HiOutlineRefresh } from 'react-icons/hi';
 

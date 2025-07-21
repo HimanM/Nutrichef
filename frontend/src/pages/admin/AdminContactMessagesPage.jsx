@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import InteractiveModal from '../../components/InteractiveModal';
+import InteractiveModal from '../../components/ui/InteractiveModal';
 import ResponsiveTable from '../../components/admin/ResponsiveTable';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { MdCheckCircle, MdError, MdOutlineRemoveRedEye, MdReply } from 'react-icons/md';

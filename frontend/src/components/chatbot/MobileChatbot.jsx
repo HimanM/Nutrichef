@@ -1,5 +1,5 @@
 import React from 'react';
-import MobileModal from '../MobileModal';
+import MobileModal from '../ui/MobileModal';
 import ChatContent from './ChatContent';
 
 const MobileChatbot = ({

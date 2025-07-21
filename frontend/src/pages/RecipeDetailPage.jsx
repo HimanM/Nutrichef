@@ -4,9 +4,9 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { consolidateBasketItems } from '../utils/basketUtils.js';
 import { PageLoaderSpinner, InlineSpinner } from '../components/common/LoadingComponents.jsx';
-import StarRating from '../components/StarRating';
+import StarRating from '../components/ui/StarRating';
 import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
-import InteractiveModal from '../components/InteractiveModal.jsx';
+import InteractiveModal from '../components/ui/InteractiveModal.jsx';
 import { FiLock, FiUnlock } from 'react-icons/fi';
 
 const SHOPPING_BASKET_KEY = 'shoppingBasketItems';

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useAuth } from '../context/AuthContext.jsx';
-import { authenticatedFetch } from '../utils/apiUtil.js';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { authenticatedFetch } from '../../utils/apiUtil.js';
 import { HiOutlineChatAlt2 } from 'react-icons/hi';
-import MobileChatbot from './chatbot/MobileChatbot';
-import DesktopChatbot from './chatbot/DesktopChatbot';
+import MobileChatbot from '../chatbot/MobileChatbot';
+import DesktopChatbot from '../chatbot/DesktopChatbot';
 
 const FloatingChatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -24,6 +24,35 @@ const FloatingChatbot = () => {
   const fetchInstance = useCallback(async (url, options) => {
     return authenticatedFetch(url, options, auth);
   }, [auth]);
+
+  // Enhanced scroll to bottom function for all devices
+  const scrollToBottom = useCallback(() => {
+    if (chatBodyRef.current) {
+      const scrollElement = chatBodyRef.current;
+      
+      // Method 1: Force immediate scroll
+      scrollElement.scrollTop = scrollElement.scrollHeight;
+      
+      // Method 2: Use scrollTo with immediate behavior
+      scrollElement.scrollTo({
+        top: scrollElement.scrollHeight,
+        behavior: 'auto'
+      });
+      
+      // Method 3: Find the last message and scroll to it
+      const lastMessage = scrollElement.lastElementChild;
+      if (lastMessage) {
+        lastMessage.scrollIntoView({ behavior: 'auto', block: 'end' });
+      }
+      
+      // Additional scroll using requestAnimationFrame for layout changes
+      requestAnimationFrame(() => {
+        if (scrollElement) {
+          scrollElement.scrollTop = scrollElement.scrollHeight;
+        }
+      });
+    }
+  }, []);
 
   // Mobile detection
   useEffect(() => {
@@ -48,12 +77,21 @@ const FloatingChatbot = () => {
       if (messages.length === 0) {
         setMessages([initialGreeting]);
       }
-      // Focus input when chat opens
+      // Focus input when chat opens and scroll to bottom for mobile
       setTimeout(() => {
         if (inputRef.current) {
           inputRef.current.focus();
         }
+        // Extra scroll for mobile when opening
+        if (isMobile) {
+          scrollToBottom();
+        }
       }, 300);
+      
+      // Additional scroll for mobile modal animation completion
+      if (isMobile) {
+        setTimeout(scrollToBottom, 500);
+      }
     } else {
       // Don't clear messages when closing, only clear input-related states
       setUserInput('');
@@ -61,13 +99,34 @@ const FloatingChatbot = () => {
       setImagePreviewUrl(null);
       setError('');
     }
-  }, [open]);
+  }, [open, isMobile, scrollToBottom]);
 
   useEffect(() => {
-    if (chatBodyRef.current) {
-      chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
+    // Use multiple strategies to ensure scroll works
+    const scrollAfterUpdate = () => {
+      // Try multiple scroll approaches
+      scrollToBottom();
+      
+      // Alternative scroll method
+      if (chatBodyRef.current) {
+        chatBodyRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
+      }
+    };
+    
+    // Immediate scroll
+    scrollAfterUpdate();
+    
+    // Additional scroll timing for different scenarios
+    setTimeout(scrollAfterUpdate, 0);
+    setTimeout(scrollAfterUpdate, 50);
+    setTimeout(scrollAfterUpdate, 150);
+    setTimeout(scrollAfterUpdate, 300);
+    
+    // Extra attempts for mobile
+    if (isMobile) {
+      setTimeout(scrollAfterUpdate, 500);
     }
-  }, [messages]);
+  }, [messages, isMobile, scrollToBottom]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -82,6 +141,40 @@ const FloatingChatbot = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [open, isMobile]);
+
+  // Handle mobile keyboard show/hide for better scrolling
+  useEffect(() => {
+    if (!isMobile || !open) return;
+
+    const handleResize = () => {
+      // Scroll to bottom when viewport changes (keyboard show/hide)
+      setTimeout(scrollToBottom, 150);
+    };
+
+    const handleFocusIn = () => {
+      // When input gets focus (keyboard shows), scroll after a delay
+      setTimeout(scrollToBottom, 300);
+    };
+
+    const handleFocusOut = () => {
+      // When input loses focus (keyboard hides), scroll after a delay
+      setTimeout(scrollToBottom, 150);
+    };
+
+    window.addEventListener('resize', handleResize);
+    if (inputRef.current) {
+      inputRef.current.addEventListener('focusin', handleFocusIn);
+      inputRef.current.addEventListener('focusout', handleFocusOut);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (inputRef.current) {
+        inputRef.current.removeEventListener('focusin', handleFocusIn);
+        inputRef.current.removeEventListener('focusout', handleFocusOut);
+      }
+    };
+  }, [isMobile, open, scrollToBottom]);
 
   const formatTime = (timestamp) => {
     return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -164,6 +257,9 @@ const FloatingChatbot = () => {
     setImagePreviewUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
 
+    // Force scroll to bottom after sending message
+    setTimeout(scrollToBottom, 50);
+
     try {
       const formData = new FormData();
       formData.append('text_query', currentInput);
@@ -194,12 +290,18 @@ const FloatingChatbot = () => {
       };
       setMessages(prevMessages => [...prevMessages, botMessage]);
 
+      // Force scroll to bottom after bot response
+      setTimeout(scrollToBottom, 100);
+
     } catch (err) {
       setError(err.message || 'An error occurred.');
       setMessages(prevMessages => [
         ...prevMessages,
         { id: Date.now() + 1, text: `❌ Error: ${err.message || 'Could not connect'}`, sender: 'bot', timestamp: new Date(), isError: true },
       ]);
+      
+      // Force scroll to bottom after error message
+      setTimeout(scrollToBottom, 100);
     } finally {
       setIsLoading(false);
       setImagePreviewUrl(null);
@@ -216,6 +318,9 @@ const FloatingChatbot = () => {
       timestamp: new Date(),
     };
     setMessages(prev => [...prev, userMessage]);
+
+    // Force scroll to bottom after user selection
+    setTimeout(scrollToBottom, 50);
 
     try {
       const response = await fetchInstance('/api/chatbot/food_nutrition_direct', {
@@ -241,12 +346,18 @@ const FloatingChatbot = () => {
       };
       setMessages(prev => [...prev, botMessage]);
 
+      // Force scroll to bottom after bot response
+      setTimeout(scrollToBottom, 100);
+
     } catch (err) {
       setError(err.message || 'An error occurred.');
       setMessages(prev => [
         ...prev,
         { id: Date.now() + 1, text: `❌ Error: ${err.message || 'Could not connect'}`, sender: 'bot', timestamp: new Date(), isError: true },
       ]);
+      
+      // Force scroll to bottom after error message
+      setTimeout(scrollToBottom, 100);
     } finally {
       setIsLoading(false);
     }

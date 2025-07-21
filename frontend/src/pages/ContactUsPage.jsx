@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { HiOutlineMail, HiOutlineInformationCircle, HiOutlinePaperAirplane } from 'react-icons/hi';
-import InteractiveModal from '../components/InteractiveModal';
+import InteractiveModal from '../components/ui/InteractiveModal';
 
 const ContactUsPage = () => {
   const appName = "NutriChef";
