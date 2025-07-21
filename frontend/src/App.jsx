@@ -40,6 +40,7 @@ import UserManagementPage from './pages/admin/UserManagementPage.jsx';
 import RecipeManagementPage from './pages/admin/RecipeManagementPage.jsx';
 import ClassificationScoresPage from './pages/admin/ClassificationScoresPage.jsx';
 import AdminContactMessagesPage from './pages/admin/AdminContactMessagesPage.jsx';
+import AdminLogsMonitor from './pages/admin/AdminLogsMonitor.jsx';
 
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ModalProvider } from './context/ModalContext.jsx';
@@ -104,6 +105,7 @@ function App() {
                             <Route path="recipes" element={<RecipeManagementPage />} />
                             <Route path="classification-scores" element={<ClassificationScoresPage />} />
                             <Route path="contact-messages" element={<AdminContactMessagesPage />} />
+                            <Route path="logs-monitor" element={<AdminLogsMonitor />} />
                           </Route>
                         </Route>
 

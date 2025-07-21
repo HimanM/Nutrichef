@@ -12,6 +12,7 @@ import signal
 import sys
 import atexit
 from .utils.logging_utils import suppress_external_warnings, log_header, log_info
+from .utils.log_monitor import log_monitor
 
 # Suppress warnings before other imports
 suppress_external_warnings()
@@ -41,6 +42,11 @@ app = Flask(__name__,
            static_url_path='/static',
            template_folder='templates')
 log_info("Flask app initialized with template folder.", "Startup")
+
+# Setup log monitoring for Flask
+log_monitor.setup_flask_logging(app)
+log_info("Log monitoring initialized.", "Startup")
+
 app.config.from_object(Config)
 log_info("Configuration loaded from object.", "Startup")
 app.extensions = {}

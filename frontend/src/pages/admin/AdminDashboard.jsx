@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { HiUsers, HiOutlineBookOpen, HiOutlineChartBar, HiOutlineMail } from 'react-icons/hi';
+import { HiUsers, HiOutlineBookOpen, HiOutlineChartBar, HiOutlineMail, HiTerminal } from 'react-icons/hi';
 
 // FeatureCard Component (adapted from HomePage.jsx)
 const FeatureCard = ({ title, description, link = "#", icon, ctaText = "Go" }) => (
@@ -43,6 +43,12 @@ const AdminDashboard = () => {
       description: "View and respond to messages submitted via the contact form.",
       link: "/admin/contact-messages",
       icon: <HiOutlineMail className="h-10 w-10" />
+    },
+    {
+      title: "System Logs Monitor",
+      description: "Monitor real-time system logs, performance metrics, and server health.",
+      link: "/admin/logs-monitor",
+      icon: <HiTerminal className="h-10 w-10" />
     }
     // Add more admin features as needed
   ];
@@ -62,13 +68,13 @@ const AdminDashboard = () => {
         </div>
         <div className="card-container bg-none p-4 sm:p-6 md:p-8">
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6 flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white mr-3 shadow-sm">
+            {/* <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white mr-3 shadow-sm">
               <span className="text-sm font-bold">⚡</span>
-            </div>
+            </div> */}
             Quick Actions
           </h2>
           <div className="bg-gradient-to-br from-gray-50/50 to-emerald-50/30 rounded-3xl p-4 sm:p-6 md:p-8 border border-gray-100/50 shadow-soft">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 quick-links-grid">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6 quick-links-grid">
               {adminFeatures.map((feature, index) => (
                 <div key={index} className="h-full">
                   <FeatureCard {...feature} />
