@@ -209,8 +209,8 @@ const MealSuggestions = ({
                 </div>
               ) : (
                 // Desktop card layout
-                <>
-                  <div className="h-32 bg-gray-100 overflow-hidden">
+                <div className="h-full flex flex-col">
+                  <div className="h-32 bg-gray-100 overflow-hidden flex-shrink-0">
                     {recipe.ImageURL ? (
                       <img
                         src={recipe.ImageURL}
@@ -229,31 +229,41 @@ const MealSuggestions = ({
                     </div>
                   </div>
 
-                  <div className="p-4">
-                    <h4 className="font-medium text-gray-800 mb-2 line-clamp-2">
-                      {recipe.Title}
-                    </h4>
+                  <div className="p-4 flex-1 flex flex-col">
+                    {/* Title with fixed height */}
+                    <div className="h-12 mb-2">
+                      <h4 className="font-medium text-gray-800 line-clamp-2 leading-tight">
+                        {recipe.Title}
+                      </h4>
+                    </div>
                     
-                    {recipe.nutrition_fit && (
-                      <p className="text-xs text-emerald-600 mb-2 bg-emerald-50 px-2 py-1 rounded">
-                        {recipe.nutrition_fit}
-                      </p>
-                    )}
+                    {/* Nutrition fit info with fixed height */}
+                    <div className="h-6 mb-2">
+                      {recipe.nutrition_fit && (
+                        <p className="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded line-clamp-1">
+                          {recipe.nutrition_fit}
+                        </p>
+                      )}
+                    </div>
 
+                    {/* Recipe details */}
                     <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
                       <span>{recipe.CookingTime ? `${recipe.CookingTime} min` : 'Quick recipe'}</span>
                       <span>{recipe.Servings || 1} servings</span>
                     </div>
 
-                    <button
-                      onClick={() => handleAddSuggestion(recipe)}
-                      className="w-full bg-emerald-600 text-white px-3 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
-                    >
-                      <MdAdd className="w-4 h-4" />
-                      Add to Meal Plan
-                    </button>
+                    {/* Button pushed to bottom */}
+                    <div className="mt-auto">
+                      <button
+                        onClick={() => handleAddSuggestion(recipe)}
+                        className="w-full bg-emerald-600 text-white px-3 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                      >
+                        <MdAdd className="w-4 h-4" />
+                        Add to Meal Plan
+                      </button>
+                    </div>
                   </div>
-                </>
+                </div>
               )}
             </div>
           ))}
