@@ -56,27 +56,57 @@ class MealSuggestionService:
             'fiber': 0, 'sugar': 0, 'sodium': 0
         }
         
+        def safe_add_nutrition_value(current_value, nutrition_value):
+            """Safely add nutrition value, handling string and numeric types"""
+            try:
+                if nutrition_value is None:
+                    return current_value
+                # Convert to float if it's a string
+                if isinstance(nutrition_value, str):
+                    nutrition_value = float(nutrition_value)
+                return current_value + nutrition_value
+            except (ValueError, TypeError):
+                print(f"Warning: Could not convert nutrition value '{nutrition_value}' to number")
+                return current_value
+        
         # Sum up nutrition from existing meals
         for meal in existing_meals:
-            if hasattr(meal, 'get') and meal.get('NutritionInfo') and meal['NutritionInfo'].get('nutrition'):
-                nutrition = meal['NutritionInfo']['nutrition']
-                consumed['calories'] += nutrition.get('calories', {}).get('amount', 0)
-                consumed['protein'] += nutrition.get('protein', {}).get('amount', 0)
-                consumed['carbs'] += nutrition.get('carbs', {}).get('amount', 0)
-                consumed['fat'] += nutrition.get('fat', {}).get('amount', 0)
-                consumed['fiber'] += nutrition.get('fiber', {}).get('amount', 0)
-                consumed['sugar'] += nutrition.get('sugar', {}).get('amount', 0)
-                consumed['sodium'] += nutrition.get('sodium', {}).get('amount', 0)
-            elif hasattr(meal, 'NutritionInfoJSON') and meal.NutritionInfoJSON:
-                # Handle direct recipe objects
-                nutrition = meal.NutritionInfoJSON.get('nutrition', {})
-                consumed['calories'] += nutrition.get('calories', {}).get('amount', 0)
-                consumed['protein'] += nutrition.get('protein', {}).get('amount', 0)
-                consumed['carbs'] += nutrition.get('carbs', {}).get('amount', 0)
-                consumed['fat'] += nutrition.get('fat', {}).get('amount', 0)
-                consumed['fiber'] += nutrition.get('fiber', {}).get('amount', 0)
-                consumed['sugar'] += nutrition.get('sugar', {}).get('amount', 0)
-                consumed['sodium'] += nutrition.get('sodium', {}).get('amount', 0)
+            try:
+                if hasattr(meal, 'get') and meal.get('NutritionInfo') and meal['NutritionInfo'].get('nutrition'):
+                    nutrition = meal['NutritionInfo']['nutrition']
+                    consumed['calories'] = safe_add_nutrition_value(consumed['calories'], nutrition.get('calories', {}).get('amount', 0))
+                    consumed['protein'] = safe_add_nutrition_value(consumed['protein'], nutrition.get('protein', {}).get('amount', 0))
+                    consumed['carbs'] = safe_add_nutrition_value(consumed['carbs'], nutrition.get('carbs', {}).get('amount', 0))
+                    consumed['fat'] = safe_add_nutrition_value(consumed['fat'], nutrition.get('fat', {}).get('amount', 0))
+                    consumed['fiber'] = safe_add_nutrition_value(consumed['fiber'], nutrition.get('fiber', {}).get('amount', 0))
+                    consumed['sugar'] = safe_add_nutrition_value(consumed['sugar'], nutrition.get('sugar', {}).get('amount', 0))
+                    consumed['sodium'] = safe_add_nutrition_value(consumed['sodium'], nutrition.get('sodium', {}).get('amount', 0))
+                elif hasattr(meal, 'NutritionInfoJSON') and meal.NutritionInfoJSON:
+                    # Handle direct recipe objects
+                    nutrition = meal.NutritionInfoJSON.get('nutrition', {})
+                    consumed['calories'] = safe_add_nutrition_value(consumed['calories'], nutrition.get('calories', {}).get('amount', 0))
+                    consumed['protein'] = safe_add_nutrition_value(consumed['protein'], nutrition.get('protein', {}).get('amount', 0))
+                    consumed['carbs'] = safe_add_nutrition_value(consumed['carbs'], nutrition.get('carbs', {}).get('amount', 0))
+                    consumed['fat'] = safe_add_nutrition_value(consumed['fat'], nutrition.get('fat', {}).get('amount', 0))
+                    consumed['fiber'] = safe_add_nutrition_value(consumed['fiber'], nutrition.get('fiber', {}).get('amount', 0))
+                    consumed['sugar'] = safe_add_nutrition_value(consumed['sugar'], nutrition.get('sugar', {}).get('amount', 0))
+                    consumed['sodium'] = safe_add_nutrition_value(consumed['sodium'], nutrition.get('sodium', {}).get('amount', 0))
+                # Handle cases where NutritionInfo might have different structure
+                elif isinstance(meal, dict):
+                    # Check for alternative nutrition structures
+                    nutrition_info = meal.get('NutritionInfo', {})
+                    if 'nutrition' in nutrition_info:
+                        nutrition = nutrition_info['nutrition']
+                        consumed['calories'] = safe_add_nutrition_value(consumed['calories'], nutrition.get('calories', {}).get('amount', 0))
+                        consumed['protein'] = safe_add_nutrition_value(consumed['protein'], nutrition.get('protein', {}).get('amount', 0))
+                        consumed['carbs'] = safe_add_nutrition_value(consumed['carbs'], nutrition.get('carbs', {}).get('amount', 0))
+                        consumed['fat'] = safe_add_nutrition_value(consumed['fat'], nutrition.get('fat', {}).get('amount', 0))
+                        consumed['fiber'] = safe_add_nutrition_value(consumed['fiber'], nutrition.get('fiber', {}).get('amount', 0))
+                        consumed['sugar'] = safe_add_nutrition_value(consumed['sugar'], nutrition.get('sugar', {}).get('amount', 0))
+                        consumed['sodium'] = safe_add_nutrition_value(consumed['sodium'], nutrition.get('sodium', {}).get('amount', 0))
+            except Exception as e:
+                print(f"Error processing meal nutrition data: {e}")
+                continue
         
         # Calculate remaining needs
         remaining = {}
@@ -127,9 +157,19 @@ class MealSuggestionService:
             'sodium': 0.05  # Lower weight, prefer less sodium
         }
         
+        def safe_get_nutrition_value(nutrition_data, nutrient_key):
+            """Safely extract nutrition value, handling both string and numeric types"""
+            try:
+                value = nutrition_data.get(nutrient_key, {}).get('amount', 0)
+                if isinstance(value, str):
+                    return float(value)
+                return float(value) if value is not None else 0
+            except (ValueError, TypeError):
+                return 0
+        
         for nutrient, weight in weights.items():
             target_amount = targets.get(nutrient, 0)
-            recipe_amount = nutrition.get(nutrient, {}).get('amount', 0)
+            recipe_amount = safe_get_nutrition_value(nutrition, nutrient)
             
             if target_amount > 0:
                 # Calculate how much of the target this recipe provides
@@ -150,8 +190,18 @@ class MealSuggestionService:
         """Generate a description of how the recipe fits nutritional needs"""
         fits = []
         
-        calories = nutrition.get('calories', {}).get('amount', 0)
-        protein = nutrition.get('protein', {}).get('amount', 0)
+        def safe_get_nutrition_value(nutrition_data, nutrient_key):
+            """Safely extract nutrition value, handling both string and numeric types"""
+            try:
+                value = nutrition_data.get(nutrient_key, {}).get('amount', 0)
+                if isinstance(value, str):
+                    return float(value)
+                return float(value) if value is not None else 0
+            except (ValueError, TypeError):
+                return 0
+        
+        calories = safe_get_nutrition_value(nutrition, 'calories')
+        protein = safe_get_nutrition_value(nutrition, 'protein')
         
         if calories > 0 and targets.get('calories', 0) > 0:
             cal_percent = (calories / targets['calories']) * 100

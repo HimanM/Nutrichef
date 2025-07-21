@@ -78,6 +78,14 @@ def suggest_meals():
         target_date = data.get('target_date')
         existing_meals = data.get('existing_meals', [])
         
+        ## Debug logging for mobile issue
+        # user_agent = request.headers.get('User-Agent', '')
+        # print(f"Suggest meals request from user {user_id}")
+        # print(f"User-Agent: {user_agent}")
+        # print(f"Existing meals count: {len(existing_meals)}")
+        # if existing_meals:
+        #     print(f"Sample meal data: {existing_meals[0] if existing_meals else 'None'}")
+        
         if not target_date:
             return jsonify({"error": "target_date is required"}), 400
         
@@ -92,4 +100,7 @@ def suggest_meals():
 
     except Exception as e:
         print(f"Error in suggest_meals: {e}")
+        print(f"Request data: {request.get_json()}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"msg": "An internal server error occurred."}), 500
