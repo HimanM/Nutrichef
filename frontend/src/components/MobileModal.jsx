@@ -14,11 +14,33 @@ const MobileModal = ({
   const [dragY, setDragY] = useState(0);
   const [startY, setStartY] = useState(0);
   const [isClosing, setIsClosing] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const modalRef = useRef(null);
   const dragHandleRef = useRef(null);
 
   const DRAG_THRESHOLD = 100; // Minimum drag distance to close
   const VELOCITY_THRESHOLD = 0.5; // Minimum velocity to close
+
+  // Handle close with animation
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    if (modalRef.current) {
+      modalRef.current.style.transition = 'transform 300ms ease-in, opacity 300ms ease-in';
+      modalRef.current.style.transform = 'translateY(100%)';
+      modalRef.current.style.opacity = '0';
+    }
+    
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+      setDragY(0);
+      if (modalRef.current) {
+        modalRef.current.style.transition = '';
+        modalRef.current.style.transform = '';
+        modalRef.current.style.opacity = '';
+      }
+    }, 300);
+  }, [onClose]);
 
   // Handle touch start - only from drag handle
   const handleTouchStart = useCallback((e) => {
@@ -46,6 +68,7 @@ const MobileModal = ({
     // Add resistance effect when dragging
     if (modalRef.current) {
       const resistance = Math.min(deltaY / 3, 150); // Max 150px drag with resistance
+      modalRef.current.style.transition = 'none'; // Disable transition during drag
       modalRef.current.style.transform = `translateY(${resistance}px)`;
       modalRef.current.style.opacity = Math.max(0.3, 1 - (deltaY / 300));
     }
@@ -68,33 +91,15 @@ const MobileModal = ({
     if (shouldClose && deltaY > 0) {
       handleClose();
     } else {
-      // Reset position
+      // Reset position with smooth animation
       if (modalRef.current) {
+        modalRef.current.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
         modalRef.current.style.transform = 'translateY(0)';
         modalRef.current.style.opacity = '1';
       }
       setDragY(0);
     }
-  }, [isDragging, startY, dragToClose]);
-
-  // Handle close with animation
-  const handleClose = useCallback(() => {
-    setIsClosing(true);
-    if (modalRef.current) {
-      modalRef.current.style.transform = 'translateY(100%)';
-      modalRef.current.style.opacity = '0';
-    }
-    
-    setTimeout(() => {
-      onClose();
-      setIsClosing(false);
-      setDragY(0);
-      if (modalRef.current) {
-        modalRef.current.style.transform = 'translateY(0)';
-        modalRef.current.style.opacity = '1';
-      }
-    }, 300);
-  }, [onClose]);
+  }, [isDragging, startY, dragToClose, handleClose, DRAG_THRESHOLD, VELOCITY_THRESHOLD]);
 
   // Handle backdrop click
   const handleBackdropClick = useCallback((e) => {
@@ -103,12 +108,36 @@ const MobileModal = ({
     }
   }, [handleClose]);
 
+  // Handle opening animation
+  useEffect(() => {
+    if (isOpen) {
+      setIsAnimating(true);
+      // Start from bottom (translated down)
+      if (modalRef.current) {
+        modalRef.current.style.transform = 'translateY(100%)';
+        modalRef.current.style.opacity = '0';
+        
+        // Trigger slide up animation
+        requestAnimationFrame(() => {
+          if (modalRef.current) {
+            modalRef.current.style.transition = 'transform 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 400ms ease-out';
+            modalRef.current.style.transform = 'translateY(0)';
+            modalRef.current.style.opacity = '1';
+          }
+        });
+      }
+      
+      setTimeout(() => setIsAnimating(false), 400);
+    }
+  }, [isOpen]);
+
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add('mobile-modal-open');
     } else {
       document.body.classList.remove('mobile-modal-open');
+      setIsAnimating(false);
     }
 
     return () => {
@@ -123,8 +152,10 @@ const MobileModal = ({
       className="fixed inset-0 z-50 md:hidden"
       onClick={handleBackdropClick}
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 mobile-modal-backdrop" />
+      {/* Backdrop with fade-in animation */}
+      <div className={`absolute inset-0 bg-black/50 mobile-modal-backdrop transition-opacity duration-300 ${
+        isOpen && !isClosing ? 'opacity-100' : 'opacity-0'
+      }`} />
       
       {/* Modal */}
       <div
@@ -133,8 +164,6 @@ const MobileModal = ({
           absolute bottom-0 left-0 right-0 
           bg-white rounded-t-3xl shadow-2xl
           max-h-[90vh] flex flex-col
-          transition-all duration-300 ease-out
-          ${isClosing ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}
           ${className}
         `}
         onTouchStart={handleTouchStart}
@@ -142,6 +171,8 @@ const MobileModal = ({
         onTouchEnd={handleTouchEnd}
         style={{
           touchAction: dragToClose ? 'none' : 'auto',
+          transform: 'translateY(100%)', // Start from bottom
+          opacity: '0',
         }}
       >
         {/* Drag Handle */}
