@@ -56,7 +56,7 @@ app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "your-super-secr
 # # Set JWT access token to expire in 1 minute for testing
 # app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=1)
 
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)  # Set JWT access token to expire in 7 days
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)  # Set JWT access token to expire in 1 hour
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)  # Set
 jwt = JWTManager(app)
 
