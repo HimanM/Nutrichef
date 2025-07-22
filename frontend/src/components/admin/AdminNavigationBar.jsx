@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { HiOutlineViewGrid, HiOutlineUsers, HiOutlineCollection, HiOutlineChartBar, HiOutlineLogout, HiOutlineHome, HiMenu, HiX, HiTerminal } from 'react-icons/hi';
@@ -8,11 +8,31 @@ const AdminNavigationBar = () => {
   const { currentUser, logout, loading } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navRef = useRef(null);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
 
   if (loading) {
     return (
@@ -39,7 +59,7 @@ const AdminNavigationBar = () => {
   ];
 
   return (
-    <nav className="glass sticky top-0 z-50 border-b border-white/20 shadow-soft backdrop-blur-xl">
+    <nav ref={navRef} className="glass sticky top-0 z-50 border-b border-white/20 shadow-soft backdrop-blur-xl">
       <div className="container-modern">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -103,7 +123,7 @@ const AdminNavigationBar = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden bg-white/95 backdrop-blur-sm border-t border-gray-200 shadow-lg absolute left-0 right-0 top-16 z-40">
+          <div className="lg:hidden bg-white/95 backdrop-blur-sm border-t border-white/20 shadow-lg absolute left-0 right-0 top-16 z-40 rounded-b-2xl">
             <div className="px-4 py-3 space-y-1">
               {adminNavLinks.map((link) => {
                 const IconComponent = link.icon;
