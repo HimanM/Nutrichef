@@ -18,7 +18,7 @@ const FeatureCard = ({ title, description, link = "#", icon, ctaText = "Go" }) =
   </a>
 );
 
-const AdminDashboard = () => {
+const AdminDashboardPage = () => {
   const adminFeatures = [
     {
       title: "Manage Users",
@@ -85,4 +85,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default AdminDashboardPage;

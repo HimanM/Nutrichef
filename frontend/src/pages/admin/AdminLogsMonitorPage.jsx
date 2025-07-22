@@ -43,7 +43,7 @@ const PageLoaderSpinner = () => (
     </svg>
 );
 
-const AdminLogsMonitor = () => {
+const AdminLogsMonitorPage = () => {
     const authContextValue = useAuth();
     const { showModal } = useModal();
     
@@ -499,4 +499,4 @@ Environment: ${info.flask_info?.environment || 'Unknown'}
     );
 };
 
-export default AdminLogsMonitor;
+export default AdminLogsMonitorPage;

@@ -29,7 +29,7 @@ const PLANNED_MEALS_KEY = 'plannedMealsData';
 const SHOPPING_BASKET_KEY = 'shoppingBasketItems';
 
 
-function MealPlanner() {
+function MealPlannerPage() {
   const [paletteRecipes, setPaletteRecipes] = useState([]);
   const [loadingPalette, setLoadingPalette] = useState(true);
   const [paletteError, setPaletteError] = useState(null);
@@ -1334,4 +1334,4 @@ function MealPlanner() {
   );
 }
 
-export default MealPlanner;
+export default MealPlannerPage;

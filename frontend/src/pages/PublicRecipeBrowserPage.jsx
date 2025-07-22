@@ -13,7 +13,7 @@ const CheckIcon = ({ className = "w-5 h-5 mr-1" }) => <svg className={className}
 
 const MEAL_PLAN_PALETTE_KEY = 'mealPlanPaletteRecipes';
 
-function PublicRecipeBrowser() {
+function PublicRecipeBrowserPage() {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -790,4 +790,4 @@ function PublicRecipeBrowser() {
   );
 }
 
-export default PublicRecipeBrowser;
+export default PublicRecipeBrowserPage;

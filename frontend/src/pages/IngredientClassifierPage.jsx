@@ -5,7 +5,7 @@ import RequireLoginModal from '../components/auth/RequireLoginModal';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { HiOutlineCloudUpload, HiOutlineRefresh, HiOutlineCamera, HiOutlineCheckCircle, HiOutlineExclamation } from 'react-icons/hi';
 
-const IngredientClassifier = () => {
+const IngredientClassifierPage = () => {
     const [classificationMode, setClassificationMode] = useState('ingredient');
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
@@ -331,4 +331,4 @@ const IngredientClassifier = () => {
     );
 };
 
-export default IngredientClassifier;
+export default IngredientClassifierPage;
