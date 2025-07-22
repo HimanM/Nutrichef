@@ -1,8 +1,12 @@
 import React from 'react';
-import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLockClosed, HiOutlinePlus } from 'react-icons/hi';
+import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLockClosed, HiOutlinePlus, HiOutlineUser } from 'react-icons/hi';
 import { InlineSpinner } from '../../common/LoadingComponents.jsx';
 
 const UserSettingsMobileView = ({
+    // User info props
+    userName,
+    userEmail,
+    
     // Allergies props
     allAllergies,
     selectedAllergyIds,
@@ -31,6 +35,27 @@ const UserSettingsMobileView = ({
     return (
         <div className="md:hidden">
             <div className="space-y-6">
+                {/* User Profile Section */}
+                <div className="bg-white rounded-2xl shadow-lg border border-emerald-100 p-6">
+                    <h2 className="text-lg font-semibold mb-4 text-emerald-700 flex items-center">
+                        <HiOutlineUser className="w-5 h-5 mr-2" />
+                        Profile Information
+                    </h2>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-emerald-700">Username</label>
+                            <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl px-3 py-3 text-sm">
+                                {userName || 'Not available'}
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-emerald-700">Email Address</label>
+                            <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl px-3 py-3 text-sm break-words">
+                                {userEmail || 'Not available'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {/* Dietary Restrictions Section */}
                 <div className="bg-white rounded-2xl shadow-lg border border-emerald-100 p-6">
                     <h2 className="text-lg font-semibold mb-4 text-emerald-700 flex items-center">
