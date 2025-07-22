@@ -73,8 +73,8 @@ NutriChef is a comprehensive web application designed to help users manage recip
         
     *   **Ingredient Substitution:** Find suitable substitutes for ingredients.
     *   **NLP Recipe Parser:** Input recipe text to have it automatically parsed into structured data (ingredients, steps).
-*   **(Planned/Partial) Meal Planner:** Interface for organizing recipes into a meal plan.
-*   **(Planned/Partial) Shopping Basket:** Interface for managing a shopping list.
+*   **Meal Planner:** Interface for organizing recipes into a meal plan.
+*   **Shopping Basket:** Interface for managing a shopping list.
 
 **For Administrators:**
 
@@ -87,7 +87,6 @@ NutriChef is a comprehensive web application designed to help users manage recip
 *   **Classification Scores:** View a summary of AI classification model performance.
 *   **View User Messages:** Access and review messages submitted by users via the Contact Us form.
         <!-- Consider adding a screenshot of the Admin Contact Messages Page here -->
-        ![Admin View Messages Page](./docs/images/admin_messages_screenshot_1.png)
         ![Admin Reply Messages Page](./docs/images/admin_messages_screenshot_2.png)
 
 
@@ -131,7 +130,7 @@ NutriChef is a comprehensive web application designed to help users manage recip
 *   **Allergy Analysis**
 *   **Food & Ingredient Classification (Image-based):**
     *   The core models are integrated within the `backend/ai_models/` directory.
-    *   An example notebook and further details on a similar food classification approach can be found here: [Food Classification Notebook (TF)](https://github.com/HimanM/Classification-Models-for-NutriChef.git)
+    *   Notebooks and further details on classification approach can be found here: [Food Classification Notebook (TF)](https://github.com/HimanM/Classification-Models-for-NutriChef.git)
 *   **Natural Language Processing (Recipe Text Parsing)**
 *   **Nutrition Lookup**
 *   **Ingredient Substitution Recommendation**
@@ -158,9 +157,20 @@ NutriChef is a comprehensive web application designed to help users manage recip
 │   ├── services/             # Business logic layer
 │   ├── static/               # Static files (e.g., uploaded recipe images)
 │   └── tests/                # Backend tests
-├── docs/                     # Documentation files
+├── deployment/               # Deployment guides and scripts
+│   ├── README.md             # Deployment documentation overview
+│   ├── VPS_DEPLOYMENT_GUIDE.md
+│   ├── VPS_README.md
+│   ├── EXTERNAL_ACCESS_GUIDE.md
+│   ├── PUBLIC_ACCESS_GUIDE.md
+│   └── vps-setup.sh          # VPS setup automation script
+├── docs/                     # Project documentation
 │   ├── documents/
-│   └── images/
+│   ├── images/
+│   ├── Project_Documentation.md
+│   ├── User_Manual.md
+│   ├── Email_Template_System.md
+│   └── Nutritional_Tracking_Feature.md
 ├── frontend/                 # React frontend application
 │   ├── README.md             # Frontend specific documentation
 │   ├── index.html            # Main HTML entry point for SPA
@@ -174,12 +184,37 @@ NutriChef is a comprehensive web application designed to help users manage recip
 │       ├── context/          # React Context API providers
 │       ├── pages/            # Page-level components
 │       └── utils/            # Utility functions
-├── old/                      # Older or deprecated code versions
+├── scripts/                  # Launch scripts and utilities
+│   ├── README.md             # Scripts documentation
+│   ├── main.py               # Python demo launcher
+│   ├── LAUNCHER_README.md    # Demo launcher documentation
+│   ├── start_demo.bat        # Windows demo launcher
+│   ├── start_backend.bat     # Windows backend launcher
+│   ├── start_frontend.bat    # Windows frontend launcher
+│   └── run_as_admin.bat      # Windows admin launcher
 ├── .env.example              # General example for root .env (used by Docker)
 ├── .gitignore                # Git ignore file
 ├── README.md                 # This file
 └── docker-compose.yml        # Docker Compose configuration
 ```
+
+## 🚀 Quick Start
+
+The fastest way to get NutriChef running locally:
+
+### Option 1: Automated Demo Launcher (Recommended)
+```bash
+# Using Python script
+python scripts/main.py
+
+# Or using Windows batch file
+scripts/start_demo.bat
+```
+
+### Option 2: Manual Setup
+Follow the detailed setup instructions below for manual configuration.
+
+For deployment to a VPS or production environment, see the [deployment guides](./deployment/).
 
 ## Setup and Running
 
@@ -404,8 +439,23 @@ docker-compose logs -f backend
 
 For more detailed information about the project architecture, features, and how to use the application, please refer to the following documents:
 
-*   [**Project Documentation**](./docs/Project_Documentation.md): Provides a comprehensive overview of the project's scope, architecture, technical details, API endpoints, and AI model integrations.
-*   [**User Manual**](./docs/User_Manual.md): A detailed guide for end-users and administrators on how to use NutriChef's features.
+### Core Documentation
+*   [**Project Documentation**](./docs/Project_Documentation.md): Comprehensive overview of the project's scope, architecture, technical details, API endpoints, and AI model integrations.
+*   [**User Manual**](./docs/User_Manual.md): Detailed guide for end-users and administrators on how to use NutriChef's features.
+*   [**Email Template System**](./docs/Email_Template_System.md): Documentation for the email notification system.
+*   [**Nutritional Tracking Feature**](./docs/Nutritional_Tracking_Feature.md): Guide to the nutritional tracking capabilities.
+
+### Deployment & Setup
+*   [**VPS Deployment Guide**](./deployment/VPS_DEPLOYMENT_GUIDE.md): Complete guide for deploying NutriChef on a VPS.
+*   [**VPS Setup Documentation**](./deployment/VPS_README.md): Additional VPS setup information.
+*   [**External Access Guide**](./deployment/EXTERNAL_ACCESS_GUIDE.md): Instructions for making your application accessible externally.
+*   [**Public Access Guide**](./deployment/PUBLIC_ACCESS_GUIDE.md): Guide for setting up public access.
+*   [**VPS Setup Script**](./deployment/vps-setup.sh): Automated VPS setup script.
+
+### Scripts & Utilities
+*   [**Local Demo Launcher**](./scripts/LAUNCHER_README.md): Information about the local demo launcher script.
+*   [**Demo Launcher Script**](./scripts/main.py): Python script for starting the application locally.
+*   [**Windows Batch Scripts**](./scripts/): Various batch files for Windows users.
 
 ## Running Tests (Backend)
 

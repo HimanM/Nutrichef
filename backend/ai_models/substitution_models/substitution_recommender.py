@@ -1,6 +1,7 @@
 import pandas as pd
 import spacy
 import os
+from backend.utils.logging_utils import log_success, log_error, log_warning
 
 class SubstitutionRecommender:
     RETAIN_ADJECTIVES = {
@@ -12,7 +13,7 @@ class SubstitutionRecommender:
     def __init__(self, data_file_path=None, spacy_model_name="en_core_web_sm"):
         """
         Initializes the SubstitutionRecommender.
-        :param data_file_path: Path to the 'sub_normalized.csv' file. 
+        :param data_file_path: Path to the 'sub_normalized.csv' file.
                                If None, defaults to 'sub_normalized.csv' in the same directory as this script.
         :param spacy_model_name: Name of the spacy model to load.
         """
@@ -25,26 +26,26 @@ class SubstitutionRecommender:
 
         try:
             self.nlp = spacy.load(spacy_model_name, disable=["parser", "ner"])
-            print(f"✅ SubstitutionRecommender: SpaCy model '{spacy_model_name}' loaded.")
+            log_success(f"SpaCy model '{spacy_model_name}' loaded.", "SubstitutionRecommender")
 
             if not os.path.exists(data_file_path):
                 raise FileNotFoundError(f"'sub_normalized.csv' not found at {data_file_path}. User needs to place it here.")
             self.df_substitutes = pd.read_csv(data_file_path)
-            print(f"✅ SubstitutionRecommender: Substitutes data loaded from '{data_file_path}'.")
+            log_success(f"Substitutes data loaded from '{data_file_path}'.", "SubstitutionRecommender")
             
             expected_cols = ['normalized_ingredient', 'normalized_substitute']
             if not all(col in self.df_substitutes.columns for col in expected_cols):
                 raise ValueError(f"CSV file must contain columns: {', '.join(expected_cols)}")
 
             self.model_loaded = True
-            print("✅ SubstitutionRecommender: Initialization successful.")
+            log_success("Initialization successful.", "SubstitutionRecommender")
 
         except FileNotFoundError as fnf_error:
-            print(f"SubstitutionRecommender: ERROR - {fnf_error}")
+            log_error(str(fnf_error), "SubstitutionRecommender")
         except ValueError as ve_error:
-            print(f"SubstitutionRecommender: ERROR - {ve_error}")
+            log_error(str(ve_error), "SubstitutionRecommender")
         except Exception as e:
-            print(f"SubstitutionRecommender: ERROR initializing - {e}. Ensure '{spacy_model_name}' is downloaded (python -m spacy download {spacy_model_name}).")
+            log_error(f"initializing - {e}. Ensure '{spacy_model_name}' is downloaded (python -m spacy download {spacy_model_name}).", "SubstitutionRecommender")
 
     def is_ready(self):
         return self.model_loaded
@@ -67,7 +68,7 @@ class SubstitutionRecommender:
 
     def get_substitutes(self, input_ingredient, top_n=5):
         if not self.is_ready():
-            print("SubstitutionRecommender: Not ready. Cannot get substitutes.")
+            log_warning("Not ready. Cannot get substitutes.", "SubstitutionRecommender")
             return []
 
         try:
@@ -101,5 +102,5 @@ class SubstitutionRecommender:
             return top_results.to_dict(orient='records')
             
         except Exception as e:
-            print(f"SubstitutionRecommender: Error during get_substitutes for '{input_ingredient}' - {e}")
+            log_error(f"Error during get_substitutes for '{input_ingredient}' - {e}", "SubstitutionRecommender")
             return []

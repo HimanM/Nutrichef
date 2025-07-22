@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from ..services.meal_planner_service import MealPlannerService
+from ..services.meal_suggestion_service import MealSuggestionService
 
 meal_planner_bp = Blueprint('meal_planner_bp', __name__, url_prefix='/api/meal-planner')
 meal_planner_service = MealPlannerService()
+meal_suggestion_service = MealSuggestionService()
 
 @meal_planner_bp.route('/save', methods=['POST'])
 @jwt_required()
@@ -56,4 +58,49 @@ def load_meal_plan():
 
     except Exception as e:
         print(f"Error in load_meal_plan: {e}")
+        return jsonify({"msg": "An internal server error occurred."}), 500
+
+
+@meal_planner_bp.route('/suggest-meals', methods=['POST'])
+@jwt_required()
+def suggest_meals():
+    """
+    Suggest meals based on nutritional targets and existing meals for a day
+    """
+    try:
+        user_id_from_token = get_jwt_identity()
+        try:
+            user_id = int(user_id_from_token)
+        except ValueError:
+            return jsonify({"msg": "User ID from token is not a valid integer"}), 400
+
+        data = request.get_json()
+        target_date = data.get('target_date')
+        existing_meals = data.get('existing_meals', [])
+        
+        ## Debug logging for mobile issue
+        # user_agent = request.headers.get('User-Agent', '')
+        # print(f"Suggest meals request from user {user_id}")
+        # print(f"User-Agent: {user_agent}")
+        # print(f"Existing meals count: {len(existing_meals)}")
+        # if existing_meals:
+        #     print(f"Sample meal data: {existing_meals[0] if existing_meals else 'None'}")
+        
+        if not target_date:
+            return jsonify({"error": "target_date is required"}), 400
+        
+        suggestions = meal_suggestion_service.suggest_meals_for_day(
+            user_id, target_date, existing_meals
+        )
+        
+        if suggestions.get('error'):
+            return jsonify(suggestions), 400
+            
+        return jsonify(suggestions), 200
+
+    except Exception as e:
+        print(f"Error in suggest_meals: {e}")
+        print(f"Request data: {request.get_json()}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"msg": "An internal server error occurred."}), 500

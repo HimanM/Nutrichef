@@ -1,5 +1,5 @@
-from ..db import db
-from ..models.meal_plan import UserMealPlan
+from backend.db import db
+from backend.models.meal_plan import UserMealPlan
 from sqlalchemy.exc import SQLAlchemyError
 import json
 

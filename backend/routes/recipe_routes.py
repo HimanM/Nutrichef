@@ -23,7 +23,7 @@ recipe_bp = Blueprint('recipe_bp', __name__, url_prefix='/api')
 def get_public_recipes():
     """ Retrieves a list of all public recipes with pagination. """
     page = request.args.get('page', 1, type=int)
-    limit = request.args.get('limit', 10, type=int)
+    limit = request.args.get('limit', 12, type=int)
     search = request.args.get('search', None, type=str)
     
     data, error, status = recipe_service.get_public_recipes_summary(page=page, limit=limit, search_term=search)
@@ -179,7 +179,7 @@ def get_my_private_recipes():
         return jsonify({"error": "Authentication required (user_id parameter missing for testing)"}), 401
 
     page = request.args.get('page', 1, type=int)
-    limit = request.args.get('limit', 10, type=int)
+    limit = request.args.get('limit', 12, type=int)
     search = request.args.get('search', None, type=str)
 
     data, error, status = recipe_service.get_user_private_recipes_summary(

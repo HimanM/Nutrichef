@@ -1,5 +1,5 @@
-from ..models import Ingredient, AllergyIntolerance
-from ..db import db
+from backend.models import Ingredient, AllergyIntolerance
+from backend.db import db
 
 class IngredientDAO:
     def get_ingredient_by_name(self, name):

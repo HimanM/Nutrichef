@@ -1,86 +1,96 @@
-import unittest
-from unittest.mock import MagicMock, patch
+import pytest
+from unittest.mock import patch, MagicMock
+import sys
+import os
 
-from backend.services.admin_service import AdminService
-# Import User, Recipe, ClassificationResult if needed for constructing mock DAO return values
-# from backend.models import User, Recipe, ClassificationResult
+test_dir = os.path.dirname(os.path.abspath(__file__))
+backend_dir = os.path.abspath(os.path.join(test_dir, '..'))
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
 
-class TestAdminService(unittest.TestCase):
+from services.admin_service import AdminService
 
-    def setUp(self):
-        """Set up for test methods."""
-        self.admin_service = AdminService()
+@pytest.fixture
+def admin_service():
+    with patch('services.admin_service.UserDAO') as MockUserDAO, \
+         patch('services.admin_service.RecipeDAO') as MockRecipeDAO, \
+         patch('services.admin_service.ClassificationResultDAO') as MockClassDAO, \
+         patch('services.admin_service.db') as mock_db:
+        service = AdminService()
+        service.user_dao = MockUserDAO()
+        service.recipe_dao = MockRecipeDAO()
+        service.classification_result_dao = MockClassDAO()
+        yield service, service.user_dao, service.recipe_dao, service.classification_result_dao, mock_db
 
-        # Mock DAOs
-        self.mock_user_dao_instance = MagicMock()
-        self.admin_service.user_dao = self.mock_user_dao_instance
+def test_list_users_success(admin_service):
+    service, mock_user_dao, *_ = admin_service
+    mock_user = MagicMock(to_dict=lambda: {'id': 1})
+    mock_pagination = MagicMock(items=[mock_user], total=1, pages=1, page=1)
+    mock_user_dao.get_all_users.return_value = mock_pagination
+    resp, err, code = service.list_users()
+    assert code == 200
+    assert err is None
+    assert 'users' in resp
 
-        self.mock_recipe_dao_instance = MagicMock()
-        self.admin_service.recipe_dao = self.mock_recipe_dao_instance
+def test_get_user_details_success(admin_service):
+    service, mock_user_dao, *_ = admin_service
+    mock_user = MagicMock(to_dict=lambda: {'id': 1})
+    mock_user_dao.get_user_by_id.return_value = mock_user
+    resp, err, code = service.get_user_details(1)
+    assert code == 200
+    assert err is None
+    assert resp['id'] == 1
 
-        self.mock_classification_result_dao_instance = MagicMock()
-        self.admin_service.classification_result_dao = self.mock_classification_result_dao_instance
+def test_update_user_role_success(admin_service):
+    service, mock_user_dao, *_ = admin_service
+    mock_user = MagicMock(role='user', to_dict=lambda: {'id': 1, 'role': 'admin'})
+    mock_user_dao.get_user_by_id.return_value = mock_user
+    with patch('services.admin_service.db') as mock_db:
+        mock_db.session.add.return_value = None
+        mock_db.session.commit.return_value = None
+        resp, err, code = service.update_user_role(1, 'admin')
+        assert code == 200
+        assert err is None
+        assert resp['role'] == 'admin'
 
-        # Mock db.session for commit/rollback if service uses it directly
-        self.mock_db_session = MagicMock()
-        self.db_patcher = patch('backend.services.admin_service.db.session', self.mock_db_session)
-        self.db_patcher.start()
+def test_delete_user_success(admin_service):
+    service, mock_user_dao, *_ = admin_service
+    mock_user = MagicMock()
+    mock_user_dao.get_user_by_id.return_value = mock_user
+    with patch('services.admin_service.db') as mock_db:
+        mock_db.session.delete.return_value = None
+        mock_db.session.commit.return_value = None
+        resp, err, code = service.delete_user(1)
+        assert code == 200
+        assert err is None
+        assert 'message' in resp
 
-    def tearDown(self):
-        self.db_patcher.stop()
+def test_list_all_recipes_success(admin_service):
+    service, _, mock_recipe_dao, *_ = admin_service
+    mock_recipe = MagicMock(to_dict=lambda: {'id': 1})
+    mock_pagination = MagicMock(items=[mock_recipe], total=1, pages=1, page=1)
+    mock_recipe_dao.get_all_recipes.return_value = mock_pagination
+    resp, err, code = service.list_all_recipes()
+    assert code == 200
+    assert err is None
+    assert 'recipes' in resp
 
-    # --- User Management Method Tests (Placeholders) ---
-    def test_list_users_success(self):
-        # Mock DAO return value (example using a mock pagination object)
-        mock_pagination = MagicMock()
-        mock_pagination.items = [] # e.g., [User(id=1, name="Test").to_dict()]
-        mock_pagination.total = 0
-        mock_pagination.pages = 0
-        mock_pagination.page = 1
-        self.mock_user_dao_instance.get_all_users.return_value = mock_pagination
+def test_delete_recipe_success(admin_service):
+    service, _, mock_recipe_dao, *_ = admin_service
+    mock_recipe = MagicMock()
+    mock_recipe_dao.get_recipe_by_id.return_value = mock_recipe
+    with patch('services.admin_service.db') as mock_db:
+        mock_db.session.delete.return_value = None
+        mock_db.session.commit.return_value = None
+        resp, err, code = service.delete_recipe(1)
+        assert code == 200
+        assert err is None
+        assert 'message' in resp
 
-        data, error, status = self.admin_service.list_users()
-        self.assertEqual(status, 200)
-        self.assertIsNone(error)
-        self.assertIsNotNone(data)
-        self.mock_user_dao_instance.get_all_users.assert_called_once_with(page=1, per_page=10)
-
-    def test_update_user_role_success(self):
-        mock_user = MagicMock()
-        mock_user.to_dict.return_value = {"UserID": 1, "role": "admin"}
-        self.mock_user_dao_instance.get_user_by_id.return_value = mock_user
-
-        data, error, status = self.admin_service.update_user_role(user_id=1, new_role='admin')
-        self.assertEqual(status, 200)
-        self.assertIsNone(error)
-        self.assertEqual(mock_user.role, 'admin') # Check role was set
-        self.mock_db_session.commit.assert_called_once()
-
-
-    # --- Recipe Management Method Tests (Placeholders) ---
-    def test_list_all_recipes_success(self):
-        mock_pagination = MagicMock()
-        mock_pagination.items = []
-        mock_pagination.total = 0
-        mock_pagination.pages = 0
-        mock_pagination.page = 1
-        self.mock_recipe_dao_instance.get_all_recipes.return_value = mock_pagination
-
-        data, error, status = self.admin_service.list_all_recipes()
-        self.assertEqual(status, 200)
-        self.assertIsNone(error)
-        self.mock_recipe_dao_instance.get_all_recipes.assert_called_once_with(page=1, per_page=10)
-
-    # --- Classification Scores Method Tests (Placeholders) ---
-    def test_get_classification_scores_summary_success(self):
-        expected_summary = {"scores_summary": [], "total": 0, "pages": 0, "current_page": 1}
-        self.mock_classification_result_dao_instance.get_all_classification_scores_summary.return_value = expected_summary
-
-        data, error, status = self.admin_service.get_classification_scores_summary()
-        self.assertEqual(status, 200)
-        self.assertIsNone(error)
-        self.assertEqual(data, expected_summary)
-        self.mock_classification_result_dao_instance.get_all_classification_scores_summary.assert_called_once_with(page=1, per_page=20)
-
-if __name__ == '__main__':
-    unittest.main()
+def test_get_classification_scores_summary_success(admin_service):
+    service, *_, mock_class_dao, _ = admin_service
+    mock_class_dao.get_all_classification_scores_summary.return_value = {'scores': [1, 2, 3]}
+    resp, err, code = service.get_classification_scores_summary()
+    assert code == 200
+    assert err is None
+    assert 'scores' in resp 

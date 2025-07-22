@@ -106,39 +106,3 @@ export const loadMealPlan = (authContextValue) => {
   }, authContextValue);
 };
 
-async function processAuthenticatedRequest(url, method = 'GET', authContextValue, body = null, params = {}) {
-    let requestPath = `${API_BASE_URL}${url}`;
-
-    if (Object.keys(params).length > 0) {
-        const queryParams = new URLSearchParams(params).toString();
-        requestPath = `${requestPath}?${queryParams}`;
-    }
-
-    const options = { method };
-    if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
-        options.body = JSON.stringify(body);
-    }
-
-    try {
-        const response = await authenticatedFetch(requestPath, options, authContextValue);
-
-        if (!response.ok) {
-            let errorData;
-            try {
-                errorData = await response.json();
-            } catch (e) {
-                errorData = { message: response.statusText || `HTTP error ${response.status}` };
-            }
-            const errorMessage = errorData.error || errorData.message || `Request failed with status ${response.status}`;
-            throw new Error(errorMessage);
-        }
-
-        if (response.status === 204 || response.headers.get("content-length") === "0") {
-            return null;
-        }
-        return await response.json();
-    } catch (error) {
-        console.error(`API request failed: ${method} ${url}`, error.message);
-        throw error;
-    }
-}

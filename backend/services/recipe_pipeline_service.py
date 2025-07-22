@@ -1,10 +1,11 @@
-from ..dao.recipe_dao import RecipeDAO
-from ..dao.ingredient_dao import IngredientDAO
-from ..ai_models.gemini_nlp.gemini_nlp_parser import GeminiNlpParser
-from ..ai_models.allergy_analyzer.allergy_analyzer import AllergyAnalyzer
-from ..db import db # For transaction management (db.session)
-from ..models.ingredient import Ingredient # For type checking if needed
-from ..models.recipe import Recipe # For type checking if needed
+from backend.dao.recipe_dao import RecipeDAO
+from backend.dao.ingredient_dao import IngredientDAO
+from backend.ai_models.gemini_nlp.gemini_nlp_parser import GeminiNlpParser
+from backend.ai_models.allergy_analyzer.allergy_analyzer import AllergyAnalyzer
+from backend.services.tags_service import TagsService
+from backend.db import db # For transaction management (db.session)
+from backend.models.ingredient import Ingredient # For type checking if needed
+from backend.models.recipe import Recipe # For type checking if needed
 import json
 
 class RecipePipelineService:
@@ -13,6 +14,7 @@ class RecipePipelineService:
         self.ingredient_dao = IngredientDAO()
         self.allergy_analyzer = AllergyAnalyzer() # Uses sample CSV
         self.gemini_nlp = GeminiNlpParser()
+        self.tags_service = TagsService()
         
 
     def process_recipe_submission(self, submission_data, user_id):
@@ -131,6 +133,9 @@ class RecipePipelineService:
                 nutrition_info=nutrition_info
             )
 
+            # Extract and assign tags to the recipe
+            self._extract_and_assign_tags(new_recipe, recipe_json)
+
             db.session.commit()
             db.session.refresh(new_recipe)
             return new_recipe.to_dict(), None, 201
@@ -147,3 +152,47 @@ class RecipePipelineService:
             db.session.rollback()
             print(f"Unexpected error in RecipePipelineService: {e}")
             return None, {"error": f"An unexpected error occurred while processing the recipe.{e}"}, 500
+
+    def _extract_and_assign_tags(self, recipe, recipe_json):
+        """
+        Extract tags using Gemini NLP and assign them to the recipe.
+        This is a helper method called after recipe creation.
+        """
+        try:
+            # Prepare recipe data for tag extraction
+            tag_extraction_data = {
+                "Title": recipe_json.get("Title", ""),
+                "Description": recipe_json.get("Description", ""),
+                "Instructions": recipe_json.get("Instructions", ""),
+                "PreparationTimeMinutes": recipe_json.get("PreparationTimeMinutes", 0),
+                "CookingTimeMinutes": recipe_json.get("CookingTimeMinutes", 0),
+                "Ingredients": recipe_json.get("Ingredients", [])
+            }
+            
+            # Extract tags using Gemini NLP
+            tag_response = self.gemini_nlp.extract_recipe_tags(tag_extraction_data)
+            
+            if tag_response.get('success') and tag_response.get('tags'):
+                tag_names = tag_response['tags']
+                tag_ids = []
+                
+                # Get or create tags and collect their IDs
+                for tag_name in tag_names:
+                    tag = self.tags_service.tags_dao.get_tag_by_name(tag_name)
+                    if tag:
+                        tag_ids.append(tag.TagID)
+                    else:
+                        print(f"Tag '{tag_name}' not found in database, skipping")
+                
+                # Assign tags to the recipe
+                if tag_ids:
+                    self.tags_service.assign_multiple_tags_to_recipe(recipe.RecipeID, tag_ids)
+                    print(f"Successfully assigned {len(tag_ids)} tags to recipe '{recipe.Title}'")
+                else:
+                    print(f"No valid tags found for recipe '{recipe.Title}'")
+            else:
+                print(f"Failed to extract tags for recipe '{recipe.Title}': {tag_response.get('error', 'Unknown error')}")
+                
+        except Exception as e:
+            print(f"Error in tag extraction and assignment for recipe '{recipe.Title}': {e}")
+            # Don't raise the exception as tag assignment is optional

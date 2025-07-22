@@ -3,6 +3,7 @@ import numpy as np
 import json
 import os
 from tensorflow.keras.preprocessing import image as keras_image
+from backend.utils.logging_utils import log_success, log_error
 
 class FoodClassifier:
     def __init__(self, model_base_path=None, model_file_name="food_model.keras", indices_json_name="class_names.json", image_size=(224, 224)):
@@ -20,28 +21,28 @@ class FoodClassifier:
         indices_path = os.path.join(model_base_path, indices_json_name)
 
         if not os.path.exists(model_path):
-            print(f"❌ Error: Model file does not exist: {model_path}")
+            log_error(f"Model file does not exist: {model_path}", "FoodClassifier")
             return
         if not os.path.exists(indices_path):
-            print(f"❌ Error: Class names JSON path does not exist: {indices_path}")
+            log_error(f"Class names JSON path does not exist: {indices_path}", "FoodClassifier")
             return
 
         try:
             with open(indices_path, 'r') as f:
                 class_names_list = json.load(f)
             if not isinstance(class_names_list, list):
-                print(f"❌ Error: class_names.json should contain a list. Found {type(class_names_list)}")
+                log_error(f"class_names.json should contain a list. Found {type(class_names_list)}", "FoodClassifier")
                 return
             self.idx_to_class = {i: name for i, name in enumerate(class_names_list)}
-            print(f"✅ Loaded {len(self.idx_to_class)} class names from JSON: {indices_path}")
+            log_success(f"Loaded {len(self.idx_to_class)} class names from JSON: {indices_path}", "FoodClassifier")
 
             self.model = tf.keras.models.load_model(model_path)
-            print(f"✅ Loaded model from .keras file: {model_path}")
+            log_success(f"Loaded model from .keras file: {model_path}", "FoodClassifier")
 
             self.model_loaded = True
 
         except Exception as e:
-            print(f"❌ Error loading FoodClassifier model or class names: {e}")
+            log_error(f"Error loading FoodClassifier model or class names: {e}", "FoodClassifier")
             self.model_loaded = False
 
     def is_model_loaded(self):
@@ -57,7 +58,7 @@ class FoodClassifier:
 
     def predict_food(self, img_path, top_k=3):
         if not self.is_model_loaded():
-            print("❌ Error: Model is not loaded.")
+            log_error("Model is not loaded.", "FoodClassifier")
             return []
 
         try:
@@ -69,7 +70,7 @@ class FoodClassifier:
             elif predictions.ndim == 1:
                 predictions_1d = predictions
             else:
-                print(f"❌ Unexpected predictions shape: {predictions.shape}")
+                log_error(f"Unexpected predictions shape: {predictions.shape}", "FoodClassifier")
                 return []
 
             actual_top_k = min(top_k, len(self.idx_to_class))
@@ -85,5 +86,5 @@ class FoodClassifier:
             return results
 
         except Exception as e:
-            print(f"❌ Error during prediction: {e}")
+            log_error(f"Error during prediction: {e}", "FoodClassifier")
             return []

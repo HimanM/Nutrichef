@@ -56,7 +56,9 @@ class Recipe(db.Model):
             'CreatedAt': self.CreatedAt.isoformat() if self.CreatedAt else None,
             'UpdatedAt': self.UpdatedAt.isoformat() if self.UpdatedAt else None,
             'ingredients': [ri.to_dict() for ri in self.recipe_ingredients],
-            'average_rating': self.average_rating if hasattr(self, 'average_rating') else None
+            'average_rating': self.average_rating if hasattr(self, 'average_rating') else None,
+            'tags': [assignment.tag.to_dict() for assignment in self.tag_assignments] if hasattr(self, 'tag_assignments') else [],
+            'is_favorited': self.is_favorited if hasattr(self, 'is_favorited') else False
         }
 
     def to_dict_summary(self):
@@ -87,5 +89,7 @@ class Recipe(db.Model):
             'is_public': self.is_public,
             'NutritionInfo': nutrition_info,
             'CreatedAt': self.CreatedAt.isoformat() if self.CreatedAt else None,
-            'average_rating': self.average_rating if hasattr(self, 'average_rating') else None
+            'average_rating': self.average_rating if hasattr(self, 'average_rating') else None,
+            'tags': [assignment.tag.to_dict() for assignment in self.tag_assignments] if hasattr(self, 'tag_assignments') else [],
+            'is_favorited': self.is_favorited if hasattr(self, 'is_favorited') else False
         }

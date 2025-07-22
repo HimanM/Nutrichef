@@ -1,5 +1,5 @@
-from ..models import User # Import User model using relative import
-from ..db import db # Import db instance using relative import
+from backend.models import User # Import User model using relative import
+from backend.db import db # Import db instance using relative import
 
 class UserDAO:
     def get_user_by_id(self, user_id):

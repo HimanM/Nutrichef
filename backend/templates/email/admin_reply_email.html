@@ -1,0 +1,81 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}{{ subject }} - NutriChef Support{% endblock %}
+
+{% block content %}
+<div class="content-section">
+    <div class="greeting">
+        Hello {{ recipient_name }}! 👋
+    </div>
+    
+    <div class="message-text">
+        Thank you for reaching out to <strong>NutriChef</strong>! We appreciate you taking the time to contact us.
+    </div>
+    
+    <div class="message-text">
+        Our support team has reviewed your message and here's our response:
+    </div>
+</div>
+
+<div style="background-color: #f8fafc; border-left: 4px solid #10b981; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+    <div style="font-size: 14px; color: #64748b; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+        📧 SUPPORT TEAM RESPONSE
+    </div>
+    
+    <div style="font-size: 16px; line-height: 1.7; color: #1e293b; white-space: pre-line;">{{ reply_body }}</div>
+</div>
+
+<div class="divider"></div>
+
+<div class="content-section">
+    <div class="message-text" style="font-size: 15px;">
+        <strong>Need further assistance?</strong>
+    </div>
+    
+    <div class="message-text" style="font-size: 14px;">
+        If you have additional questions or need more help, please don't hesitate to reach out to us again. We're always here to support your culinary journey!
+    </div>
+    
+    <div class="btn-container">
+        <a href="{{ frontend_url }}/contact-us" class="btn-primary">
+            💬 Contact Support Again
+        </a>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="content-section">
+    <div class="message-text" style="font-size: 14px; color: #64748b;">
+        <strong>Helpful Resources:</strong>
+        <ul style="color: #475569; padding-left: 20px; margin: 16px 0;">
+            <li><a href="{{ frontend_url }}" style="color: #10b981;">Browse Recipes</a> - Discover new dishes to cook</li>
+            <li><a href="{{ frontend_url }}/classifier" style="color: #10b981;">Ingredient Classifier</a> - Identify ingredients with AI</li>
+            <li><a href="{{ frontend_url }}/meal-planner" style="color: #10b981;">Meal Planner</a> - Plan your weekly meals</li>
+            <li><a href="{{ frontend_url }}/pantry" style="color: #10b981;">Pantry Manager</a> - Track your ingredients</li>
+        </ul>
+    </div>
+</div>
+
+<div class="content-section">
+    <div class="message-text" style="font-size: 14px; color: #64748b; background-color: #f0fdf4; padding: 16px; border-radius: 8px; border: 1px solid #bbf7d0;">
+        <strong>💡 Pro Tip:</strong> Make sure to explore our AI chatbot feature! It can help answer cooking questions, suggest recipe modifications, and provide nutritional information in real-time.
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 30px;">
+    <div style="font-size: 16px; color: #475569; margin-bottom: 8px;">
+        Thank you for being part of the NutriChef community!
+    </div>
+    <div style="font-size: 16px; font-weight: 600; color: #10b981;">
+        The NutriChef Support Team 🍳✨
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+    <div style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
+        This email was sent in response to your contact form submission.<br>
+        Response generated on {{ current_date }} by the NutriChef Support Team.
+    </div>
+</div>
+{% endblock %}

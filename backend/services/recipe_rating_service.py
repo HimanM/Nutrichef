@@ -1,5 +1,5 @@
-from ..dao import RecipeRatingDAO # Relative import
-from ..db import db # Relative import
+from backend.dao import RecipeRatingDAO
+from backend.db import db
 
 class RecipeRatingService:
     def __init__(self):

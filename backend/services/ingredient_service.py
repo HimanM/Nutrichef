@@ -1,4 +1,4 @@
-from ..dao import IngredientDAO
+from backend.dao import IngredientDAO
 
 class IngredientService:
     def __init__(self):

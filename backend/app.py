@@ -8,13 +8,14 @@ from .services import UserService, RecipeService
 from flask_jwt_extended import JWTManager, get_jwt_identity
 from flask_mail import Mail
 import os
-import warnings
-import logging
+import signal
+import sys
+import atexit
+from .utils.logging_utils import suppress_external_warnings, log_header, log_info
+from .utils.log_monitor import log_monitor
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-warnings.filterwarnings('ignore')
-logging.getLogger('tensorflow').setLevel(logging.ERROR)
+# Suppress warnings before other imports
+suppress_external_warnings()
 
 from .routes.user_routes import user_bp
 from .routes.recipe_routes import recipe_bp
@@ -32,9 +33,22 @@ from .routes.food_lookup_routes import food_lookup_bp
 from .routes.chatbot_routes import chatbot_bp, initialize_chatbot_service
 from .routes.pantry_routes import pantry_bp
 from .routes.contact_message_routes import contact_message_bp
+from .routes.favorites_routes import favorites_bp
+from .routes.tags_routes import tags_bp
 
-app = Flask(__name__, static_folder='static', static_url_path='/static')
+log_header("Application Startup")
+app = Flask(__name__, 
+           static_folder='static', 
+           static_url_path='/static',
+           template_folder='templates')
+log_info("Flask app initialized with template folder.", "Startup")
+
+# Setup log monitoring for Flask
+log_monitor.setup_flask_logging(app)
+log_info("Log monitoring initialized.", "Startup")
+
 app.config.from_object(Config)
+log_info("Configuration loaded from object.", "Startup")
 app.extensions = {}
 
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "your-super-secret-jwt-key-fallback")
@@ -99,9 +113,39 @@ app.register_blueprint(food_lookup_bp)
 app.register_blueprint(chatbot_bp)
 app.register_blueprint(pantry_bp)
 app.register_blueprint(contact_message_bp)
+app.register_blueprint(favorites_bp)
+app.register_blueprint(tags_bp)
 
 with app.app_context():
+    log_header("Service Initialization")
     initialize_chatbot_service()
+    log_header("Service Initialization Complete")
+
+def graceful_shutdown():
+    """Perform cleanup tasks before shutting down the application."""
+    log_info("Initiating graceful shutdown...", "Shutdown")
+    try:
+        # Cleanup any background services or tasks here
+        # Add any other cleanup tasks specific to your application
+        log_info("Background services cleaned up.", "Shutdown")
+    except Exception as e:
+        log_info(f"Error during service cleanup: {e}", "Shutdown")
+    
+    log_info("Graceful shutdown complete.", "Shutdown")
+
+def signal_handler(signum, frame):
+    """Handle termination signals gracefully."""
+    signal_name = signal.Signals(signum).name
+    log_info(f"Received signal {signal_name} ({signum}). Shutting down gracefully...", "Shutdown")
+    graceful_shutdown()
+    sys.exit(0)
+
+# Register signal handlers for graceful shutdown
+signal.signal(signal.SIGINT, signal_handler)   # Ctrl+C
+signal.signal(signal.SIGTERM, signal_handler)  # Termination signal
+
+# Register cleanup function to run on normal exit
+atexit.register(graceful_shutdown)
 
 @app.errorhandler(404)
 def handle_not_found_error(e):
@@ -143,4 +187,12 @@ def make_shell_context():
     }
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    try:
+        log_info("Starting Flask application...", "Startup")
+        app.run(debug=True, host='0.0.0.0', port=5000)
+    except KeyboardInterrupt:
+        log_info("Received keyboard interrupt. Shutting down...", "Shutdown")
+    except Exception as e:
+        log_info(f"Application error: {e}", "Error")
+    finally:
+        graceful_shutdown()

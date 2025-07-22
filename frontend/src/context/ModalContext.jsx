@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useCallback, useRef } from 'react';
-import InteractiveModal from '../components/InteractiveModal';
+import InteractiveModal from '../components/ui/InteractiveModal';
 
 const ModalContext = createContext();
 
