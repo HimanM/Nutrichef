@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import RecipeCard from '../components/recipe/RecipeCard.jsx';
+import RecipeCard from '../components/pages/recipe/RecipeCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
-import RecipeSubmissionModal from '../components/recipe/RecipeSubmissionModal.jsx';
+import RecipeSubmissionModal from '../components/pages/recipe/RecipeSubmissionModal.jsx';
 import FloatingLoader from '../components/ui/FloatingLoader.jsx';
 import { HiOutlineRefresh, HiOutlineSearch, HiOutlinePlus, HiOutlineCheck, HiOutlineEye, HiOutlineEyeOff, HiOutlineHeart, HiHeart, HiOutlineTag, HiOutlineX } from 'react-icons/hi';
 
