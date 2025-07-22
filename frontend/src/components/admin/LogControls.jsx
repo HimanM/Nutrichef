@@ -75,13 +75,12 @@ const LogControls = ({
 
     return (
         <div className="card-glass p-4 lg:p-6 border border-white/20 hover:border-emerald-200/50 transition-all duration-300">
-            <h3 className="text-base lg:text-lg font-semibold text-gray-700 mb-3 lg:mb-4 flex items-center">
-                <HiCog6Tooth className="text-emerald-500 mr-2" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 sm:mb-6">
                 Log Controls
             </h3>
             
             {/* Auto-scroll toggle */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 sm:mb-5">
                 <label htmlFor="autoScroll" className="text-sm font-medium text-gray-700 flex items-center">
                     <HiAdjustmentsHorizontal className="h-4 w-4 mr-2 text-emerald-500" />
                     Auto-scroll
@@ -96,7 +95,7 @@ const LogControls = ({
             </div>
 
             {/* Hide log stream requests toggle */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 sm:mb-5">
                 <label htmlFor="hideLogStreamRequests" className="text-sm font-medium text-gray-700 flex items-center">
                     <HiEyeSlash className="h-4 w-4 mr-2 text-emerald-500" />
                     Hide monitoring requests
@@ -111,7 +110,7 @@ const LogControls = ({
             </div>
 
             {/* Log level filter */}
-            <div className="mb-4">
+            <div className="mb-4 sm:mb-5">
                 <label className="text-sm font-medium text-gray-700 mb-2 block">
                     Filter by Level
                 </label>
@@ -129,7 +128,7 @@ const LogControls = ({
             </div>
 
             {/* Log type filter */}
-            <div className="mb-4">
+            <div className="mb-5 sm:mb-6">
                 <label className="text-sm font-medium text-gray-700 mb-2 block">
                     Filter by Type
                 </label>
@@ -147,12 +146,12 @@ const LogControls = ({
             </div>
 
             {/* Log statistics */}
-            <div className="border-t pt-4">
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Statistics</h4>
+            <div className="border-t pt-4 sm:pt-5">
+                <h4 className="text-sm font-medium text-gray-700 mb-3 sm:mb-4">Statistics</h4>
                 
                 {/* Chart */}
                 {logStats.total > 0 && (
-                    <div className="mb-4" style={{ height: '160px' }}>
+                    <div className="mb-4 sm:mb-5" style={{ height: '160px' }}>
                         <Doughnut data={logStatsChartData} options={logStatsChartOptions} />
                     </div>
                 )}

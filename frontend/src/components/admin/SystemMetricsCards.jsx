@@ -46,22 +46,24 @@ const SystemMetricsCards = ({ systemMetrics, formatBytes }) => {
 
     return (
         <div className="mb-6 lg:mb-8">
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-3 sm:mb-4 lg:mb-6 flex items-center">
-                <div className="w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white mr-2 lg:mr-3 shadow-sm">
-                    <HiCircleStack className="h-3 w-3 lg:h-4 lg:w-4" />
-                </div>
-                System Metrics
-            </h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
+            <div className="card-glass p-4 lg:p-6 border border-white/20 hover:border-emerald-200/50 transition-all duration-300">
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">
+                    System Metrics
+                </h2>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
                 {metrics.map((metric, index) => {
                     const colors = getColorClasses(metric.color);
                     return (
-                        <div key={index} className="card-glass p-3 lg:p-6 border border-white/20 hover:border-emerald-200/50 transition-all duration-300">
-                            <div className="flex items-center justify-between mb-2 lg:mb-4">
-                                <h3 className="text-sm lg:text-lg font-semibold text-gray-700 truncate">{metric.title}</h3>
-                                {metric.icon}
+                        <div key={index} className="bg-gradient-to-br from-gray-50/50 to-emerald-50/30 p-3 sm:p-4 lg:p-5 rounded-xl border border-gray-100/50 hover:border-emerald-200/70 transition-all duration-300 shadow-sm hover:shadow-md">
+                            <div className="flex items-center justify-between mb-2 sm:mb-3 lg:mb-4">
+                                <h3 className="text-xs sm:text-sm lg:text-base font-semibold text-gray-700 truncate">{metric.title}</h3>
+                                <div className="flex-shrink-0">
+                                    {React.cloneElement(metric.icon, { 
+                                        className: "text-base sm:text-lg lg:text-2xl text-emerald-600" 
+                                    })}
+                                </div>
                             </div>
-                            <div className={`text-lg lg:text-3xl font-bold ${colors.text} mb-1 lg:mb-2`}>
+                            <div className={`text-base sm:text-lg lg:text-3xl font-bold ${colors.text} mb-1 lg:mb-2`}>
                                 {metric.value}
                             </div>
                             {metric.percentage !== undefined && (
@@ -80,6 +82,7 @@ const SystemMetricsCards = ({ systemMetrics, formatBytes }) => {
                         </div>
                     );
                 })}
+                </div>
             </div>
         </div>
     );

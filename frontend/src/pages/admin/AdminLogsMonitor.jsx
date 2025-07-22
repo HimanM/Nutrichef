@@ -468,7 +468,7 @@ Environment: ${info.flask_info?.environment || 'Unknown'}
                 {/* Log Controls and Display Grid */}
                 <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
                     {/* Log Controls */}
-                    <div className="xl:col-span-1">
+                    <div className="xl:col-span-1 order-2 xl:order-1">
                        
                         <LogControls 
                             logStats={logStats}
@@ -484,7 +484,7 @@ Environment: ${info.flask_info?.environment || 'Unknown'}
                     </div>
 
                     {/* Logs Display */}
-                    <div className="xl:col-span-3">
+                    <div className="xl:col-span-3 order-1 xl:order-2">
                         <LogsDisplay 
                             filteredLogs={filteredLogs}
                             logs={logs}
