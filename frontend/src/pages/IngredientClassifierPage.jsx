@@ -5,6 +5,8 @@ import { useConditionalAuth } from '../components/auth/AuthGuard.jsx';
 import RequireLoginModal from '../components/auth/RequireLoginModal';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { HiOutlineCloudUpload, HiOutlineRefresh, HiOutlineCamera, HiOutlineCheckCircle, HiOutlineExclamation } from 'react-icons/hi';
+import { useCamera } from '../hooks/useCamera.js';
+import CameraModal from '../components/camera/CameraModal.jsx';
 
 const IngredientClassifierPage = () => {
     const [classificationMode, setClassificationMode] = useState('ingredient');
@@ -23,6 +25,24 @@ const IngredientClassifierPage = () => {
     const fileInputRef = useRef(null);
     const appName = "NutriChef";
 
+    // Camera functionality
+    const {
+        showCamera,
+        isCameraLoading,
+        cameraError,
+        availableCameras,
+        currentCameraId,
+        hasMultiple,
+        videoRef,
+        canvasRef,
+        startCamera,
+        stopCamera,
+        capturePhoto,
+        switchToCamera,
+        isCameraAvailable
+    } = useCamera();
+
+    // Clean up image preview URL on unmount
     useEffect(() => {
         return () => {
             if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
@@ -45,6 +65,22 @@ const IngredientClassifierPage = () => {
                 URL.revokeObjectURL(imagePreviewUrl); 
                 setImagePreviewUrl(null); 
             }
+        }
+    };
+
+    // Handle camera photo capture
+    const handleCameraCapture = async () => {
+        try {
+            const file = await capturePhoto();
+            setSelectedImage(file);
+            setFileName(file.name);
+            if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+            setImagePreviewUrl(URL.createObjectURL(file));
+            setClassificationResult(null);
+            setError(null);
+            stopCamera();
+        } catch (error) {
+            console.error('Camera capture failed:', error);
         }
     };
 
@@ -149,24 +185,72 @@ const IngredientClassifierPage = () => {
                                 </div>
                             </div>
 
-                            {/* File Upload */}
-                            <div className="text-center">
-                                <input 
-                                    type="file" 
-                                    hidden 
-                                    accept="image/*" 
-                                    onChange={handleImageChange} 
-                                    ref={fileInputRef} 
-                                    id="imageUploadInput"
-                                />
-                                <label 
-                                    htmlFor="imageUploadInput" 
-                                    className="cursor-pointer inline-flex items-center justify-center px-4 sm:px-6 py-3 sm:py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 bg-white hover:border-emerald-400 hover:text-emerald-600 transition-all duration-200 w-full sm:w-auto min-h-[44px] touch-manipulation"
-                                >
-                                    <HiOutlineCloudUpload className="h-5 w-5 sm:h-6 sm:w-6 mr-2" /> 
-                                    Upload Image
-                                </label>
-                                <p className="text-xs sm:text-sm text-gray-500 mt-2 px-4 break-all">{fileName}</p>
+                            {/* File Upload and Camera */}
+                            <div className="text-center space-y-4">
+                                <div className={`flex ${isCameraAvailable ? 'flex-col sm:flex-row' : 'justify-center'} gap-4 justify-center items-center`}>
+                                    {/* File Upload Button */}
+                                    <div>
+                                        <input 
+                                            type="file" 
+                                            hidden 
+                                            accept="image/*" 
+                                            onChange={handleImageChange} 
+                                            ref={fileInputRef} 
+                                            id="imageUploadInput"
+                                        />
+                                        <label 
+                                            htmlFor="imageUploadInput" 
+                                            className="cursor-pointer inline-flex items-center justify-center px-4 sm:px-6 py-3 sm:py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 bg-white hover:border-emerald-400 hover:text-emerald-600 transition-all duration-200 w-full sm:w-auto min-h-[44px] touch-manipulation"
+                                        >
+                                            <HiOutlineCloudUpload className="h-5 w-5 sm:h-6 sm:w-6 mr-2" /> 
+                                            Upload Image
+                                        </label>
+                                    </div>
+
+                                    {/* Camera Button - Only show if camera is available */}
+                                    {isCameraAvailable && (
+                                        <>
+                                            {/* Or Divider */}
+                                            <div className="text-gray-400 text-sm font-medium">OR</div>
+
+                                            <div>
+                                                <button
+                                                    type="button"
+                                                    onClick={startCamera}
+                                                    disabled={isCameraLoading || showCamera}
+                                                    className="cursor-pointer inline-flex items-center justify-center px-4 sm:px-6 py-3 sm:py-4 border-2 border-dashed border-blue-300 rounded-xl text-blue-600 bg-white hover:border-blue-400 hover:text-blue-700 transition-all duration-200 w-full sm:w-auto min-h-[44px] touch-manipulation disabled:opacity-75 disabled:cursor-not-allowed"
+                                                >
+                                                    {isCameraLoading ? (
+                                                        <>
+                                                            <HiOutlineRefresh className="animate-spin h-5 w-5 sm:h-6 sm:w-6 mr-2" />
+                                                            Starting Camera...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <HiOutlineCamera className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
+                                                            Use Camera
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                                
+                                {/* Camera Error */}
+                                {cameraError && (
+                                    <div className="text-red-600 text-sm mt-2">{cameraError}</div>
+                                )}
+                                
+                                {/* Camera Not Available Message */}
+                                {!isCameraAvailable && (
+                                    <div className="text-gray-500 text-sm mt-2">
+                                        Camera not available on this device or browser
+                                    </div>
+                                )}
+                                
+                                {/* File Name Display */}
+                                <p className="text-xs sm:text-sm text-gray-500 px-4 break-all">{fileName}</p>
                             </div>
 
                             {/* Classify Button */}
@@ -324,6 +408,21 @@ const IngredientClassifierPage = () => {
                     )}
                 </div>
             </div>
+
+            {/* Camera Modal */}
+            <CameraModal
+                isOpen={showCamera}
+                onClose={stopCamera}
+                onCapture={handleCameraCapture}
+                videoRef={videoRef}
+                canvasRef={canvasRef}
+                isCameraLoading={isCameraLoading}
+                cameraError={cameraError}
+                availableCameras={availableCameras}
+                currentCameraId={currentCameraId}
+                onSwitchCamera={switchToCamera}
+                hasMultiple={hasMultiple}
+            />
 
             {/* Only show login modal if session hasn't expired (global modal handles expiry) */}
             {!isSessionExpired && (
