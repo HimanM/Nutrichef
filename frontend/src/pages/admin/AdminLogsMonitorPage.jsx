@@ -64,16 +64,16 @@ const AdminLogsMonitorPage = () => {
             {
                 label: 'CPU Usage (%)',
                 data: [],
-                borderColor: 'rgb(16, 185, 129)',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderColor: 'rgb(239, 68, 68)',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
                 tension: 0.4,
                 fill: true,
             },
             {
                 label: 'Memory Usage (%)',
                 data: [],
-                borderColor: 'rgb(5, 150, 105)',
-                backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                borderColor: 'rgb(245, 158, 11)',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
                 tension: 0.4,
                 fill: true,
             }
@@ -205,16 +205,16 @@ const AdminLogsMonitorPage = () => {
                 {
                     label: 'CPU Usage (%)',
                     data: [],
-                    borderColor: 'rgb(16, 185, 129)',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderColor: 'rgb(239, 68, 68)',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
                     tension: 0.4,
                     fill: true,
                 },
                 {
                     label: 'Memory Usage (%)',
                     data: [],
-                    borderColor: 'rgb(5, 150, 105)',
-                    backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                    borderColor: 'rgb(245, 158, 11)',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
                     tension: 0.4,
                     fill: true,
                 }

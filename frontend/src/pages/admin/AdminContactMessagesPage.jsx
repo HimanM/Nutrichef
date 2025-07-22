@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useModal } from '../../context/ModalContext';
+import { authenticatedFetch } from '../../utils/apiUtil';
 import InteractiveModal from '../../components/ui/InteractiveModal';
 import ResponsiveTable from '../../components/admin/ResponsiveTable';
 import { AiOutlineLoading } from 'react-icons/ai';
@@ -7,7 +9,8 @@ import { MdCheckCircle, MdError, MdOutlineRemoveRedEye, MdReply } from 'react-ic
 import { HiX, HiEye, HiChat } from 'react-icons/hi';
 
 const AdminContactMessagesPage = () => {
-  const { token } = useAuth(); // Assuming useAuth provides the JWT token
+  const authContextValue = useAuth(); // Use the full auth context value
+  const { showModal } = useModal(); // Add modal context for consistent error handling
 
   // --- State Management ---
   const [messages, setMessages] = useState([]);
@@ -32,14 +35,14 @@ const AdminContactMessagesPage = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await fetch(`/api/contact/admin/messages?page=${page}&per_page=${itemsPerPage}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await authenticatedFetch(
+        `/api/contact/admin/messages?page=${page}&per_page=${itemsPerPage}`,
+        { method: 'GET' },
+        authContextValue
+      );
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.msg || `HTTP error ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.msg || errorData.error || `Failed to fetch messages: ${response.status}`);
       }
       const data = await response.json();
       setMessages(data.messages || []);
@@ -51,13 +54,13 @@ const AdminContactMessagesPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [token, itemsPerPage]);
+  }, [authContextValue, itemsPerPage]);
 
   useEffect(() => {
-    if (token) {
+    if (authContextValue.token) {
       fetchMessages(currentPage);
     }
-  }, [fetchMessages, currentPage, token]);
+  }, [fetchMessages, currentPage, authContextValue.token]);
 
   // --- Modal Handlers ---
   const handleOpenModal = (message) => {
@@ -86,28 +89,29 @@ const AdminContactMessagesPage = () => {
     setReplyError('');
 
     try {
-      const response = await fetch(`/api/contact/admin/messages/${selectedMessage.MessageID}/reply`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await authenticatedFetch(
+        `/api/contact/admin/messages/${selectedMessage.MessageID}/reply`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            reply_subject: `Re: Your inquiry to NutriChef (ID: ${selectedMessage.MessageID})`,
+            reply_body: replyText,
+          }),
         },
-        body: JSON.stringify({
-          reply_subject: `Re: Your inquiry to NutriChef (ID: ${selectedMessage.MessageID})`,
-          reply_body: replyText,
-        }),
-      });
-
-      const responseData = await response.json();
+        authContextValue
+      );
 
       if (!response.ok) {
-        throw new Error(responseData.msg || `HTTP error ${response.status}`);
+        const responseData = await response.json().catch(() => ({}));
+        throw new Error(responseData.msg || responseData.error || `Failed to send reply: ${response.status}`);
       }
 
+      const responseData = await response.json();
       setReplyLoading(false);
       handleCloseModal(); // Close reply modal
-      setNotificationModalContent({ title: 'Success', message: `Reply sent successfully to ${selectedMessage.Email}!`, iconType: 'success' });
-      setNotificationModalOpen(true);
+      
+      // Use showModal for consistent success messaging
+      showModal('alert', 'Success', `Reply sent successfully to ${selectedMessage.Email}!`, { iconType: 'success' });
 
       // Update message in state or re-fetch
       // For simplicity, re-fetching current page to get updated status
@@ -116,9 +120,7 @@ const AdminContactMessagesPage = () => {
     } catch (err) {
       setReplyLoading(false);
       setReplyError(err.message || 'Failed to send reply.');
-      // Optionally, show this error in the main notification modal too
-      // setNotificationModalContent({ title: 'Reply Error', message: err.message || 'Failed to send reply.', iconType: 'error' });
-      // setNotificationModalOpen(true);
+      console.error("Error sending reply:", err);
     }
   };
 

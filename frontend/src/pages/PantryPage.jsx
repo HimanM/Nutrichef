@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useConditionalAuth } from '../components/auth/AuthGuard.jsx';
 import { useModal } from '../context/ModalContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { ButtonSpinner, PageLoaderSpinner } from '../components/common/LoadingComponents.jsx';
@@ -14,6 +15,7 @@ function PantryPage() {
     const [error, setError] = useState('');
     const auth = useAuth();
     const { isAuthenticated, loading: authLoading, token } = auth;
+    const { canPerformAuthAction, isSessionExpired } = useConditionalAuth();
 
     const [newIngredients, setNewIngredients] = useState([{ name: '', quantity: '', unit: '' }]);
     const [isIngredientFormOpen, setIsIngredientFormOpen] = useState(false);
@@ -197,12 +199,22 @@ function PantryPage() {
             </div>
         );
     }
-    if (!isAuthenticated) {
+    // Don't show the login message if session has expired (global modal handles it)
+    if (!isAuthenticated && !isSessionExpired) {
         return (
             <div className="page-container my-8">
                 <div className="p-4 bg-yellow-700/[0.5] border-l-4 border-yellow-500 text-yellow-200">
                     <p>Please log in to view your pantry.</p>
                 </div>
+            </div>
+        );
+    }
+
+    // Show loading spinner if session has expired (let global modal handle it)
+    if (!isAuthenticated && isSessionExpired) {
+        return (
+            <div className="page-container my-8 text-center">
+                <PageLoaderSpinner /> <p className="mt-2 text-blue-400">Checking authentication...</p>
             </div>
         );
     }

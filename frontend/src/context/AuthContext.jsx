@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
+import { resetSessionExpiryFlag } from '../utils/apiUtil.js';
 
 const AuthContext = createContext(null);
 
@@ -31,6 +32,8 @@ export const AuthProvider = ({ children }) => {
     setToken(newToken);
     setCurrentUser(userData);
     setSessionExpiredMessage(null);
+    // Reset the session expiry flag when user logs in
+    resetSessionExpiryFlag();
   }, []);
 
   const logout = useCallback(() => {
@@ -41,9 +44,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const showExpiryMessageAndLogout = useCallback((message) => {
-    setSessionExpiredMessage(message || "Your session has expired. Please log in again.");
-    logout();
-  }, [logout]);
+    // Only set the message if there isn't already one set
+    if (!sessionExpiredMessage) {
+      setSessionExpiredMessage(message || "Your session has expired. Please log in again.");
+      logout();
+    }
+  }, [logout, sessionExpiredMessage]);
 
   const isAuthenticated = !!token;
   const isAdmin = currentUser?.role === 'admin';

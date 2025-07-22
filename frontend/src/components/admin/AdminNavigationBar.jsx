@@ -94,7 +94,7 @@ const AdminNavigationBar = () => {
                 </span>
                 <button
                   onClick={handleLogout}
-                  className="btn-primary flex items-center text-sm px-2 xl:px-3 whitespace-nowrap"
+                  className="btn-danger-outline"
                 >
                   <HiOutlineLogout className="h-4 w-4 mr-1 xl:mr-1.5" />
                   Logout

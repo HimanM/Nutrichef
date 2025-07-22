@@ -3,6 +3,7 @@ import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { useMealPlanSelection } from '../context/MealPlanSelectionContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useModal } from '../context/ModalContext.jsx';
+import { useConditionalAuth } from '../components/auth/AuthGuard.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { consolidateBasketItems } from '../utils/basketUtils.js';
 import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
@@ -48,6 +49,7 @@ function MealPlannerPage() {
 
   const { recipeSelectedForPlanning, setRecipeSelectedForPlanning, clearRecipeSelection } = useMealPlanSelection();
   const auth = useAuth();
+  const { canPerformAuthAction, isSessionExpired } = useConditionalAuth();
   const { showModal } = useModal();
   const location = useLocation();
   const navigate = useNavigate();
@@ -62,12 +64,12 @@ function MealPlannerPage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Redirect unauthenticated users to login page
+  // Handle authentication - only redirect if session hasn't expired (global modal handles that)
   useEffect(() => {
-    if (!auth.token) {
+    if (!auth.token && !isSessionExpired) {
       setIsRequireLoginModalOpen(true);
     }
-  }, [auth.token]);
+  }, [auth.token, isSessionExpired]);
 
   const handleRequireLoginModalClose = () => {
     setIsRequireLoginModalOpen(false);
@@ -173,8 +175,7 @@ function MealPlannerPage() {
 
   // Save nutritional targets
   const handleSaveNutritionalTargets = async (targets) => {
-    if (!auth.token) {
-      setIsRequireLoginModalOpen(true);
+    if (!canPerformAuthAction()) {
       return;
     }
 
@@ -291,8 +292,7 @@ function MealPlannerPage() {
 
   // Add all ingredients from meal plan to shopping basket
   const handleAddAllToBasket = async () => {
-    if (!auth.token) { 
-      setIsRequireLoginModalOpen(true); 
+    if (!canPerformAuthAction()) { 
       return; 
     }
 
@@ -414,8 +414,7 @@ function MealPlannerPage() {
   };
 
   const handleSaveToCloud = async () => {
-    if (!auth.token) { 
-      setIsRequireLoginModalOpen(true); 
+    if (!canPerformAuthAction()) { 
       return; 
     }
     setIsSavingToCloud(true);
@@ -436,8 +435,7 @@ function MealPlannerPage() {
   };
 
   const handleLoadFromCloudLogic = async () => {
-    if (!auth.token) { 
-      setIsRequireLoginModalOpen(true); 
+    if (!canPerformAuthAction()) { 
       return; 
     }
     setIsLoadingFromCloud(true);
@@ -692,14 +690,16 @@ function MealPlannerPage() {
         paletteRef={paletteRef}
       />
 
-      {/* Modals */}
-      <RequireLoginModal
-        isOpen={isRequireLoginModalOpen}
-        onClose={handleRequireLoginModalClose}
-        title="Login Required"
-        message="You need to be logged in to save and load meal plans from the cloud."
-        redirectState={{ from: location }}
-      />
+      {/* Modals - Only show login modal if session hasn't expired (global modal handles expiry) */}
+      {!isSessionExpired && (
+        <RequireLoginModal
+          isOpen={isRequireLoginModalOpen}
+          onClose={handleRequireLoginModalClose}
+          title="Login Required"
+          message="You need to be logged in to save and load meal plans from the cloud."
+          redirectState={{ from: location }}
+        />
+      )}
 
       <NutritionalTargetsModal
         isOpen={isNutritionalTargetsModalOpen}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLocation } from 'react-router-dom';
+import { useConditionalAuth } from '../components/auth/AuthGuard.jsx';
 import RequireLoginModal from '../components/auth/RequireLoginModal';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { HiOutlineCloudUpload, HiOutlineRefresh, HiOutlineCamera, HiOutlineCheckCircle, HiOutlineExclamation } from 'react-icons/hi';
@@ -17,6 +18,7 @@ const IngredientClassifierPage = () => {
 
     const auth = useAuth();
     const { isAuthenticated, currentUser } = auth;
+    const { canPerformAuthAction, attemptAuthAction, isSessionExpired } = useConditionalAuth();
     const location = useLocation();
     const fileInputRef = useRef(null);
     const appName = "NutriChef";
@@ -47,43 +49,46 @@ const IngredientClassifierPage = () => {
     };
 
     const handleClassify = async () => {
-        if (!isAuthenticated) { 
-            setShowLoginModal(true); 
-            return; 
-        }
-        if (!selectedImage) { 
-            setError("Please upload an image for classification."); 
-            return; 
-        }
-
-        setIsLoading(true); 
-        setClassificationResult(null); 
-        setError(null);
-
-        const formData = new FormData();
-        formData.append('image', selectedImage);
-        formData.append('classification_mode', classificationMode);
-        if (currentUser && currentUser.UserID) formData.append('user_id', currentUser.UserID);
-
-        try {
-            const response = await authenticatedFetch('/api/classify', { method: 'POST', body: formData }, auth);
-            const data = await response.json();
-
-            if (response.ok) {
-                setClassificationResult(data);
-            } else {
-                const errorMsg = data?.nutrition?.error || data?.error || data?.message || 'Classification failed.';
-                setError(errorMsg);
-                if (data && (data.classification || data.nutrition)) setClassificationResult(data); 
-                else setClassificationResult(null);
+        return attemptAuthAction(async () => {
+            if (!selectedImage) { 
+                setError("Please upload an image for classification."); 
+                return; 
             }
-        } catch (err) {
-            console.error("Classification API error:", err);
-            setError('An error occurred. Please try again.');
-            setClassificationResult(null);
-        } finally {
-            setIsLoading(false);
-        }
+
+            setIsLoading(true); 
+            setClassificationResult(null); 
+            setError(null);
+
+            const formData = new FormData();
+            formData.append('image', selectedImage);
+            formData.append('classification_mode', classificationMode);
+            if (currentUser && currentUser.UserID) formData.append('user_id', currentUser.UserID);
+
+            try {
+                const response = await authenticatedFetch('/api/classify', { method: 'POST', body: formData }, auth);
+                const data = await response.json();
+
+                if (response.ok) {
+                    setClassificationResult(data);
+                } else {
+                    const errorMsg = data?.nutrition?.error || data?.error || data?.message || 'Classification failed.';
+                    setError(errorMsg);
+                    if (data && (data.classification || data.nutrition)) setClassificationResult(data); 
+                    else setClassificationResult(null);
+                }
+            } catch (err) {
+                console.error("Classification API error:", err);
+                setError('An error occurred. Please try again.');
+                setClassificationResult(null);
+            } finally {
+                setIsLoading(false);
+            }
+        }, () => {
+            // Fallback when not authenticated and session hasn't expired
+            if (!isSessionExpired) {
+                setShowLoginModal(true);
+            }
+        });
     };
 
     return (
@@ -320,13 +325,16 @@ const IngredientClassifierPage = () => {
                 </div>
             </div>
 
-            <RequireLoginModal
-                isOpen={showLoginModal}
-                onClose={() => setShowLoginModal(false)}
-                title="Login Required"
-                message="You need to be logged in to use the ingredient classifier."
-                redirectState={{ from: location }}
-            />
+            {/* Only show login modal if session hasn't expired (global modal handles expiry) */}
+            {!isSessionExpired && (
+                <RequireLoginModal
+                    isOpen={showLoginModal}
+                    onClose={() => setShowLoginModal(false)}
+                    title="Login Required"
+                    message="You need to be logged in to use the ingredient classifier."
+                    redirectState={{ from: location }}
+                />
+            )}
         </div>
     );
 };
