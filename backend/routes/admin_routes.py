@@ -1,7 +1,12 @@
-from flask import Blueprint, jsonify, request # Added request back
+from flask import Blueprint, jsonify, request, Response, stream_template, render_template # Added request back
 from functools import wraps
 from backend.services.admin_service import AdminService
 from flask_jwt_extended import jwt_required, get_current_user
+from backend.utils.log_monitor import log_monitor
+from backend.dao.user_dao import UserDAO
+import json
+import time
+import uuid
 
 admin_bp = Blueprint('admin_bp', __name__, url_prefix='/api/admin')
 admin_service = AdminService()
@@ -96,3 +101,131 @@ def get_classification_scores_summary_route():
     if error:
         return jsonify(error), status
     return jsonify(data), status
+
+@admin_bp.route('/logs/recent', methods=['GET'])
+@admin_required
+def get_recent_logs():
+    """Get recent logs."""
+    limit = request.args.get('limit', 50, type=int)
+    logs = log_monitor.get_recent_logs(limit)
+    return jsonify({
+        'logs': logs,
+        'total': len(logs)
+    })
+
+@admin_bp.route('/logs/stream')
+def stream_logs():
+    """Server-Sent Events endpoint for real-time logs."""
+    # Check for token in query params for SSE
+    token = request.args.get('token')
+    if token:
+        # Verify JWT token manually for SSE connection
+        try:
+            from flask_jwt_extended import decode_token
+            decoded_token = decode_token(token)
+            user_dao = UserDAO()
+            user = user_dao.get_user_by_id(int(decoded_token['sub']))
+            if not user or user.role != 'admin':
+                return jsonify({"error": "Administration rights required"}), 403
+        except Exception:
+            return jsonify({"error": "Invalid token"}), 401
+    else:
+        # Fallback to normal JWT check
+        try:
+            from flask_jwt_extended import verify_jwt_in_request, get_current_user
+            verify_jwt_in_request()
+            current_user = get_current_user()
+            if not current_user or current_user.role != 'admin':
+                return jsonify({"error": "Administration rights required"}), 403
+        except Exception:
+            return jsonify({"error": "Authorization required"}), 401
+    
+    def event_stream():
+        client_id = str(uuid.uuid4())
+        log_monitor.add_client(client_id)
+        
+        try:
+            while True:
+                # Get new logs
+                new_logs = log_monitor.get_new_logs()
+                if new_logs:
+                    data = json.dumps({
+                        'type': 'logs',
+                        'data': new_logs
+                    })
+                    yield f"data: {data}\n\n"
+                
+                # Send system metrics every 10 seconds
+                if int(time.time()) % 10 == 0:
+                    metrics = log_monitor.get_system_metrics()
+                    if metrics:
+                        data = json.dumps({
+                            'type': 'metrics',
+                            'data': metrics
+                        })
+                        yield f"data: {data}\n\n"
+                
+                # Send heartbeat
+                yield f"data: {json.dumps({'type': 'heartbeat'})}\n\n"
+                time.sleep(1)
+                
+        except GeneratorExit:
+            log_monitor.remove_client(client_id)
+    
+    return Response(
+        event_stream(),
+        mimetype='text/event-stream',
+        headers={
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Cache-Control'
+        }
+    )
+
+@admin_bp.route('/system/metrics', methods=['GET'])
+@admin_required
+def get_system_metrics():
+    """Get current system metrics."""
+    metrics = log_monitor.get_system_metrics()
+    return jsonify(metrics)
+
+@admin_bp.route('/logs/clear', methods=['POST'])
+@admin_required
+def clear_logs():
+    """Clear all logs."""
+    log_monitor.flask_logs.clear()
+    return jsonify({'message': 'Logs cleared successfully'})
+
+@admin_bp.route('/logs/monitor')
+@admin_required  
+def logs_monitor_page():
+    """Serve the logs monitor page."""
+    return render_template('admin/logs_monitor.html')
+
+@admin_bp.route('/system/info', methods=['GET'])
+@admin_required
+def get_system_info():
+    """Get detailed system information."""
+    import platform
+    import sys
+    
+    try:
+        system_info = {
+            'platform': {
+                'system': platform.system(),
+                'release': platform.release(),
+                'version': platform.version(),
+                'machine': platform.machine(),
+                'processor': platform.processor(),
+                'python_version': sys.version,
+                'python_executable': sys.executable
+            },
+            'flask_info': {
+                'debug_mode': request.environ.get('werkzeug.server.shutdown') is not None,
+                'environment': request.environ.get('FLASK_ENV', 'production')
+            }
+        }
+        return jsonify(system_info)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

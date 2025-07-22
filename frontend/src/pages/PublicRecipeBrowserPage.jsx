@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import RecipeCard from '../components/recipe/RecipeCard.jsx';
+import RecipeCard from '../components/pages/recipe/RecipeCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useConditionalAuth } from '../components/auth/AuthGuard.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
-import RecipeSubmissionModal from '../components/recipe/RecipeSubmissionModal.jsx';
+import RecipeSubmissionModal from '../components/pages/recipe/RecipeSubmissionModal.jsx';
 import FloatingLoader from '../components/ui/FloatingLoader.jsx';
 import { HiOutlineRefresh, HiOutlineSearch, HiOutlinePlus, HiOutlineCheck, HiOutlineEye, HiOutlineEyeOff, HiOutlineHeart, HiHeart, HiOutlineTag, HiOutlineX } from 'react-icons/hi';
 
@@ -13,7 +14,7 @@ const CheckIcon = ({ className = "w-5 h-5 mr-1" }) => <svg className={className}
 
 const MEAL_PLAN_PALETTE_KEY = 'mealPlanPaletteRecipes';
 
-function PublicRecipeBrowser() {
+function PublicRecipeBrowserPage() {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,6 +36,7 @@ function PublicRecipeBrowser() {
 
   const auth = useAuth();
   const { isAuthenticated, currentUser } = auth;
+  const { canPerformAuthAction, attemptAuthAction, isSessionExpired } = useConditionalAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const location = useLocation();
 
@@ -51,11 +53,13 @@ function PublicRecipeBrowser() {
   const effectiveUserId = isAuthenticated && currentUser ? String(currentUser.UserID) : null;
 
   const handleOpenRecipeSubmissionModal = () => {
-    if (isAuthenticated) {
+    return attemptAuthAction(() => {
       setIsRecipeSubmissionModalOpen(true);
-    } else {
-      setIsLoginModalOpen(true);
-    }
+    }, () => {
+      if (!isSessionExpired) {
+        setIsLoginModalOpen(true);
+      }
+    });
   };
   const handleCloseRecipeSubmissionModal = () => {
     setIsRecipeSubmissionModalOpen(false);
@@ -124,7 +128,9 @@ function PublicRecipeBrowser() {
           setLoading(false);
           setRecipes([]);
           setTotalRecipes(0);
-          setIsLoginModalOpen(true);
+          if (!isSessionExpired) {
+            setIsLoginModalOpen(true);
+          }
           return;
         }
         url = `/api/recipes/my-private?page=${pageToFetch}&limit=${limit}&user_id=${currentUserId}`; 
@@ -209,52 +215,56 @@ function PublicRecipeBrowser() {
         setError("Failed to add recipe to palette. Please try again.");
       }
     } else {
-      setIsLoginModalOpen(true);
+      if (!isSessionExpired) {
+        setIsLoginModalOpen(true);
+      }
     }
   };
 
   // Favorites API functions
   const toggleFavorite = async (recipeId) => {
-    if (!isAuthenticated) {
-      setIsLoginModalOpen(true);
-      return;
-    }
+    return attemptAuthAction(async () => {
+      try {
+        const isFavorited = favoriteRecipeIds.has(recipeId);
+        const method = isFavorited ? 'DELETE' : 'POST';
+        const response = await authenticatedFetch(`/api/recipes/${recipeId}/favorite`, {
+          method
+        }, auth);
 
-    try {
-      const isFavorited = favoriteRecipeIds.has(recipeId);
-      const method = isFavorited ? 'DELETE' : 'POST';
-      const response = await authenticatedFetch(`/api/recipes/${recipeId}/favorite`, {
-        method
-      }, auth);
-
-      if (!response.ok) {
-        throw new Error('Failed to update favorite status');
-      }
-
-      const data = await response.json();
-      
-      // Update local state
-      setFavoriteRecipeIds(prev => {
-        const newSet = new Set(prev);
-        if (data.is_favorited) {
-          newSet.add(recipeId);
-        } else {
-          newSet.delete(recipeId);
+        if (!response.ok) {
+          throw new Error('Failed to update favorite status');
         }
-        return newSet;
-      });
 
-      // Update recipe in current list if needed
-      setRecipes(prev => prev.map(recipe => 
-        recipe.RecipeID === recipeId 
-          ? { ...recipe, is_favorited: data.is_favorited }
-          : recipe
-      ));
+        const data = await response.json();
+        
+        // Update local state
+        setFavoriteRecipeIds(prev => {
+          const newSet = new Set(prev);
+          if (data.is_favorited) {
+            newSet.add(recipeId);
+          } else {
+            newSet.delete(recipeId);
+          }
+          return newSet;
+        });
 
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-      setError('Failed to update favorite status');
-    }
+        // Update recipe in current list if needed
+        setRecipes(prev => prev.map(recipe => 
+          recipe.RecipeID === recipeId 
+            ? { ...recipe, is_favorited: data.is_favorited }
+            : recipe
+        ));
+
+      } catch (error) {
+        console.error('Error toggling favorite:', error);
+        setError('Failed to update favorite status');
+      }
+    }, () => {
+      // Fallback when not authenticated and session hasn't expired
+      if (!isSessionExpired) {
+        setIsLoginModalOpen(true);
+      }
+    });
   };
 
   const fetchUserFavorites = async (userId, page = 1, limit = 12, search = '') => {
@@ -364,7 +374,9 @@ function PublicRecipeBrowser() {
   // View management functions
   const handleViewChange = (newView) => {
     if ((newView === 'private' || newView === 'favorites') && !isAuthenticated) {
-      setIsLoginModalOpen(true);
+      if (!isSessionExpired) {
+        setIsLoginModalOpen(true);
+      }
       return;
     }
     setCurrentView(newView);
@@ -778,16 +790,19 @@ function PublicRecipeBrowser() {
           setIsLoading={setIsProcessingRecipeSubmission}
         />
       )}
-      <RequireLoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        title="Login Required"
-        message="You need to be logged in to add recipes to your palette or submit a new recipe."
-        redirectState={{ from: location }}
-      />
+      {/* Only show login modal if session hasn't expired (global modal handles expiry) */}
+      {!isSessionExpired && (
+        <RequireLoginModal
+          isOpen={isLoginModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          title="Login Required"
+          message="You need to be logged in to add recipes to your palette or submit a new recipe."
+          redirectState={{ from: location }}
+        />
+      )}
       {isProcessingRecipeSubmission && <FloatingLoader text="Submitting recipe..."/>}
     </div>
   );
 }
 
-export default PublicRecipeBrowser;
+export default PublicRecipeBrowserPage;

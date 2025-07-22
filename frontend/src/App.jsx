@@ -12,10 +12,10 @@ import AnimatedBackground from './components/layout/AnimatedBackground.jsx';
 
 import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
-import UserRegistration from './pages/UserRegistration.jsx';
+import UserRegistrationPage from './pages/UserRegistrationPage.jsx';
 
-import PublicRecipeBrowser from './pages/PublicRecipeBrowser.jsx';
-import IngredientClassifier from './pages/IngredientClassifier.jsx';
+import PublicRecipeBrowserPage from './pages/PublicRecipeBrowserPage.jsx';
+import IngredientClassifierPage from './pages/IngredientClassifierPage.jsx';
 import IngredientSubstitutePage from './pages/IngredientSubstitutePage.jsx';
 import FoodLookupPage from './pages/FoodLookupPage.jsx';
 import PersonalizedRecipesPage from './pages/PersonalizedRecipesPage.jsx';
@@ -32,14 +32,15 @@ import RecipeSuggestionsPage from './pages/RecipeSuggestionsPage.jsx';
 import ShoppingBasketPage from './pages/ShoppingBasketPage.jsx';
 import UserSettingsPage from './pages/UserSettingsPage.jsx';
 
-import MealPlanner from './pages/MealPlanner.jsx';
+import MealPlannerPage from './pages/MealPlannerPage.jsx';
 
-import AdminLayout from './pages/admin/AdminLayout.jsx';
-import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import AdminLayoutPage from './pages/admin/AdminLayoutPage.jsx';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx';
 import UserManagementPage from './pages/admin/UserManagementPage.jsx';
 import RecipeManagementPage from './pages/admin/RecipeManagementPage.jsx';
 import ClassificationScoresPage from './pages/admin/ClassificationScoresPage.jsx';
 import AdminContactMessagesPage from './pages/admin/AdminContactMessagesPage.jsx';
+import AdminLogsMonitorPage from './pages/admin/AdminLogsMonitorPage.jsx';
 
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ModalProvider } from './context/ModalContext.jsx';
@@ -76,11 +77,11 @@ function App() {
                 <main className="flex-grow">
                     <Routes>
                         <Route path="/" element={<HomePage />} />
-                        <Route path="/recipes" element={<PublicRecipeBrowser />} />
-                        <Route path="/meal-planner" element={<MealPlanner />} /> 
+                        <Route path="/recipes" element={<PublicRecipeBrowserPage />} />
+                        <Route path="/meal-planner" element={<MealPlannerPage />} /> 
                         <Route path="/basket" element={<ShoppingBasketPage />} />
-                        <Route path="/classifier" element={<IngredientClassifier />} />
-                        <Route path="/register" element={<UserRegistration />} />
+                        <Route path="/classifier" element={<IngredientClassifierPage />} />
+                        <Route path="/register" element={<UserRegistrationPage />} />
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/recipe/:recipeId" element={<RecipeDetailPage />} />
                         <Route path="/verify-email/:token" element={<EmailVerificationPage />} />
@@ -98,12 +99,13 @@ function App() {
                         </Route>
 
                         <Route element={<AdminRoute />}>
-                          <Route path="/admin" element={<AdminLayout />}>
-                            <Route index element={<AdminDashboard />} />
+                          <Route path="/admin" element={<AdminLayoutPage />}>
+                            <Route index element={<AdminDashboardPage />} />
                             <Route path="users" element={<UserManagementPage />} />
                             <Route path="recipes" element={<RecipeManagementPage />} />
                             <Route path="classification-scores" element={<ClassificationScoresPage />} />
                             <Route path="contact-messages" element={<AdminContactMessagesPage />} />
+                            <Route path="logs-monitor" element={<AdminLogsMonitorPage />} />
                           </Route>
                         </Route>
 

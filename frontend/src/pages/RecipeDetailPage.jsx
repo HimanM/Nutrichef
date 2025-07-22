@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useConditionalAuth } from '../components/auth/AuthGuard.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { consolidateBasketItems } from '../utils/basketUtils.js';
 import { PageLoaderSpinner, InlineSpinner } from '../components/common/LoadingComponents.jsx';
@@ -18,6 +19,7 @@ function RecipeDetailPage() {
   const [error, setError] = useState(null);
   const auth = useAuth();
   const { isAuthenticated, currentUser } = auth;
+  const { canPerformAuthAction, attemptAuthAction, isSessionExpired } = useConditionalAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const location = useLocation();
   const [isRatingSubmitting, setIsRatingSubmitting] = useState(false);
@@ -37,29 +39,32 @@ function RecipeDetailPage() {
   const navigate = useNavigate();
 
   const handleRateRecipe = async (newRating) => {
-    if (!isAuthenticated || !currentUser) {
-      setIsLoginModalOpen(true);
-      return;
-    }
-    setIsRatingSubmitting(true);
-    setRatingError('');
-    try {
-      const response = await authenticatedFetch(`/api/recipes/${recipeId}/rate`, {
-        method: 'POST',
-        body: JSON.stringify({ rating: newRating, user_id: currentUser.UserID })
-      }, auth);
+    return attemptAuthAction(async () => {
+      setIsRatingSubmitting(true);
+      setRatingError('');
+      try {
+        const response = await authenticatedFetch(`/api/recipes/${recipeId}/rate`, {
+          method: 'POST',
+          body: JSON.stringify({ rating: newRating, user_id: currentUser.UserID })
+        }, auth);
 
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to submit rating.');
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to submit rating.');
+        }
+        setRecipeData(prev => ({ ...prev, average_rating: result.average_rating }));
+        setUserRating(result.user_rating.Rating);
+      } catch (err) {
+        setRatingError(err.message);
+      } finally {
+        setIsRatingSubmitting(false);
       }
-      setRecipeData(prev => ({ ...prev, average_rating: result.average_rating }));
-      setUserRating(result.user_rating.Rating);
-    } catch (err) {
-      setRatingError(err.message);
-    } finally {
-      setIsRatingSubmitting(false);
-    }
+    }, () => {
+      // Fallback when not authenticated and session hasn't expired
+      if (!isSessionExpired) {
+        setIsLoginModalOpen(true);
+      }
+    });
   };
 
 
@@ -209,29 +214,35 @@ function RecipeDetailPage() {
   };
 
   const handleAddToBasket = () => {
-    if (!isAuthenticated) { setIsLoginModalOpen(true); return; }
-    if (!recipeData || !recipeData.ingredients || recipeData.ingredients.length === 0) {
-      setBasketMessage('No ingredients to add.'); setTimeout(() => setBasketMessage(''), 3000); return;
-    }
-    try {
-      const itemsToAdd = recipeData.ingredients.map(ing => ({
-        id: `${ing.RecipeIngredientID || ing.IngredientID}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
-        name: ing.IngredientName, originalName: ing.originalName === ing.IngredientName ? null : ing.originalName,
-        quantity: ing.Quantity || '', unit: ing.Unit || '',
-        recipeTitle: recipeData.Title, recipeId: recipeData.RecipeID, isChecked: false
-      }));
-      
-      // Use consolidation logic to merge ingredients with same name and unit
-      const existingBasketString = localStorage.getItem(SHOPPING_BASKET_KEY);
-      const existingBasket = existingBasketString ? JSON.parse(existingBasketString) : [];
-      const consolidatedBasket = consolidateBasketItems(existingBasket, itemsToAdd);
-      
-      localStorage.setItem(SHOPPING_BASKET_KEY, JSON.stringify(consolidatedBasket));
-      setBasketMessage(`Ingredients added to your shopping basket!`);
-      setTimeout(() => setBasketMessage(''), 3000);
-    } catch (error) {
-      setBasketMessage('Failed to add items to basket.'); setTimeout(() => setBasketMessage(''), 3000);
-    }
+    return attemptAuthAction(() => {
+      if (!recipeData || !recipeData.ingredients || recipeData.ingredients.length === 0) {
+        setBasketMessage('No ingredients to add.'); setTimeout(() => setBasketMessage(''), 3000); return;
+      }
+      try {
+        const itemsToAdd = recipeData.ingredients.map(ing => ({
+          id: `${ing.RecipeIngredientID || ing.IngredientID}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          name: ing.IngredientName, originalName: ing.originalName === ing.IngredientName ? null : ing.originalName,
+          quantity: ing.Quantity || '', unit: ing.Unit || '',
+          recipeTitle: recipeData.Title, recipeId: recipeData.RecipeID, isChecked: false
+        }));
+        
+        // Use consolidation logic to merge ingredients with same name and unit
+        const existingBasketString = localStorage.getItem(SHOPPING_BASKET_KEY);
+        const existingBasket = existingBasketString ? JSON.parse(existingBasketString) : [];
+        const consolidatedBasket = consolidateBasketItems(existingBasket, itemsToAdd);
+        
+        localStorage.setItem(SHOPPING_BASKET_KEY, JSON.stringify(consolidatedBasket));
+        setBasketMessage(`Ingredients added to your shopping basket!`);
+        setTimeout(() => setBasketMessage(''), 3000);
+      } catch (error) {
+        setBasketMessage('Failed to add items to basket.'); setTimeout(() => setBasketMessage(''), 3000);
+      }
+    }, () => {
+      // Fallback when not authenticated and session hasn't expired
+      if (!isSessionExpired) {
+        setIsLoginModalOpen(true);
+      }
+    });
   };
 
   const handleTogglePublicStatus = async () => {
@@ -586,13 +597,16 @@ function RecipeDetailPage() {
         cancelText={modalState.cancelText || 'Cancel'}
         showCancelButton={modalState.showCancelButton}
       />
-      <RequireLoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        title="Login Required"
-        message="Please log in to perform this action (e.g., rate recipes, add to basket)."
-        redirectState={{ from: location }}
-      />
+      {/* Only show login modal if session hasn't expired (global modal handles expiry) */}
+      {!isSessionExpired && (
+        <RequireLoginModal
+          isOpen={isLoginModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          title="Login Required"
+          message="Please log in to perform this action (e.g., rate recipes, add to basket)."
+          redirectState={{ from: location }}
+        />
+      )}
     </div>
   );
 }

@@ -1,5 +1,8 @@
+// Global flag to prevent multiple session expiry triggers
+let sessionExpiryTriggered = false;
+
 export const authenticatedFetch = async (url, options = {}, authContextValue) => {
-  const { token, showExpiryMessageAndLogout } = authContextValue;
+  const { token, showExpiryMessageAndLogout, sessionExpiredMessage } = authContextValue;
 
   const defaultHeaders = {
     'Content-Type': 'application/json',
@@ -25,8 +28,18 @@ export const authenticatedFetch = async (url, options = {}, authContextValue) =>
     const response = await fetch(url, fetchOptions);
 
     if (response.status === 401) {
-      if (showExpiryMessageAndLogout && typeof showExpiryMessageAndLogout === 'function') {
-        showExpiryMessageAndLogout("Your session has expired. Please log in again.");
+      // Only trigger session expiry once to prevent multiple modals
+      if (!sessionExpiryTriggered && !sessionExpiredMessage) {
+        sessionExpiryTriggered = true;
+        
+        if (showExpiryMessageAndLogout && typeof showExpiryMessageAndLogout === 'function') {
+          showExpiryMessageAndLogout("Your session has expired. Please log in again.");
+        }
+        
+        // Reset flag after a short delay to allow for cleanup
+        setTimeout(() => {
+          sessionExpiryTriggered = false;
+        }, 1000);
       }
       throw new Error(`Unauthorized: ${response.statusText}`);
     }
@@ -35,6 +48,11 @@ export const authenticatedFetch = async (url, options = {}, authContextValue) =>
     console.error('API Fetch Error:', error);
     throw error;
   }
+};
+
+// Function to reset the session expiry flag (called when user logs in)
+export const resetSessionExpiryFlag = () => {
+  sessionExpiryTriggered = false;
 };
 
 const API_BASE_URL = '/api';

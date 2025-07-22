@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Logs Monitor - NutriChef</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .log-entry {
+            transition: all 0.3s ease;
+            border-left: 4px solid;
+        }
+        .log-success { border-left-color: #10b981; background-color: rgba(16, 185, 129, 0.05); }
+        .log-info { border-left-color: #3b82f6; background-color: rgba(59, 130, 246, 0.05); }
+        .log-warning { border-left-color: #f59e0b; background-color: rgba(245, 158, 11, 0.05); }
+        .log-error { border-left-color: #ef4444; background-color: rgba(239, 68, 68, 0.05); }
+        
+        .metric-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .log-container {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-online { background-color: #10b981; }
+        .status-warning { background-color: #f59e0b; }
+        .status-error { background-color: #ef4444; }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 to-blue-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">
+                    <i class="fas fa-chart-line text-emerald-600 mr-3"></i>
+                    Admin Logs Monitor
+                </h1>
+                <p class="text-gray-600 mt-2">Real-time system monitoring and log analysis</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="status-indicator status-online pulse-animation" id="connectionStatus"></div>
+                <span class="text-sm text-gray-600" id="connectionText">Connected</span>
+                <button onclick="clearLogs()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-trash mr-2"></i>Clear Logs
+                </button>
+                <button onclick="window.history.back()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>Back
+                </button>
+            </div>
+        </div>
+
+        <!-- System Metrics Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- CPU Usage -->
+            <div class="metric-card rounded-xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-700">CPU Usage</h3>
+                    <i class="fas fa-microchip text-2xl text-blue-500"></i>
+                </div>
+                <div class="text-3xl font-bold text-blue-600" id="cpuUsage">0%</div>
+                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div class="bg-blue-600 h-2 rounded-full transition-all duration-500" id="cpuBar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Memory Usage -->
+            <div class="metric-card rounded-xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-700">Memory</h3>
+                    <i class="fas fa-memory text-2xl text-green-500"></i>
+                </div>
+                <div class="text-3xl font-bold text-green-600" id="memoryUsage">0%</div>
+                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div class="bg-green-600 h-2 rounded-full transition-all duration-500" id="memoryBar" style="width: 0%"></div>
+                </div>
+                <div class="text-sm text-gray-500 mt-1" id="memoryDetails">0 MB / 0 MB</div>
+            </div>
+
+            <!-- Disk Usage -->
+            <div class="metric-card rounded-xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-700">Disk</h3>
+                    <i class="fas fa-hard-drive text-2xl text-yellow-500"></i>
+                </div>
+                <div class="text-3xl font-bold text-yellow-600" id="diskUsage">0%</div>
+                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div class="bg-yellow-600 h-2 rounded-full transition-all duration-500" id="diskBar" style="width: 0%"></div>
+                </div>
+                <div class="text-sm text-gray-500 mt-1" id="diskDetails">0 GB / 0 GB</div>
+            </div>
+
+            <!-- Active Processes -->
+            <div class="metric-card rounded-xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-700">Processes</h3>
+                    <i class="fas fa-list text-2xl text-purple-500"></i>
+                </div>
+                <div class="text-3xl font-bold text-purple-600" id="processCount">0</div>
+                <div class="text-sm text-gray-500 mt-1">Active processes</div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- CPU/Memory Chart -->
+            <div class="metric-card rounded-xl p-6 shadow-lg">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">
+                    <i class="fas fa-chart-area text-emerald-500 mr-2"></i>
+                    System Performance
+                </h3>
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Network Activity -->
+            <div class="metric-card rounded-xl p-6 shadow-lg">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">
+                    <i class="fas fa-network-wired text-blue-500 mr-2"></i>
+                    Network Activity
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-600" id="networkSent">0 MB</div>
+                        <div class="text-sm text-gray-500">Bytes Sent</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-600" id="networkReceived">0 MB</div>
+                        <div class="text-sm text-gray-500">Bytes Received</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Log Controls -->
+            <div class="lg:col-span-1">
+                <div class="metric-card rounded-xl p-6 shadow-lg">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">
+                        <i class="fas fa-filter text-emerald-500 mr-2"></i>
+                        Log Controls
+                    </h3>
+                    
+                    <!-- Auto-scroll toggle -->
+                    <div class="flex items-center justify-between mb-4">
+                        <label for="autoScroll" class="text-sm font-medium text-gray-700">Auto-scroll</label>
+                        <input type="checkbox" id="autoScroll" checked class="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500">
+                    </div>
+
+                    <!-- Log level filter -->
+                    <div class="mb-4">
+                        <label class="text-sm font-medium text-gray-700 mb-2 block">Filter by Level</label>
+                        <select id="logLevelFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="all">All Levels</option>
+                            <option value="success">Success</option>
+                            <option value="info">Info</option>
+                            <option value="warning">Warning</option>
+                            <option value="error">Error</option>
+                        </select>
+                    </div>
+
+                    <!-- Log type filter -->
+                    <div class="mb-4">
+                        <label class="text-sm font-medium text-gray-700 mb-2 block">Filter by Type</label>
+                        <select id="logTypeFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="all">All Types</option>
+                            <option value="request">HTTP Requests</option>
+                            <option value="error">Errors</option>
+                            <option value="warning">Warnings</option>
+                            <option value="info">General Info</option>
+                        </select>
+                    </div>
+
+                    <!-- Log statistics -->
+                    <div class="border-t pt-4">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">Statistics</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Total Logs:</span>
+                                <span class="font-medium" id="totalLogs">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Errors:</span>
+                                <span class="font-medium text-red-600" id="errorCount">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Warnings:</span>
+                                <span class="font-medium text-yellow-600" id="warningCount">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Requests:</span>
+                                <span class="font-medium text-blue-600" id="requestCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Display -->
+            <div class="lg:col-span-2">
+                <div class="metric-card rounded-xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-700">
+                            <i class="fas fa-terminal text-emerald-500 mr-2"></i>
+                            Real-time Logs
+                        </h3>
+                        <div class="text-sm text-gray-500" id="logCount">0 entries</div>
+                    </div>
+                    
+                    <div class="log-container scrollbar-thin" id="logContainer">
+                        <div class="text-center text-gray-500 py-8">
+                            <i class="fas fa-hourglass-half text-2xl mb-2"></i>
+                            <p>Waiting for logs...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let eventSource = null;
+        let logs = [];
+        let charts = {};
+        let performanceData = {
+            labels: [],
+            cpu: [],
+            memory: []
+        };
+        let logStats = {
+            total: 0,
+            errors: 0,
+            warnings: 0,
+            requests: 0
+        };
+
+        // Initialize charts
+        function initializeCharts() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            charts.performance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'CPU Usage (%)',
+                        data: [],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Memory Usage (%)',
+                        data: [],
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+
+        // Connect to SSE stream
+        function connectToStream() {
+            if (eventSource) {
+                eventSource.close();
+            }
+
+            eventSource = new EventSource('/api/admin/logs/stream');
+            
+            eventSource.onopen = function(event) {
+                updateConnectionStatus(true);
+            };
+
+            eventSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'logs') {
+                    data.data.forEach(addLogEntry);
+                } else if (data.type === 'metrics') {
+                    updateSystemMetrics(data.data);
+                }
+            };
+
+            eventSource.onerror = function(event) {
+                updateConnectionStatus(false);
+                setTimeout(connectToStream, 5000); // Reconnect after 5 seconds
+            };
+        }
+
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            const statusIndicator = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('connectionText');
+            
+            if (connected) {
+                statusIndicator.className = 'status-indicator status-online pulse-animation';
+                statusText.textContent = 'Connected';
+            } else {
+                statusIndicator.className = 'status-indicator status-error';
+                statusText.textContent = 'Disconnected';
+            }
+        }
+
+        // Add log entry
+        function addLogEntry(logEntry) {
+            logs.push(logEntry);
+            updateLogStats(logEntry);
+            
+            if (shouldDisplayLog(logEntry)) {
+                displayLogEntry(logEntry);
+            }
+            
+            updateLogDisplay();
+        }
+
+        // Check if log should be displayed based on filters
+        function shouldDisplayLog(logEntry) {
+            const levelFilter = document.getElementById('logLevelFilter').value;
+            const typeFilter = document.getElementById('logTypeFilter').value;
+            
+            if (levelFilter !== 'all' && logEntry.color !== levelFilter) {
+                return false;
+            }
+            
+            if (typeFilter !== 'all' && logEntry.type !== typeFilter) {
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Display log entry
+        function displayLogEntry(logEntry) {
+            const logContainer = document.getElementById('logContainer');
+            const logElement = document.createElement('div');
+            const timestamp = new Date(logEntry.timestamp).toLocaleString();
+            
+            logElement.className = `log-entry log-${logEntry.color} p-3 mb-2 rounded-lg`;
+            logElement.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center mb-1">
+                            <span class="text-xs font-medium text-gray-500 mr-2">${timestamp}</span>
+                            <span class="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">${logEntry.level}</span>
+                            ${logEntry.logger ? `<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded ml-1">${logEntry.logger}</span>` : ''}
+                        </div>
+                        <div class="text-sm text-gray-800">${logEntry.message}</div>
+                        ${logEntry.module || logEntry.function ? `<div class="text-xs text-gray-500 mt-1">${logEntry.module}${logEntry.function ? '::' + logEntry.function : ''}${logEntry.line ? ':' + logEntry.line : ''}</div>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Remove placeholder if it exists
+            const placeholder = logContainer.querySelector('.text-center');
+            if (placeholder) {
+                placeholder.remove();
+            }
+            
+            logContainer.appendChild(logElement);
+            
+            // Auto-scroll if enabled
+            if (document.getElementById('autoScroll').checked) {
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+            
+            // Limit displayed logs to prevent memory issues
+            const logElements = logContainer.querySelectorAll('.log-entry');
+            if (logElements.length > 100) {
+                logElements[0].remove();
+            }
+        }
+
+        // Update system metrics
+        function updateSystemMetrics(metrics) {
+            if (!metrics) return;
+            
+            // Update CPU
+            document.getElementById('cpuUsage').textContent = `${metrics.cpu_percent.toFixed(1)}%`;
+            document.getElementById('cpuBar').style.width = `${metrics.cpu_percent}%`;
+            
+            // Update Memory
+            const memoryPercent = metrics.memory.percent;
+            const memoryUsedGB = (metrics.memory.used / (1024**3)).toFixed(1);
+            const memoryTotalGB = (metrics.memory.total / (1024**3)).toFixed(1);
+            
+            document.getElementById('memoryUsage').textContent = `${memoryPercent.toFixed(1)}%`;
+            document.getElementById('memoryBar').style.width = `${memoryPercent}%`;
+            document.getElementById('memoryDetails').textContent = `${memoryUsedGB} GB / ${memoryTotalGB} GB`;
+            
+            // Update Disk
+            const diskPercent = metrics.disk.percent;
+            const diskUsedGB = (metrics.disk.used / (1024**3)).toFixed(1);
+            const diskTotalGB = (metrics.disk.total / (1024**3)).toFixed(1);
+            
+            document.getElementById('diskUsage').textContent = `${diskPercent.toFixed(1)}%`;
+            document.getElementById('diskBar').style.width = `${diskPercent}%`;
+            document.getElementById('diskDetails').textContent = `${diskUsedGB} GB / ${diskTotalGB} GB`;
+            
+            // Update Process Count
+            document.getElementById('processCount').textContent = metrics.process_count;
+            
+            // Update Network
+            const networkSentMB = (metrics.network.bytes_sent / (1024**2)).toFixed(1);
+            const networkReceivedMB = (metrics.network.bytes_recv / (1024**2)).toFixed(1);
+            
+            document.getElementById('networkSent').textContent = `${networkSentMB} MB`;
+            document.getElementById('networkReceived').textContent = `${networkReceivedMB} MB`;
+            
+            // Update performance chart
+            updatePerformanceChart(metrics);
+        }
+
+        // Update performance chart
+        function updatePerformanceChart(metrics) {
+            const now = new Date().toLocaleTimeString();
+            performanceData.labels.push(now);
+            performanceData.cpu.push(metrics.cpu_percent);
+            performanceData.memory.push(metrics.memory.percent);
+            
+            // Keep only last 20 data points
+            if (performanceData.labels.length > 20) {
+                performanceData.labels.shift();
+                performanceData.cpu.shift();
+                performanceData.memory.shift();
+            }
+            
+            charts.performance.data.labels = performanceData.labels;
+            charts.performance.data.datasets[0].data = performanceData.cpu;
+            charts.performance.data.datasets[1].data = performanceData.memory;
+            charts.performance.update('none');
+        }
+
+        // Update log statistics
+        function updateLogStats(logEntry) {
+            logStats.total++;
+            
+            if (logEntry.type === 'error') logStats.errors++;
+            else if (logEntry.type === 'warning') logStats.warnings++;
+            else if (logEntry.type === 'request') logStats.requests++;
+            
+            document.getElementById('totalLogs').textContent = logStats.total;
+            document.getElementById('errorCount').textContent = logStats.errors;
+            document.getElementById('warningCount').textContent = logStats.warnings;
+            document.getElementById('requestCount').textContent = logStats.requests;
+        }
+
+        // Update log display based on filters
+        function updateLogDisplay() {
+            const logContainer = document.getElementById('logContainer');
+            const displayedLogs = logContainer.querySelectorAll('.log-entry');
+            document.getElementById('logCount').textContent = `${displayedLogs.length} entries`;
+        }
+
+        // Clear logs
+        function clearLogs() {
+            if (confirm('Are you sure you want to clear all logs?')) {
+                fetch('/api/admin/logs/clear', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        logs = [];
+                        logStats = { total: 0, errors: 0, warnings: 0, requests: 0 };
+                        document.getElementById('logContainer').innerHTML = '<div class="text-center text-gray-500 py-8"><i class="fas fa-hourglass-half text-2xl mb-2"></i><p>Waiting for logs...</p></div>';
+                        updateLogDisplay();
+                        
+                        // Reset stats
+                        document.getElementById('totalLogs').textContent = '0';
+                        document.getElementById('errorCount').textContent = '0';
+                        document.getElementById('warningCount').textContent = '0';
+                        document.getElementById('requestCount').textContent = '0';
+                    })
+                    .catch(error => console.error('Error clearing logs:', error));
+            }
+        }
+
+        // Filter change handlers
+        document.getElementById('logLevelFilter').addEventListener('change', function() {
+            refreshLogDisplay();
+        });
+
+        document.getElementById('logTypeFilter').addEventListener('change', function() {
+            refreshLogDisplay();
+        });
+
+        // Refresh log display with current filters
+        function refreshLogDisplay() {
+            const logContainer = document.getElementById('logContainer');
+            logContainer.innerHTML = '';
+            
+            const filteredLogs = logs.filter(shouldDisplayLog);
+            if (filteredLogs.length === 0) {
+                logContainer.innerHTML = '<div class="text-center text-gray-500 py-8"><i class="fas fa-filter text-2xl mb-2"></i><p>No logs match the current filters</p></div>';
+            } else {
+                filteredLogs.forEach(displayLogEntry);
+            }
+            
+            updateLogDisplay();
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            connectToStream();
+            
+            // Load initial logs
+            fetch('/api/admin/logs/recent?limit=50')
+                .then(response => response.json())
+                .then(data => {
+                    data.logs.forEach(addLogEntry);
+                })
+                .catch(error => console.error('Error loading initial logs:', error));
+            
+            // Load initial system metrics
+            fetch('/api/admin/system/metrics')
+                .then(response => response.json())
+                .then(data => {
+                    updateSystemMetrics(data);
+                })
+                .catch(error => console.error('Error loading system metrics:', error));
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (eventSource) {
+                eventSource.close();
+            }
+        });
+    </script>
+</body>
+</html>

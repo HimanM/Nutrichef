@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { authenticatedFetch } from '../../utils/apiUtil.js';
-import { useAuth } from '../../context/AuthContext.jsx';
-import InteractiveModal from '../ui/InteractiveModal.jsx';
-import ResponsiveModal from '../ui/ResponsiveModal.jsx';
+import { authenticatedFetch } from '../../../utils/apiUtil.js';
+import { useAuth } from '../../../context/AuthContext.jsx';
+import InteractiveModal from '../../ui/InteractiveModal.jsx';
+import ResponsiveModal from '../../ui/ResponsiveModal.jsx';
 import { MdAddCircleOutline } from 'react-icons/md';
 import RecipeSubmissionViews from './RecipeSubmissionViews.jsx';
 

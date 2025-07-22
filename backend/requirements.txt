@@ -16,3 +16,4 @@ keras>=3.0.0
 keras-nightly
 Pillow
 tensorflow-hub>=0.13.0
+psutil>=5.9.0

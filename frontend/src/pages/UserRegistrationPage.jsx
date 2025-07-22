@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { HiOutlineUser, HiOutlineMail, HiOutlineLockClosed, HiOutlineArrowRight, HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
 
-const UserRegistration = () => {
+const UserRegistrationPage = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -257,4 +257,4 @@ const UserRegistration = () => {
     );
 };
 
-export default UserRegistration;
+export default UserRegistrationPage;

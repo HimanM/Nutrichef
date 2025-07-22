@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
-import RecipeCard from '../components/recipe/RecipeCard.jsx'; // Tailwind version
+import { useConditionalAuth } from '../components/auth/AuthGuard.jsx';
+import RecipeCard from '../components/pages/recipe/RecipeCard.jsx'; // Tailwind version
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { HiOutlineRefresh } from 'react-icons/hi';
 
@@ -10,6 +11,7 @@ function PersonalizedRecipesPage() {
     const [error, setError] = useState(null);
     const auth = useAuth();
     const { isAuthenticated, loading: authLoading, currentUser, token } = auth;
+    const { canPerformAuthAction, isSessionExpired } = useConditionalAuth();
 
     const [currentPage, setCurrentPage] = useState(1);
     const [recipesPerPage, setRecipesPerPage] = useState(12); // Changed to 12 for better 3-column layout
@@ -81,7 +83,8 @@ function PersonalizedRecipesPage() {
         );
     }
     
-    if (!isAuthenticated) {
+    // Don't show the login message if session has expired (global modal handles it)
+    if (!isAuthenticated && !isSessionExpired) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex items-center justify-center">
                 <div className="max-w-md mx-auto p-6">
@@ -96,6 +99,18 @@ function PersonalizedRecipesPage() {
                             <p className="text-gray-600">Please log in to view your personalized recipes.</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Show loading spinner if session has expired (let global modal handle it)
+    if (!isAuthenticated && isSessionExpired) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Checking authentication...</p>
                 </div>
             </div>
         );

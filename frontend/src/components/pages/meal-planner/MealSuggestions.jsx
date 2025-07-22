@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { MdLightbulb, MdAdd, MdClose, MdRefresh, MdExpandMore, MdExpandLess } from 'react-icons/md';
 import { HiOutlineSparkles, HiOutlineX } from 'react-icons/hi';
-import { authenticatedFetch } from '../../utils/apiUtil.js';
-import { useAuth } from '../../context/AuthContext.jsx';
+import { authenticatedFetch } from '../../../utils/apiUtil.js';
+import { useAuth } from '../../../context/AuthContext.jsx';
 import { format } from 'date-fns';
-import MobileModal from '../ui/MobileModal.jsx';
+import MobileModal from '../../ui/MobileModal.jsx';
 
 const MealSuggestions = ({ 
   selectedDate, 

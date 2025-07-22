@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { HiOutlineUserCircle, HiMenu, HiOutlineLogin, HiOutlineUserAdd, HiOutlineLogout, HiX, HiChevronDown } from 'react-icons/hi';
@@ -12,11 +12,33 @@ const NavigationBar = () => {
   const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
   const toolsDropdownTimeout = useRef(null);
+  const navRef = useRef(null);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) {
+        setIsMobileMenuOpen(false);
+        setToolsDropdownOpen(false);
+        setMobileToolsOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen || toolsDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isMobileMenuOpen, toolsDropdownOpen]);
 
   if (isAdmin && location.pathname.startsWith('/admin')) {
     return null;
@@ -50,7 +72,7 @@ const NavigationBar = () => {
   ];
 
   return (
-    <nav className="glass sticky top-0 z-50 border-b border-white/20 shadow-soft backdrop-blur-xl">
+    <nav ref={navRef} className="glass sticky top-0 z-50 border-b border-white/20 shadow-soft backdrop-blur-xl">
       <div className="container-modern">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -151,10 +173,10 @@ const NavigationBar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="lg:hidden">
+          <div className="lg:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="btn-ghost p-2"
+              className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100"
               aria-label="Toggle mobile menu"
             >
               {isMobileMenuOpen ? (
@@ -168,9 +190,8 @@ const NavigationBar = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden animate-slide-in">
-            <div className="glass mt-2 rounded-xl border border-white/20 shadow-soft">
-              <div className="px-4 py-2 space-y-1">
+          <div className="lg:hidden bg-white/95 backdrop-blur-sm border-t border-white/20 shadow-lg absolute left-0 right-0 top-16 z-40 rounded-b-2xl">
+            <div className="px-4 py-3 space-y-1">
                 {navLinks.map((link) => (
                   <Link
                     key={link.to}
@@ -291,7 +312,6 @@ const NavigationBar = () => {
                 )}
               </div>
             </div>
-          </div>
         )}
       </div>
     </nav>

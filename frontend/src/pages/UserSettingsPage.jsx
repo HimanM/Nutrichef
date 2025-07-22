@@ -24,17 +24,19 @@ const UserSettingsPage = () => {
     const { currentUser: authContextUser, token, showExpiryMessageAndLogout, loading: authLoading } = auth;
     const [userId, setUserId] = useState(null);
     const [userName, setUserName] = useState('User');
+    const [userEmail, setUserEmail] = useState('');
     const { showModal } = useModal();
     const navigate = useNavigate();
 
     useEffect(() => {
-        let effectiveUserId = null; let userIdSource = 'default'; let resolvedUserName = 'User';
+        let effectiveUserId = null; let userIdSource = 'default'; let resolvedUserName = 'User'; let resolvedUserEmail = '';
         const storedUser = localStorage.getItem('currentUser');
         if (storedUser) {
             try {
                 const u = JSON.parse(storedUser);
                 effectiveUserId = String(u.UserID || u.id); userIdSource = 'localStorage';
                 resolvedUserName = u.Name || u.Email?.split('@')[0] || `User ID: ${effectiveUserId}`;
+                resolvedUserEmail = u.Email || '';
             } catch (e) { 
                 console.error("Error parsing stored user data:", e);
                 // Continue with auth context
@@ -43,6 +45,7 @@ const UserSettingsPage = () => {
         if (!effectiveUserId && authContextUser) {
             effectiveUserId = String(authContextUser.UserID || authContextUser.id); userIdSource = 'AuthContext';
             resolvedUserName = authContextUser.Name || authContextUser.Email?.split('@')[0] || `User ID: ${effectiveUserId}`;
+            resolvedUserEmail = authContextUser.Email || '';
         }
         if (effectiveUserId) { 
             setUserId(effectiveUserId);
@@ -51,6 +54,7 @@ const UserSettingsPage = () => {
             showModal('Error', 'We could not determine your user information. Some features may not work as expected.');
         }
         setUserName(resolvedUserName);
+        setUserEmail(resolvedUserEmail);
     }, [authContextUser]);
 
     const fetchAllData = useCallback(async () => {
@@ -164,6 +168,10 @@ const UserSettingsPage = () => {
 
                     {/* Content */}
                     <UserSettingsViews 
+                        // User info props
+                        userName={userName}
+                        userEmail={userEmail}
+                        
                         // Allergies props
                         allAllergies={allAllergies}
                         selectedAllergyIds={selectedAllergyIds}
