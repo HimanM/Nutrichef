@@ -121,7 +121,7 @@ function RecipeManagementPage() {
     { 
       key: 'is_public', 
       label: 'Visibility', 
-      sortable: false,
+      sortable: true,
       render: (recipe) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           recipe.is_public ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
