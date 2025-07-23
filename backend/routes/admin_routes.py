@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, Response, stream_template, render_template # Added request back
 from functools import wraps
 from backend.services.admin_service import AdminService
+from backend.services.recipe_comment_service import RecipeCommentService
 from flask_jwt_extended import jwt_required, get_current_user
 from backend.utils.log_monitor import log_monitor
 from backend.dao.user_dao import UserDAO
@@ -10,6 +11,7 @@ import uuid
 
 admin_bp = Blueprint('admin_bp', __name__, url_prefix='/api/admin')
 admin_service = AdminService()
+comment_service = RecipeCommentService()
 
 def admin_required(fn):
     @wraps(fn)
@@ -229,3 +231,34 @@ def get_system_info():
         return jsonify(system_info)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@admin_bp.route('/comments', methods=['GET'])
+@admin_required
+def get_all_comments():
+    """Get all comments for admin management"""
+    try:
+        page = request.args.get('page', 1, type=int)
+        limit = request.args.get('limit', 20, type=int)
+        
+        data, error, status = comment_service.get_all_comments_for_admin(page, limit)
+        
+        if error:
+            return jsonify(error), status
+        return jsonify(data), status
+        
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch comments'}), 500
+
+@admin_bp.route('/comments/<int:comment_id>', methods=['DELETE'])
+@admin_required
+def admin_delete_comment(comment_id):
+    """Admin delete a comment"""
+    try:
+        data, error, status = comment_service.admin_delete_comment(comment_id)
+        
+        if error:
+            return jsonify(error), status
+        return jsonify(data), status
+        
+    except Exception as e:
+        return jsonify({'error': 'Failed to delete comment'}), 500

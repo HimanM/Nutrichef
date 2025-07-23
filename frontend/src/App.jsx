@@ -38,6 +38,7 @@ import AdminLayoutPage from './pages/admin/AdminLayoutPage.jsx';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx';
 import UserManagementPage from './pages/admin/UserManagementPage.jsx';
 import RecipeManagementPage from './pages/admin/RecipeManagementPage.jsx';
+import CommentManagementPage from './pages/admin/CommentManagementPage.jsx';
 import ClassificationScoresPage from './pages/admin/ClassificationScoresPage.jsx';
 import AdminContactMessagesPage from './pages/admin/AdminContactMessagesPage.jsx';
 import AdminLogsMonitorPage from './pages/admin/AdminLogsMonitorPage.jsx';
@@ -103,6 +104,7 @@ function App() {
                             <Route index element={<AdminDashboardPage />} />
                             <Route path="users" element={<UserManagementPage />} />
                             <Route path="recipes" element={<RecipeManagementPage />} />
+                            <Route path="comments" element={<CommentManagementPage />} />
                             <Route path="classification-scores" element={<ClassificationScoresPage />} />
                             <Route path="contact-messages" element={<AdminContactMessagesPage />} />
                             <Route path="logs-monitor" element={<AdminLogsMonitorPage />} />

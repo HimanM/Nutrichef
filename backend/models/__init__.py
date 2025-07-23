@@ -11,6 +11,7 @@ from .contact_message import ContactMessage
 from .recipe_rating import RecipeRating
 from .user_favorite_recipe import UserFavoriteRecipe
 from .recipe_tag import RecipeTag, RecipeTagAssignment
+from .recipe_comment import RecipeComment
 
 __all__ = [
     'User',
@@ -27,5 +28,6 @@ __all__ = [
     'RecipeRating',
     'UserFavoriteRecipe',
     'RecipeTag',
-    'RecipeTagAssignment'
+    'RecipeTagAssignment',
+    'RecipeComment'
 ]

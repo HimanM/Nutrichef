@@ -5,7 +5,8 @@ import RecipeDetailPopup from '../../components/admin/RecipeDetailPopup.jsx';
 import { authenticatedFetch } from '../../utils/apiUtil.js';
 import { PageLoaderSpinner } from '../../components/common/LoadingComponents.jsx';
 import ResponsiveTable from '../../components/admin/ResponsiveTable.jsx';
-import { HiTrash, HiEye } from 'react-icons/hi';
+import { HiTrash, HiEye, HiChat } from 'react-icons/hi';
+import { Link } from 'react-router-dom';
 
 function RecipeManagementPage() {
   const authContextValue = useAuth();
@@ -177,7 +178,18 @@ function RecipeManagementPage() {
       <div className="container-modern">
         <div className="text-center mb-10 animate-fade-in">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Recipe Management</h1>
-          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">View and manage user-submitted recipes.</p>
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-4">View and manage user-submitted recipes.</p>
+          
+          {/* Quick Action Links */}
+          <div className="flex justify-center gap-4 mt-6">
+            <Link 
+              to="/admin/comments"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors font-medium"
+            >
+              <HiChat className="w-5 h-5" />
+              Manage Comments
+            </Link>
+          </div>
         </div>
         
         {actionError && (
