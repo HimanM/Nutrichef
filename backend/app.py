@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from .db import db
 from .config import Config
 from . import models
-from .models import User, Recipe, Ingredient, RecipeIngredient, Substitution, ClassificationResult, UserMealPlan
+from .models import User, Recipe, Ingredient, RecipeIngredient, ClassificationResult, UserMealPlan
 from .dao import UserDAO, IngredientDAO, RecipeDAO
 from .services import UserService, RecipeService
 from flask_jwt_extended import JWTManager, get_jwt_identity
@@ -185,7 +185,6 @@ def make_shell_context():
         'Recipe': Recipe,
         'Ingredient': Ingredient,
         'RecipeIngredient': RecipeIngredient,
-        'Substitution': Substitution,
         'ClassificationResult': ClassificationResult,
         'UserDAO': UserDAO,
         'IngredientDAO': IngredientDAO,

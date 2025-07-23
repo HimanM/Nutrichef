@@ -576,7 +576,7 @@ function RecipeDetailPage() {
                       className="text-emerald-600 hover:underline"
                     >
                       Log in
-                    </button> to rate this recipe.
+                    </button> to rate and comment on this recipe.
                   </p>
                 </div>
               )}

@@ -2,7 +2,6 @@ from .user import User
 from .ingredient import Ingredient
 from .recipe import Recipe
 from .recipe_ingredient import RecipeIngredient
-from .substitution import Substitution
 from .classification_result import ClassificationResult
 from .allergy_intolerance import AllergyIntolerance, UserAllergy
 from .meal_plan import UserMealPlan
@@ -18,7 +17,6 @@ __all__ = [
     'Ingredient',
     'Recipe',
     'RecipeIngredient',
-    'Substitution',
     'ClassificationResult',
     'AllergyIntolerance',
     'UserAllergy',

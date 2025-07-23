@@ -251,15 +251,6 @@ const RecipeComments = ({ recipeId, className = '' }) => {
                 </div>
             )}
             
-            {!loading && !isAuthenticated && (
-                <div className="mb-6 p-3 bg-gray-50 rounded-lg text-center">
-                    <p className="text-gray-600 text-sm">
-                        <a href="/login" className="text-emerald-600 hover:underline">
-                            Log in
-                        </a> to share your thoughts about this recipe
-                    </p>
-                </div>
-            )}
 
             {/* Error Message */}
             {error && (

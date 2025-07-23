@@ -850,24 +850,6 @@ INSERT INTO `Recipes` (`RecipeID`, `UserID`, `Title`, `Description`, `Instructio
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Substitutions`
---
-
-DROP TABLE IF EXISTS `Substitutions`;
-CREATE TABLE IF NOT EXISTS `Substitutions` (
-  `SubstitutionID` int NOT NULL AUTO_INCREMENT,
-  `OriginalIngredientID` int NOT NULL,
-  `SubstituteIngredientID` int NOT NULL,
-  `Notes` text,
-  `CreatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`SubstitutionID`),
-  KEY `OriginalIngredientID` (`OriginalIngredientID`),
-  KEY `SubstituteIngredientID` (`SubstituteIngredientID`)
-);
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `UserAllergies`
 --
 
