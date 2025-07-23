@@ -333,6 +333,25 @@ INSERT INTO `Ingredients` (`IngredientID`, `Name`, `CreatedAt`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `RecipeComments`
+--
+
+DROP TABLE IF EXISTS `RecipeComments`;
+CREATE TABLE IF NOT EXISTS `RecipeComments` (
+  `CommentID` int NOT NULL AUTO_INCREMENT,
+  `RecipeID` int NOT NULL,
+  `UserID` int NOT NULL,
+  `Comment` text NOT NULL,
+  `IsEdited` tinyint(1) NOT NULL DEFAULT '0',
+  `CreatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `UpdatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`CommentID`),
+  UNIQUE KEY `uq_recipe_user_comment` (`RecipeID`,`UserID`),
+  KEY `UserID` (`UserID`),
+  KEY `idx_recipe_comments_recipe_created` (`RecipeID`,`CreatedAt`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
 -- Table structure for table `RecipeIngredients`
 --
 
@@ -831,24 +850,6 @@ INSERT INTO `Recipes` (`RecipeID`, `UserID`, `Title`, `Description`, `Instructio
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Substitutions`
---
-
-DROP TABLE IF EXISTS `Substitutions`;
-CREATE TABLE IF NOT EXISTS `Substitutions` (
-  `SubstitutionID` int NOT NULL AUTO_INCREMENT,
-  `OriginalIngredientID` int NOT NULL,
-  `SubstituteIngredientID` int NOT NULL,
-  `Notes` text,
-  `CreatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`SubstitutionID`),
-  KEY `OriginalIngredientID` (`OriginalIngredientID`),
-  KEY `SubstituteIngredientID` (`SubstituteIngredientID`)
-);
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `UserAllergies`
 --
 
@@ -945,7 +946,14 @@ INSERT INTO `Users` (`UserID`, `Name`, `Email`, `PasswordHash`, `DietaryPreferen
 -- Constraints for table `ClassificationResults`
 --
 ALTER TABLE `ClassificationResults`
-  ADD CONSTRAINT `ClassificationResults_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE SET NULL;
+  ADD CONSTRAINT `classificationresults_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `RecipeComments`
+--
+ALTER TABLE `RecipeComments`
+  ADD CONSTRAINT `recipecomments_ibfk_1` FOREIGN KEY (`RecipeID`) REFERENCES `recipes` (`RecipeID`) ON DELETE CASCADE,
+  ADD CONSTRAINT `recipecomments_ibfk_2` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `RecipeIngredients`

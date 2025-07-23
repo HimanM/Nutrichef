@@ -8,6 +8,7 @@ import { PageLoaderSpinner, InlineSpinner } from '../components/common/LoadingCo
 import StarRating from '../components/ui/StarRating';
 import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
 import InteractiveModal from '../components/ui/InteractiveModal.jsx';
+import RecipeComments from '../components/pages/recipe/RecipeComments.jsx';
 import { FiLock, FiUnlock } from 'react-icons/fi';
 
 const SHOPPING_BASKET_KEY = 'shoppingBasketItems';
@@ -575,10 +576,15 @@ function RecipeDetailPage() {
                       className="text-emerald-600 hover:underline"
                     >
                       Log in
-                    </button> to rate this recipe.
+                    </button> to rate and comment on this recipe.
                   </p>
                 </div>
               )}
+            </div>
+
+            {/* Comments Section */}
+            <div className="my-8 pt-6 border-t border-emerald-100">
+              <RecipeComments recipeId={recipeId} />
             </div>
           </div>
         </div>
