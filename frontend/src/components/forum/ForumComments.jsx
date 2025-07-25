@@ -169,35 +169,57 @@ const ForumComments = ({
             <p className="text-gray-600">Be the first to share your thoughts!</p>
           </div>
         ) : (
-          comments.map((comment) => (
-            <div key={comment.Id} className="px-6 py-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-emerald-700 font-medium text-sm">
-                    {comment.UserName?.charAt(0)?.toUpperCase() || 'U'}
+          <div className={`${comments.length > 5 ? 'max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' : ''}`}>
+            {/* Show indicator if there are more than 5 comments */}
+            {comments.length > 5 && (
+              <div className="px-6 py-3 bg-gradient-to-r from-emerald-50 to-blue-50 text-center border-b border-gray-100">
+                <div className="flex items-center justify-center gap-2">
+                  <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
+                  <span className="text-sm text-gray-700 font-medium">
+                    {comments.length} comments - scroll to view all
                   </span>
+                  <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-gray-900">{comment.UserName || 'Unknown User'}</span>
-                    <span className="text-sm text-gray-500">{formatDate(comment.CreatedAt)}</span>
-                  </div>
-                  <p className="text-gray-700 whitespace-pre-wrap">{comment.Comment}</p>
-                </div>
-                {canDeleteComment(comment) && (
-                  <button
-                    onClick={() => handleDeleteComment(comment.Id)}
-                    className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                    title="Delete comment"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                )}
               </div>
+            )}
+            
+            {/* All comments */}
+            <div className="divide-y divide-gray-100">
+              {comments.map((comment) => (
+                <div key={comment.Id} className="px-6 py-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-emerald-700 font-medium text-sm">
+                        {comment.UserName?.charAt(0)?.toUpperCase() || 'U'}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-gray-900">{comment.UserName || 'Unknown User'}</span>
+                        <span className="text-sm text-gray-500">{formatDate(comment.CreatedAt)}</span>
+                      </div>
+                      <p className="text-gray-700 whitespace-pre-wrap">{comment.Comment}</p>
+                    </div>
+                    {canDeleteComment(comment) && (
+                      <button
+                        onClick={() => handleDeleteComment(comment.Id)}
+                        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        title="Delete comment"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))
+          </div>
         )}
       </div>
 

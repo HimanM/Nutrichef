@@ -12,7 +12,7 @@ const ForumPostDetailPage = () => {
   const auth = useAuth();
   const { isAuthenticated, currentUser } = auth;
   const { showAlert } = useModal();
-  
+
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,7 +28,7 @@ const ForumPostDetailPage = () => {
     try {
       setLoading(true);
       let response;
-      
+
       // Use authenticatedFetch if user is authenticated to get like status
       if (isAuthenticated) {
         response = await authenticatedFetch(`/api/forum/posts/${postId}`, {
@@ -63,7 +63,8 @@ const ForumPostDetailPage = () => {
     try {
       setCommentsLoading(true);
       // Use regular fetch for public endpoint (no auth required for viewing comments)
-      const response = await fetch(`/api/forum/posts/${postId}/comments?page=${page}&per_page=20`, {
+      // Fetch more comments initially to populate the scrollable area
+      const response = await fetch(`/api/forum/posts/${postId}/comments?page=${page}&per_page=50`, {
         method: 'GET'
       });
 
@@ -157,42 +158,42 @@ const ForumPostDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 pb-8">
       <div className="pt-4">
         <div className="container-modern">
-        {/* Back Button */}
-        <button
-          onClick={() => navigate('/forum')}
-          className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 mb-6 transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Forum
-        </button>
+          {/* Back Button */}
+          <button
+            onClick={() => navigate('/forum')}
+            className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 mb-6 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Forum
+          </button>
 
-        <div className="max-w-4xl mx-auto">
-          {/* Post Detail */}
-          <ForumPostDetail
-            post={post}
-            onLikeToggle={handleLikeToggle}
-            onPostDeleted={handlePostDeleted}
-            currentUser={currentUser}
-          />
+          <div className="max-w-4xl mx-auto">
+            {/* Post Detail */}
+            <ForumPostDetail
+              post={post}
+              onLikeToggle={handleLikeToggle}
+              onPostDeleted={handlePostDeleted}
+              currentUser={currentUser}
+            />
 
-          {/* Comments Section */}
-          <ForumComments
-            postId={postId}
-            comments={comments}
-            loading={commentsLoading}
-            pagination={commentsPagination}
-            onCommentAdded={handleCommentAdded}
-            onCommentDeleted={handleCommentDeleted}
-            onLoadMore={() => fetchComments(commentsPagination.page + 1)}
-            isAuthenticated={isAuthenticated}
-            currentUser={currentUser}
-          />
-        </div>
+            {/* Comments Section */}
+            <ForumComments
+              postId={postId}
+              comments={comments}
+              loading={commentsLoading}
+              pagination={commentsPagination}
+              onCommentAdded={handleCommentAdded}
+              onCommentDeleted={handleCommentDeleted}
+              onLoadMore={() => fetchComments(commentsPagination.page + 1)}
+              isAuthenticated={isAuthenticated}
+              currentUser={currentUser}
+            />
+          </div>
         </div>
       </div>
     </div>
