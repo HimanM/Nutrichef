@@ -220,13 +220,22 @@ class ForumDAO:
         except Exception as e:
             raise e
 
-    def get_all_posts_for_admin(self, page=1, per_page=20):
+    def get_all_posts_for_admin(self, page=1, per_page=20, sort_by='Id', sort_order='desc'):
         """Get all forum posts for admin management"""
         try:
-            return ForumPost.query.options(
+            query = ForumPost.query.options(
                 joinedload(ForumPost.user),
                 joinedload(ForumPost.tags).joinedload(ForumPostTag.recipe)
-            ).order_by(desc(ForumPost.CreatedAt)).paginate(
+            )
+            
+            # Apply sorting
+            sort_column = getattr(ForumPost, sort_by, ForumPost.Id)
+            if sort_order == 'desc':
+                query = query.order_by(desc(sort_column))
+            else:
+                query = query.order_by(sort_column)
+                
+            return query.paginate(
                 page=page,
                 per_page=per_page,
                 error_out=False
@@ -234,13 +243,22 @@ class ForumDAO:
         except Exception as e:
             raise e
 
-    def get_all_comments_for_admin(self, page=1, per_page=20):
+    def get_all_comments_for_admin(self, page=1, per_page=20, sort_by='Id', sort_order='desc'):
         """Get all forum comments for admin management"""
         try:
-            return ForumComment.query.options(
+            query = ForumComment.query.options(
                 joinedload(ForumComment.user),
                 joinedload(ForumComment.post)
-            ).order_by(desc(ForumComment.CreatedAt)).paginate(
+            )
+            
+            # Apply sorting
+            sort_column = getattr(ForumComment, sort_by, ForumComment.Id)
+            if sort_order == 'desc':
+                query = query.order_by(desc(sort_column))
+            else:
+                query = query.order_by(sort_column)
+                
+            return query.paginate(
                 page=page,
                 per_page=per_page,
                 error_out=False

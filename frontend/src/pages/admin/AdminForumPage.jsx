@@ -1,122 +1,198 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
 import { authenticatedFetch } from '../../utils/apiUtil';
+import ResponsiveTable from '../../components/admin/ResponsiveTable';
+import { HiTrash, HiEye, HiChat, HiHeart } from 'react-icons/hi';
+import { PageLoaderSpinner } from '../../components/common/LoadingComponents';
 
 const AdminForumPage = () => {
-  const auth = useAuth();
-  const { showAlert } = useModal();
+  const authContextValue = useAuth();
+  const { showModal, setLoading: setModalLoading } = useModal();
   const [activeTab, setActiveTab] = useState('posts');
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState([]);
-  const [postsLoading, setPostsLoading] = useState(false);
-  const [commentsLoading, setCommentsLoading] = useState(false);
-  const [postsPagination, setPostsPagination] = useState({});
-  const [commentsPagination, setCommentsPagination] = useState({});
-  const [postsPage, setPostsPage] = useState(1);
-  const [commentsPage, setCommentsPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [actionError, setActionError] = useState(null);
+  
+  // Posts pagination and sorting
+  const [postsPage, setPostsPage] = useState(0); // 0-indexed for consistency
+  const [postsRowsPerPage, setPostsRowsPerPage] = useState(10);
+  const [postsTotalCount, setPostsTotalCount] = useState(0);
+  const [postsSortColumn, setPostsSortColumn] = useState('Id');
+  const [postsSortDirection, setPostsSortDirection] = useState('desc');
+  
+  // Comments pagination and sorting
+  const [commentsPage, setCommentsPage] = useState(0); // 0-indexed for consistency
+  const [commentsRowsPerPage, setCommentsRowsPerPage] = useState(10);
+  const [commentsTotalCount, setCommentsTotalCount] = useState(0);
+  const [commentsSortColumn, setCommentsSortColumn] = useState('Id');
+  const [commentsSortDirection, setCommentsSortDirection] = useState('desc');
+
+  const fetchPosts = useCallback(async (currentPage, currentRowsPerPage, currentSortColumn, currentSortDirection) => {
+    setLoading(true);
+    setError(null);
+    const backendPage = currentPage + 1; // Convert to 1-indexed for backend
+    
+    try {
+      const response = await authenticatedFetch(
+        `/api/admin/forum/posts?page=${backendPage}&per_page=${currentRowsPerPage}&sort_by=${currentSortColumn}&sort_order=${currentSortDirection}`,
+        { method: 'GET' },
+        authContextValue
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to fetch posts: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setPosts(data.posts || []);
+      setPostsTotalCount(data.pagination?.total || 0);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error fetching posts:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [authContextValue]);
+
+  const fetchComments = useCallback(async (currentPage, currentRowsPerPage, currentSortColumn, currentSortDirection) => {
+    setLoading(true);
+    setError(null);
+    const backendPage = currentPage + 1; // Convert to 1-indexed for backend
+    
+    try {
+      const response = await authenticatedFetch(
+        `/api/admin/forum/comments?page=${backendPage}&per_page=${currentRowsPerPage}&sort_by=${currentSortColumn}&sort_order=${currentSortDirection}`,
+        { method: 'GET' },
+        authContextValue
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to fetch comments: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setComments(data.comments || []);
+      setCommentsTotalCount(data.pagination?.total || 0);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error fetching comments:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [authContextValue]);
 
   useEffect(() => {
     if (activeTab === 'posts') {
-      fetchPosts();
+      fetchPosts(postsPage, postsRowsPerPage, postsSortColumn, postsSortDirection);
     } else {
-      fetchComments();
+      fetchComments(commentsPage, commentsRowsPerPage, commentsSortColumn, commentsSortDirection);
     }
-  }, [activeTab, postsPage, commentsPage]);
+  }, [activeTab, postsPage, postsRowsPerPage, postsSortColumn, postsSortDirection, 
+      commentsPage, commentsRowsPerPage, commentsSortColumn, commentsSortDirection, 
+      fetchPosts, fetchComments]);
 
-  const fetchPosts = async () => {
-    try {
-      setPostsLoading(true);
-      const response = await authenticatedFetch(`/api/admin/forum/posts?page=${postsPage}&per_page=20`, {
-        method: 'GET'
-      }, auth);
-
-      if (response.ok) {
-        const data = await response.json();
-        setPosts(data.posts);
-        setPostsPagination(data.pagination);
-      } else {
-        throw new Error('Failed to fetch posts');
-      }
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      showAlert('Error', 'Failed to load forum posts. Please try again.');
-    } finally {
-      setPostsLoading(false);
+  // Sorting handlers
+  const handlePostsSort = (columnKey) => {
+    if (postsSortColumn === columnKey) {
+      setPostsSortDirection(prevDirection => prevDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setPostsSortColumn(columnKey);
+      setPostsSortDirection('asc');
     }
+    setPostsPage(0);
   };
 
-  const fetchComments = async () => {
-    try {
-      setCommentsLoading(true);
-      const response = await authenticatedFetch(`/api/admin/forum/comments?page=${commentsPage}&per_page=20`, {
-        method: 'GET'
-      }, auth);
-
-      if (response.ok) {
-        const data = await response.json();
-        setComments(data.comments);
-        setCommentsPagination(data.pagination);
-      } else {
-        throw new Error('Failed to fetch comments');
-      }
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-      showAlert('Error', 'Failed to load forum comments. Please try again.');
-    } finally {
-      setCommentsLoading(false);
+  const handleCommentsSort = (columnKey) => {
+    if (commentsSortColumn === columnKey) {
+      setCommentsSortDirection(prevDirection => prevDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setCommentsSortColumn(columnKey);
+      setCommentsSortDirection('asc');
     }
+    setCommentsPage(0);
+  };
+
+  // Pagination handlers
+  const handlePostsPageChange = (newPage) => setPostsPage(newPage - 1); // Convert to 0-indexed
+  const handlePostsRowsPerPageChange = (event) => {
+    setPostsRowsPerPage(parseInt(event.target.value, 10));
+    setPostsPage(0);
+  };
+
+  const handleCommentsPageChange = (newPage) => setCommentsPage(newPage - 1); // Convert to 0-indexed
+  const handleCommentsRowsPerPageChange = (event) => {
+    setCommentsRowsPerPage(parseInt(event.target.value, 10));
+    setCommentsPage(0);
   };
 
   const handleDeletePost = async (postId) => {
-    const confirmed = await showAlert(
-      'Confirm Delete',
-      'Are you sure you want to delete this post? This action cannot be undone.',
-      { iconType: 'warning' }
+    setActionError(null);
+    
+    const confirmed = await showModal(
+      'confirm',
+      'Delete Post',
+      'Are you sure you want to delete this post? This action cannot be undone.'
     );
 
     if (!confirmed) return;
 
     try {
+      setModalLoading(true);
       const response = await authenticatedFetch(`/api/admin/forum/posts/${postId}`, {
         method: 'DELETE'
-      }, auth);
+      }, authContextValue);
 
-      if (response.ok) {
-        setPosts(prev => prev.filter(post => post.Id !== postId));
-        showAlert('Success', 'Post deleted successfully!', { iconType: 'success' });
-      } else {
-        throw new Error('Failed to delete post');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to delete post');
       }
+
+      // Refresh the current page
+      fetchPosts(postsPage, postsRowsPerPage, postsSortColumn, postsSortDirection);
+      await showModal('alert', 'Success', 'Post deleted successfully!');
     } catch (error) {
       console.error('Error deleting post:', error);
-      showAlert('Error', 'Failed to delete post. Please try again.');
+      setActionError(error.message);
+    } finally {
+      setModalLoading(false);
     }
   };
 
   const handleDeleteComment = async (commentId) => {
-    const confirmed = await showAlert(
-      'Confirm Delete',
-      'Are you sure you want to delete this comment? This action cannot be undone.',
-      { iconType: 'warning' }
+    setActionError(null);
+    
+    const confirmed = await showModal(
+      'confirm',
+      'Delete Comment',
+      'Are you sure you want to delete this comment? This action cannot be undone.'
     );
 
     if (!confirmed) return;
 
     try {
+      setModalLoading(true);
       const response = await authenticatedFetch(`/api/admin/forum/comments/${commentId}`, {
         method: 'DELETE'
-      }, auth);
+      }, authContextValue);
 
-      if (response.ok) {
-        setComments(prev => prev.filter(comment => comment.Id !== commentId));
-        showAlert('Success', 'Comment deleted successfully!', { iconType: 'success' });
-      } else {
-        throw new Error('Failed to delete comment');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to delete comment');
       }
+
+      // Refresh the current page
+      fetchComments(commentsPage, commentsRowsPerPage, commentsSortColumn, commentsSortDirection);
+      await showModal('alert', 'Success', 'Comment deleted successfully!');
     } catch (error) {
       console.error('Error deleting comment:', error);
-      showAlert('Error', 'Failed to delete comment. Please try again.');
+      setActionError(error.message);
+    } finally {
+      setModalLoading(false);
     }
   };
 
@@ -135,207 +211,275 @@ const AdminForumPage = () => {
     return text.substring(0, maxLength) + '...';
   };
 
-  const renderPagination = (pagination, currentPage, onPageChange) => {
-    if (!pagination || pagination.pages <= 1) return null;
-
-    return (
-      <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-        <div className="text-sm text-gray-600">
-          Showing {((pagination.page - 1) * pagination.per_page) + 1} to{' '}
-          {Math.min(pagination.page * pagination.per_page, pagination.total)} of{' '}
-          {pagination.total} items
+  // Posts table columns
+  const postsColumns = [
+    { key: 'Id', label: 'Post ID', sortable: true },
+    { 
+      key: 'Title', 
+      label: 'Title', 
+      sortable: true,
+      render: (post) => (
+        <div className="max-w-xs">
+          <div className="font-medium text-gray-900 truncate">{post.Title}</div>
+          <div className="text-sm text-gray-500 truncate">{truncateText(post.Content, 60)}</div>
         </div>
-        
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => onPageChange(pagination.page - 1)}
-            disabled={!pagination.has_prev}
-            className="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Previous
-          </button>
-          
-          <span className="px-3 py-2 text-sm font-medium text-gray-900">
-            Page {pagination.page} of {pagination.pages}
-          </span>
-          
-          <button
-            onClick={() => onPageChange(pagination.page + 1)}
-            disabled={!pagination.has_next}
-            className="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Next
-          </button>
+      )
+    },
+    { 
+      key: 'UserName', 
+      label: 'Author', 
+      sortable: true,
+      render: (post) => (
+        <div>
+          <div className="font-medium text-gray-900">{post.UserName}</div>
+          <div className="text-sm text-gray-500">ID: {post.UserId}</div>
+        </div>
+      )
+    },
+    { 
+      key: 'CreatedAt', 
+      label: 'Created', 
+      sortable: true,
+      render: (post) => (
+        <div className="text-sm text-gray-900">
+          {formatDate(post.CreatedAt)}
+        </div>
+      )
+    },
+    { 
+      key: 'LikesCount', 
+      label: 'Likes', 
+      sortable: true,
+      render: (post) => (
+        <div className="flex items-center gap-1 text-sm">
+          <HiHeart className="w-4 h-4 text-red-500" />
+          {post.LikesCount}
+        </div>
+      )
+    },
+    { 
+      key: 'ViewsCount', 
+      label: 'Views', 
+      sortable: true,
+      render: (post) => (
+        <div className="flex items-center gap-1 text-sm">
+          <HiEye className="w-4 h-4 text-blue-500" />
+          {post.ViewsCount}
+        </div>
+      )
+    },
+    { 
+      key: 'CommentsCount', 
+      label: 'Comments', 
+      sortable: true,
+      render: (post) => (
+        <div className="flex items-center gap-1 text-sm">
+          <HiChat className="w-4 h-4 text-green-500" />
+          {post.CommentsCount}
+        </div>
+      )
+    }
+  ];
+
+  // Comments table columns
+  const commentsColumns = [
+    { key: 'Id', label: 'Comment ID', sortable: true },
+    { 
+      key: 'Comment', 
+      label: 'Comment', 
+      sortable: false,
+      render: (comment) => (
+        <div className="max-w-xs">
+          <div className="text-sm text-gray-900 whitespace-pre-wrap">
+            {truncateText(comment.Comment, 100)}
+          </div>
+        </div>
+      )
+    },
+    { 
+      key: 'PostTitle', 
+      label: 'Post', 
+      sortable: true,
+      render: (comment) => (
+        <div className="max-w-xs">
+          <div className="font-medium text-gray-900 truncate">
+            {truncateText(comment.PostTitle, 40)}
+          </div>
+          <div className="text-sm text-gray-500">Post ID: {comment.PostId}</div>
+        </div>
+      )
+    },
+    { 
+      key: 'UserName', 
+      label: 'Author', 
+      sortable: true,
+      render: (comment) => (
+        <div>
+          <div className="font-medium text-gray-900">{comment.UserName}</div>
+          <div className="text-sm text-gray-500">ID: {comment.UserId}</div>
+        </div>
+      )
+    },
+    { 
+      key: 'CreatedAt', 
+      label: 'Created', 
+      sortable: true,
+      render: (comment) => (
+        <div className="text-sm text-gray-900">
+          {formatDate(comment.CreatedAt)}
+        </div>
+      )
+    }
+  ];
+
+  // Actions for posts
+  const postsActions = [
+    {
+      label: 'Delete',
+      icon: HiTrash,
+      onClick: (post) => handleDeletePost(post.Id),
+      className: 'bg-red-50 text-red-700 hover:bg-red-100 focus:ring-red-500'
+    }
+  ];
+
+  // Actions for comments
+  const commentsActions = [
+    {
+      label: 'Delete',
+      icon: HiTrash,
+      onClick: (comment) => handleDeleteComment(comment.Id),
+      className: 'bg-red-50 text-red-700 hover:bg-red-100 focus:ring-red-500'
+    }
+  ];
+
+  // Pagination objects
+  const postsPagination = {
+    currentPage: postsPage + 1, // Convert to 1-indexed
+    totalPages: Math.ceil(postsTotalCount / postsRowsPerPage),
+    onPageChange: handlePostsPageChange,
+    onRowsPerPageChange: handlePostsRowsPerPageChange,
+    rowsPerPage: postsRowsPerPage
+  };
+
+  const commentsPagination = {
+    currentPage: commentsPage + 1, // Convert to 1-indexed
+    totalPages: Math.ceil(commentsTotalCount / commentsRowsPerPage),
+    onPageChange: handleCommentsPageChange,
+    onRowsPerPageChange: handleCommentsRowsPerPageChange,
+    rowsPerPage: commentsRowsPerPage
+  };
+
+  // Loading state
+  if (loading && ((activeTab === 'posts' && posts.length === 0) || (activeTab === 'comments' && comments.length === 0))) {
+    return <div className="flex justify-center items-center min-h-[calc(100vh-200px)]"><PageLoaderSpinner /></div>;
+  }
+
+  // Error state
+  if (error && ((activeTab === 'posts' && posts.length === 0) || (activeTab === 'comments' && comments.length === 0))) {
+    return (
+      <div className="section-padding">
+        <div className="container-modern">
+          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+            <p>Error fetching {activeTab}: {error}</p>
+          </div>
         </div>
       </div>
     );
-  };
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Forum Management</h1>
-        <p className="text-gray-600 mt-1">Manage forum posts and comments</p>
-      </div>
-
-      {/* Tabs */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
-          <nav className="flex space-x-8 px-6">
-            <button
-              onClick={() => setActiveTab('posts')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === 'posts'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Posts ({postsPagination.total || 0})
-            </button>
-            <button
-              onClick={() => setActiveTab('comments')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === 'comments'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Comments ({commentsPagination.total || 0})
-            </button>
-          </nav>
+    <div className="section-padding">
+      <div className="container-modern">
+        {/* Header */}
+        <div className="text-center mb-10 animate-fade-in">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Forum Management</h1>
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+            Manage forum posts and comments, monitor community activity
+          </p>
         </div>
 
-        {/* Posts Tab */}
-        {activeTab === 'posts' && (
-          <div>
-            {postsLoading ? (
-              <div className="p-8 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading posts...</p>
-              </div>
-            ) : posts.length === 0 ? (
-              <div className="p-8 text-center">
-                <p className="text-gray-600">No forum posts found.</p>
-              </div>
-            ) : (
-              <>
-                <div className="divide-y divide-gray-200">
-                  {posts.map((post) => (
-                    <div key={post.Id} className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-medium text-gray-900 truncate">
-                              {post.Title}
-                            </h3>
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              Post #{post.Id}
-                            </span>
-                          </div>
-                          
-                          <p className="text-gray-600 mb-3">
-                            {truncateText(post.Content)}
-                          </p>
-                          
-                          <div className="flex items-center gap-6 text-sm text-gray-500">
-                            <span>By: {post.UserName}</span>
-                            <span>Created: {formatDate(post.CreatedAt)}</span>
-                            <span>{post.LikesCount} likes</span>
-                            <span>{post.ViewsCount} views</span>
-                            <span>{post.CommentsCount} comments</span>
-                          </div>
-                          
-                          {post.TaggedRecipes && post.TaggedRecipes.length > 0 && (
-                            <div className="mt-2">
-                              <div className="flex flex-wrap gap-1">
-                                {post.TaggedRecipes.map((recipe) => (
-                                  <span
-                                    key={recipe.Id}
-                                    className="inline-flex items-center px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full"
-                                  >
-                                    #{recipe.RecipeTitle}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        
-                        <button
-                          onClick={() => handleDeletePost(post.Id)}
-                          className="ml-4 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                          title="Delete post"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {renderPagination(postsPagination, postsPage, setPostsPage)}
-              </>
-            )}
+        {/* Action Error */}
+        {actionError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
+            Action Error: {actionError}
           </div>
         )}
 
-        {/* Comments Tab */}
-        {activeTab === 'comments' && (
-          <div>
-            {commentsLoading ? (
-              <div className="p-8 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading comments...</p>
-              </div>
-            ) : comments.length === 0 ? (
-              <div className="p-8 text-center">
-                <p className="text-gray-600">No forum comments found.</p>
-              </div>
-            ) : (
-              <>
-                <div className="divide-y divide-gray-200">
-                  {comments.map((comment) => (
-                    <div key={comment.Id} className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              Comment #{comment.Id}
-                            </span>
-                            <span className="text-sm text-gray-500">
-                              on "{truncateText(comment.PostTitle, 50)}"
-                            </span>
-                          </div>
-                          
-                          <p className="text-gray-700 mb-3 whitespace-pre-wrap">
-                            {comment.Comment}
-                          </p>
-                          
-                          <div className="flex items-center gap-6 text-sm text-gray-500">
-                            <span>By: {comment.UserName}</span>
-                            <span>Created: {formatDate(comment.CreatedAt)}</span>
-                          </div>
-                        </div>
-                        
-                        <button
-                          onClick={() => handleDeleteComment(comment.Id)}
-                          className="ml-4 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                          title="Delete comment"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {renderPagination(commentsPagination, commentsPage, setCommentsPage)}
-              </>
-            )}
+        {/* Loading Error for existing data */}
+        {error && ((activeTab === 'posts' && posts.length > 0) || (activeTab === 'comments' && comments.length > 0)) && (
+          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-md text-sm">
+            Could not refresh {activeTab}: {error}
           </div>
+        )}
+
+        {/* Tab Navigation */}
+        <div className="mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="flex space-x-8">
+              <button
+                onClick={() => setActiveTab('posts')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'posts'
+                    ? 'border-emerald-500 text-emerald-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Posts ({postsTotalCount})
+              </button>
+              <button
+                onClick={() => setActiveTab('comments')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'comments'
+                    ? 'border-emerald-500 text-emerald-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Comments ({commentsTotalCount})
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        {/* Posts Table */}
+        {activeTab === 'posts' && (
+          <>
+            {posts.length === 0 && !loading && !error ? (
+              <p className="text-center text-gray-400 mt-6 text-lg">No forum posts found.</p>
+            ) : (
+              <ResponsiveTable
+                data={posts}
+                columns={postsColumns}
+                loading={loading}
+                onSort={handlePostsSort}
+                sortColumn={postsSortColumn}
+                sortDirection={postsSortDirection}
+                actions={postsActions}
+                pagination={postsPagination}
+                tableTitle="Forum Posts"
+              />
+            )}
+          </>
+        )}
+
+        {/* Comments Table */}
+        {activeTab === 'comments' && (
+          <>
+            {comments.length === 0 && !loading && !error ? (
+              <p className="text-center text-gray-400 mt-6 text-lg">No forum comments found.</p>
+            ) : (
+              <ResponsiveTable
+                data={comments}
+                columns={commentsColumns}
+                loading={loading}
+                onSort={handleCommentsSort}
+                sortColumn={commentsSortColumn}
+                sortDirection={commentsSortDirection}
+                actions={commentsActions}
+                pagination={commentsPagination}
+                tableTitle="Forum Comments"
+              />
+            )}
+          </>
         )}
       </div>
     </div>

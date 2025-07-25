@@ -273,7 +273,7 @@ function PersonalizedRecipesPage() {
                                     </div>
                                 </div>
 
-                                {/* Single Page Indicator */}
+                                {/* Single Page Indicator
                                 {totalRecipes <= recipesPerPage && (
                                     <div className="mt-3 text-center">
                                         <div className="inline-flex items-center px-2 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs text-blue-700">
@@ -283,7 +283,7 @@ function PersonalizedRecipesPage() {
                                             All recipes displayed
                                         </div>
                                     </div>
-                                )}
+                                )} */}
                             </div>
                         </div>
                     )}

@@ -743,7 +743,7 @@ function PublicRecipeBrowserPage() {
                   </div>
                 </div>
 
-                {/* Single Page Indicator */}
+                {/* Single Page Indicator
                 {totalRecipes <= recipesPerPage && (
                   <div className="mt-4 text-center">
                     <div className="inline-flex items-center px-3 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs text-blue-700">
@@ -753,7 +753,7 @@ function PublicRecipeBrowserPage() {
                       All recipes displayed
                     </div>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           )}

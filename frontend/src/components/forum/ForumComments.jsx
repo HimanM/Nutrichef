@@ -15,7 +15,7 @@ const ForumComments = ({
   currentUser 
 }) => {
   const auth = useAuth();
-  const { showAlert } = useModal();
+  const { showAlert, showModal } = useModal();
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -72,10 +72,10 @@ const ForumComments = ({
   };
 
   const handleDeleteComment = async (commentId) => {
-    const confirmed = await showAlert(
+    const confirmed = await showModal(
+      'confirm',
       'Confirm Delete',
-      'Are you sure you want to delete this comment? This action cannot be undone.',
-      { iconType: 'warning' }
+      'Are you sure you want to delete this comment? This action cannot be undone.'
     );
 
     if (!confirmed) return;
@@ -104,9 +104,9 @@ const ForumComments = ({
     <div className="bg-white rounded-xl shadow-sm border border-gray-100">
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h4 className="text-lg font-semibold text-gray-900">
           Comments ({pagination?.total || comments.length})
-        </h3>
+        </h4>
       </div>
 
       {/* Add Comment Form */}
@@ -165,7 +165,7 @@ const ForumComments = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <h4 className="text-lg font-medium text-gray-900 mb-2">No comments yet</h4>
+            <h5 className="text-lg font-medium text-gray-900 mb-2">No comments yet</h5>
             <p className="text-gray-600">Be the first to share your thoughts!</p>
           </div>
         ) : (

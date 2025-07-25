@@ -273,8 +273,10 @@ def get_all_forum_posts():
     try:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
+        sort_by = request.args.get('sort_by', 'Id')
+        sort_order = request.args.get('sort_order', 'desc')
         
-        data, error, status = forum_service.get_all_posts_for_admin(page, per_page)
+        data, error, status = forum_service.get_all_posts_for_admin(page, per_page, sort_by, sort_order)
         
         if error:
             return jsonify(error), status
@@ -304,8 +306,10 @@ def get_all_forum_comments():
     try:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
+        sort_by = request.args.get('sort_by', 'Id')
+        sort_order = request.args.get('sort_order', 'desc')
         
-        data, error, status = forum_service.get_all_comments_for_admin(page, per_page)
+        data, error, status = forum_service.get_all_comments_for_admin(page, per_page, sort_by, sort_order)
         
         if error:
             return jsonify(error), status

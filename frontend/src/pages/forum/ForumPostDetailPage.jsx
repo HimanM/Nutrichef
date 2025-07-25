@@ -27,10 +27,19 @@ const ForumPostDetailPage = () => {
   const fetchPost = async () => {
     try {
       setLoading(true);
-      // Use regular fetch for public endpoint (no auth required for viewing posts)
-      const response = await fetch(`/api/forum/posts/${postId}`, {
-        method: 'GET'
-      });
+      let response;
+      
+      // Use authenticatedFetch if user is authenticated to get like status
+      if (isAuthenticated) {
+        response = await authenticatedFetch(`/api/forum/posts/${postId}`, {
+          method: 'GET'
+        }, auth);
+      } else {
+        // Use regular fetch for non-authenticated users
+        response = await fetch(`/api/forum/posts/${postId}`, {
+          method: 'GET'
+        });
+      }
 
       if (response.ok) {
         const data = await response.json();
@@ -149,7 +158,7 @@ const ForumPostDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
-      <div className="section-padding">
+      <div className="pt-4">
         <div className="container-modern">
         {/* Back Button */}
         <button

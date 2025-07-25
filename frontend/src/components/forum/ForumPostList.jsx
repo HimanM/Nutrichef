@@ -2,13 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import ForumPostCard from './ForumPostCard';
 
-const ForumPostList = ({ 
-  posts, 
-  loading, 
-  pagination, 
-  onPageChange, 
-  onPostDeleted, 
-  onRefresh 
+const ForumPostList = ({
+  posts,
+  loading,
+  pagination,
+  onPageChange,
+  onPostDeleted,
+  onRefresh
 }) => {
   if (loading) {
     return (
@@ -40,15 +40,6 @@ const ForumPostList = ({
         </div>
         <h3 className="text-lg font-medium text-gray-900 mb-2">No posts yet</h3>
         <p className="text-gray-600 mb-6">Be the first to share your culinary experience with the community!</p>
-        <Link
-          to="/forum"
-          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-          </svg>
-          Create First Post
-        </Link>
       </div>
     );
   }
@@ -74,7 +65,7 @@ const ForumPostList = ({
               {Math.min(pagination.page * pagination.per_page, pagination.total)} of{' '}
               {pagination.total} posts
             </div>
-            
+
             <div className="flex items-center gap-2">
               <button
                 onClick={() => onPageChange(pagination.page - 1)}
@@ -83,29 +74,28 @@ const ForumPostList = ({
               >
                 Previous
               </button>
-              
+
               {/* Page Numbers */}
               <div className="flex items-center gap-1">
                 {[...Array(Math.min(5, pagination.pages))].map((_, index) => {
                   const pageNum = Math.max(1, pagination.page - 2) + index;
                   if (pageNum > pagination.pages) return null;
-                  
+
                   return (
                     <button
                       key={pageNum}
                       onClick={() => onPageChange(pageNum)}
-                      className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                        pageNum === pagination.page
-                          ? 'bg-emerald-600 text-white'
-                          : 'text-gray-600 bg-white border border-gray-300 hover:bg-gray-50'
-                      }`}
+                      className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${pageNum === pagination.page
+                        ? 'bg-emerald-600 text-white'
+                        : 'text-gray-600 bg-white border border-gray-300 hover:bg-gray-50'
+                        }`}
                     >
                       {pageNum}
                     </button>
                   );
                 })}
               </div>
-              
+
               <button
                 onClick={() => onPageChange(pagination.page + 1)}
                 disabled={!pagination.has_next}

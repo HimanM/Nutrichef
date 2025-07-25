@@ -223,10 +223,10 @@ class ForumService:
             log_error(f"Error searching recipes: {str(e)}", "ForumService")
             return None, {"error": "Failed to search recipes"}, 500
 
-    def get_all_posts_for_admin(self, page=1, per_page=20):
+    def get_all_posts_for_admin(self, page=1, per_page=20, sort_by='Id', sort_order='desc'):
         """Get all forum posts for admin management"""
         try:
-            pagination = self.forum_dao.get_all_posts_for_admin(page, per_page)
+            pagination = self.forum_dao.get_all_posts_for_admin(page, per_page, sort_by, sort_order)
             posts = [post.to_dict() for post in pagination.items]
 
             return {
@@ -245,10 +245,10 @@ class ForumService:
             log_error(f"Error fetching posts for admin: {str(e)}", "ForumService")
             return None, {"error": "Failed to fetch posts"}, 500
 
-    def get_all_comments_for_admin(self, page=1, per_page=20):
+    def get_all_comments_for_admin(self, page=1, per_page=20, sort_by='Id', sort_order='desc'):
         """Get all forum comments for admin management"""
         try:
-            pagination = self.forum_dao.get_all_comments_for_admin(page, per_page)
+            pagination = self.forum_dao.get_all_comments_for_admin(page, per_page, sort_by, sort_order)
             comments = []
             
             for comment in pagination.items:

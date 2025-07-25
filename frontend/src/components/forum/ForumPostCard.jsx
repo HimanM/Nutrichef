@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
@@ -7,9 +7,14 @@ import { authenticatedFetch } from '../../utils/apiUtil';
 const ForumPostCard = ({ post, onPostDeleted, onRefresh }) => {
   const auth = useAuth();
   const { isAuthenticated, currentUser } = auth;
-  const { showAlert } = useModal();
+  const { showAlert, showModal } = useModal();
   const [isLiking, setIsLiking] = useState(false);
   const [localPost, setLocalPost] = useState(post);
+
+  // Sync localPost with post prop when it changes (e.g., on page refresh)
+  useEffect(() => {
+    setLocalPost(post);
+  }, [post]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -66,10 +71,10 @@ const ForumPostCard = ({ post, onPostDeleted, onRefresh }) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const confirmed = await showAlert(
+    const confirmed = await showModal(
+      'confirm',
       'Confirm Delete',
-      'Are you sure you want to delete this post? This action cannot be undone.',
-      { iconType: 'warning' }
+      'Are you sure you want to delete this post? This action cannot be undone.'
     );
 
     if (!confirmed) return;
@@ -177,21 +182,21 @@ const ForumPostCard = ({ post, onPostDeleted, onRefresh }) => {
           <button
             onClick={handleLikeToggle}
             disabled={isLiking}
-            className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+            className={`flex items-center gap-1 px-3 py-2 sm:py-1 rounded-full text-sm font-medium transition-colors min-h-[36px] sm:min-h-0 ${
               localPost.IsLikedByCurrentUser
-                ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                ? 'bg-red-50 text-red-600 hover:bg-red-100 active:bg-red-100'
+                : 'bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-100'
             } ${isLiking ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <svg 
-              className={`w-4 h-4 ${localPost.IsLikedByCurrentUser ? 'fill-current' : ''}`} 
+              className={`w-5 h-5 sm:w-4 sm:h-4 ${localPost.IsLikedByCurrentUser ? 'fill-current' : ''}`} 
               fill={localPost.IsLikedByCurrentUser ? 'currentColor' : 'none'} 
               stroke="currentColor" 
               viewBox="0 0 24 24"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
-            {localPost.LikesCount}
+            <span className="font-medium">{localPost.LikesCount}</span>
           </button>
         </div>
       </div>
