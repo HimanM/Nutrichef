@@ -160,29 +160,29 @@ const ForumPostDetail = ({ post, onLikeToggle, onPostDeleted, currentUser }) => 
 
             {/* Actions */}
             <div className="px-4 sm:px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-xl">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <button
                         onClick={handleLikeClick}
                         disabled={isLiking}
-                        className={`flex items-center justify-center gap-2 px-6 py-3 sm:px-4 sm:py-2 rounded-lg font-medium transition-colors min-h-[44px] sm:min-h-0 ${post.IsLikedByCurrentUser
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors self-start ${post.IsLikedByCurrentUser
                                 ? 'bg-red-100 text-red-700 hover:bg-red-200 active:bg-red-200'
                                 : 'bg-white text-gray-700 hover:bg-gray-100 active:bg-gray-100 border border-gray-300'
                             } ${isLiking ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         <svg
-                            className={`w-6 h-6 sm:w-5 sm:h-5 ${post.IsLikedByCurrentUser ? 'fill-current' : ''}`}
+                            className={`w-5 h-5 ${post.IsLikedByCurrentUser ? 'fill-current' : ''}`}
                             fill={post.IsLikedByCurrentUser ? 'currentColor' : 'none'}
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                         >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
-                        <span className="text-base sm:text-sm">
+                        <span className="text-sm">
                             {post.IsLikedByCurrentUser ? 'Liked' : 'Like'} ({post.LikesCount})
                         </span>
                     </button>
 
-                    <div className="text-sm text-gray-500 text-center sm:text-right">
+                    <div className="text-sm text-gray-500 text-left sm:text-right">
                         {post.UpdatedAt !== post.CreatedAt && (
                             <span>Last updated: {formatDate(post.UpdatedAt)}</span>
                         )}
