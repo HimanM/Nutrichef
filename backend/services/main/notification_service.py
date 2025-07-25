@@ -14,3 +14,6 @@ class NotificationService:
     def mark_as_read(self, notification_id, user_id):
         notif = self.notification_dao.mark_as_read(notification_id, user_id)
         return notif.to_dict() if notif else None 
+
+    def clear_all_notifications_for_user(self, user_id):
+        self.notification_dao.delete_all_notifications_for_user(user_id) 

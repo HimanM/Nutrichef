@@ -22,3 +22,7 @@ class NotificationDAO:
             notif.IsRead = True
             db.session.commit()
         return notif 
+
+    def delete_all_notifications_for_user(self, user_id):
+        Notification.query.filter_by(UserId=user_id).delete()
+        db.session.commit() 

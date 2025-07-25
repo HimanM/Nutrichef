@@ -1,5 +1,6 @@
 import React from 'react';
 import MobileModal from './MobileModal';
+import ReactDOM from 'react-dom';
 
 const ResponsiveModal = ({
   isOpen,
@@ -18,16 +19,21 @@ const ResponsiveModal = ({
   return (
     <>
       {/* Mobile Modal - Full screen with drag to close */}
-      <MobileModal
-        isOpen={isOpen}
-        onClose={onClose}
-        title={title}
-        showCloseButton={showCloseButton}
-        className={className}
-        dragToClose={dragToClose}
-      >
-        {children}
-      </MobileModal>
+      {typeof window !== 'undefined' && window.innerWidth < 768
+        ? ReactDOM.createPortal(
+            <MobileModal
+              isOpen={isOpen}
+              onClose={onClose}
+              title={title}
+              showCloseButton={showCloseButton}
+              className={className}
+              dragToClose={dragToClose}
+            >
+              {children}
+            </MobileModal>,
+            document.body
+          )
+        : null}
 
       {/* Desktop Modal - Traditional centered modal */}
       <div className="fixed inset-0 z-50 hidden md:flex items-center justify-center p-4">

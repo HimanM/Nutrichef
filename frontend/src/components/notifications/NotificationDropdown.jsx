@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { HiOutlineBell, HiOutlineTrash, HiCheck } from 'react-icons/hi';
+import { HiOutlineBell, HiOutlineTrash, HiCheck, HiX } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import ResponsiveModal from '../ui/ResponsiveModal';
+import useResponsiveModal from '../../hooks/useResponsiveModal';
+import { useModal } from '../../context/ModalContext.jsx';
 
 const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) => {
   const { token, isAuthenticated } = useAuth();
@@ -10,6 +13,8 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const responsiveModal = useResponsiveModal(false);
+  const { showModal } = useModal();
 
   useEffect(() => {
     if (isAuthenticated) fetchNotifications();
@@ -18,6 +23,12 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
     }, 60000);
     return () => clearInterval(interval);
   }, [isAuthenticated, token]);
+
+  useEffect(() => {
+    const handleResize = () => setOpen(window.innerWidth >= 640);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const fetchNotifications = async () => {
     if (!isAuthenticated || !token) return;
@@ -58,10 +69,29 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
     // Extend for other notification types
   };
 
-  const handleClearAll = () => {
-    setNotifications([]);
-    setUnreadCount(0);
-    // Optionally, call backend to clear notifications
+  const handleClearAll = async () => {
+    if (!token) return;
+    const confirmed = await showModal(
+      'confirm',
+      'Clear All Notifications',
+      'Are you sure you want to delete all notifications? This action cannot be undone.',
+      { iconType: 'warning', confirmText: 'Clear All', cancelText: 'Cancel' }
+    );
+    if (!confirmed) return;
+    try {
+      const res = await fetch(apiUrl + 'clear', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!res.ok) throw new Error('Failed to clear notifications');
+      setNotifications([]);
+      setUnreadCount(0);
+    } catch (e) {
+      alert('Failed to clear notifications.');
+    }
   };
 
   const handleMarkAllRead = async () => {
@@ -91,33 +121,48 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
       document.addEventListener('mousedown', handleClick);
       document.addEventListener('touchstart', handleClick);
     }
+    // Listen for custom event to open notifications (for mobile menu)
+    const handleOpenNotifications = () => responsiveModal.openModal();
+    window.addEventListener('openNotifications', handleOpenNotifications);
     return () => {
       document.removeEventListener('mousedown', handleClick);
       document.removeEventListener('touchstart', handleClick);
+      window.removeEventListener('openNotifications', handleOpenNotifications);
     };
-  }, [open]);
+  }, [open, responsiveModal.openModal]);
 
   if (!isAuthenticated) return null;
 
   // Responsive dropdown styling
   const dropdownClass =
-    'absolute right-0 mt-2 w-80 max-w-xs bg-white rounded-xl shadow-lg border border-gray-100 z-50 animate-fade-in' +
-    ' sm:w-96 sm:right-0' +
-    ' mobile:w-full mobile:left-0 mobile:right-0 mobile:mt-0 mobile:rounded-b-2xl';
+    'absolute right-0 mt-2 w-80 max-w-xs bg-white/80 backdrop-blur-xl rounded-xl shadow-2xl border border-gray-100 z-50 animate-fade-in sm:w-96 sm:right-0';
+
+  // Mobile modal styling
+  const mobileModalClass =
+    'fixed top-0 left-0 right-0 w-full bg-white z-50 shadow-lg border-b border-gray-200 animate-fade-in rounded-b-2xl';
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        className="relative p-2 rounded-full hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+        className="relative p-2 rounded-full hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-colors duration-200"
         aria-label="Notifications"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          if (window.innerWidth < 640) {
+            responsiveModal.openModal();
+          } else {
+            setOpen((o) => !o);
+          }
+        }}
       >
-        <HiOutlineBell className="w-6 h-6 text-gray-700" />
+        <HiOutlineBell className="w-6 h-6 text-emerald-600" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 block w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
+          <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 bg-emerald-500 text-white text-xs font-bold rounded-full ring-2 ring-white animate-pulse shadow-md">
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
         )}
       </button>
-      {open && (
+      {/* Desktop Dropdown */}
+      {open && window.innerWidth >= 640 && (
         <div className={dropdownClass} style={{ minWidth: 320 }}>
           <div className="flex items-center justify-between p-4 border-b border-gray-100 font-semibold text-gray-800 bg-emerald-50 rounded-t-xl">
             <span>Notifications</span>
@@ -140,13 +185,13 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
               </button>
             </div>
           </div>
-          <div className="max-h-80 overflow-y-auto divide-y divide-gray-100">
+          <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 rounded-b-xl">
             {notifications.length === 0 ? (
               <div className="p-4 text-gray-500 text-center">No notifications</div>
             ) : notifications.map((notif) => (
               <button
                 key={notif.Id}
-                className={`w-full text-left px-4 py-3 text-sm transition-colors duration-150 ${notif.IsRead ? 'bg-white text-gray-700' : 'bg-emerald-50 text-emerald-900 font-semibold'} hover:bg-emerald-100`}
+                className={`w-full text-left px-4 py-3 text-sm transition-colors duration-150 ${notif.IsRead ? 'bg-white/70 text-gray-700' : 'bg-emerald-50 text-emerald-900 font-semibold'} hover:bg-emerald-100/80 rounded-xl mt-1`}
                 onClick={() => handleNotificationClick(notif)}
               >
                 <div>{notif.Message}</div>
@@ -156,6 +201,95 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
           </div>
         </div>
       )}
+      {/* Mobile Modal */}
+      <ResponsiveModal
+        isOpen={responsiveModal.isOpen}
+        onClose={responsiveModal.closeModal}
+        title="Notifications"
+        showCloseButton
+      >
+        {/* Action Buttons - Better mobile layout */}
+        <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            {unreadCount > 0 && (
+              <span className="text-sm text-gray-600">
+                {unreadCount} unread
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors duration-200 touch-manipulation"
+              onClick={handleMarkAllRead}
+              disabled={unreadCount === 0}
+            >
+              <HiCheck className="w-4 h-4" />
+              <span className="hidden sm:inline">Mark all read</span>
+            </button>
+            <button
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors duration-200 touch-manipulation"
+              onClick={handleClearAll}
+              disabled={notifications.length === 0}
+            >
+              <HiOutlineTrash className="w-4 h-4" />
+              <span className="hidden sm:inline">Clear all</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Notifications List */}
+        <div className="space-y-2">
+          {notifications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+              <div className="w-16 h-16 mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                <HiOutlineBell className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-lg font-medium">No notifications</p>
+              <p className="text-sm text-gray-400 mt-1">You're all caught up!</p>
+            </div>
+          ) : notifications.map((notif) => (
+            <div
+              key={notif.Id}
+              className={`relative rounded-xl border transition-all duration-200 ${
+                notif.IsRead 
+                  ? 'bg-white border-gray-200 hover:border-gray-300' 
+                  : 'bg-emerald-50 border-emerald-200 hover:border-emerald-300'
+              }`}
+            >
+              <button
+                className="w-full text-left p-4 rounded-xl hover:bg-gray-50 transition-colors duration-200 touch-manipulation"
+                onClick={() => {
+                  handleNotificationClick(notif);
+                  responsiveModal.closeModal();
+                }}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm leading-relaxed ${
+                      notif.IsRead ? 'text-gray-700' : 'text-emerald-900 font-medium'
+                    }`}>
+                      {notif.Message}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                      <span>{new Date(notif.CreatedAt).toLocaleDateString()}</span>
+                      <span>•</span>
+                      <span>{new Date(notif.CreatedAt).toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}</span>
+                    </p>
+                  </div>
+                  {!notif.IsRead && (
+                    <div className="flex-shrink-0">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    </div>
+                  )}
+                </div>
+              </button>
+            </div>
+          ))}
+        </div>
+      </ResponsiveModal>
     </div>
   );
 };

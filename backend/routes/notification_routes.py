@@ -20,4 +20,11 @@ def mark_notification_as_read(notification_id):
     notif = notification_service.mark_as_read(notification_id, current_user.UserID)
     if not notif:
         return jsonify({'error': 'Notification not found'}), 404
-    return jsonify(notif), 200 
+    return jsonify(notif), 200
+
+@notification_bp.route('/clear', methods=['POST'])
+@jwt_required()
+def clear_notifications():
+    current_user = get_current_user()
+    notification_service.clear_all_notifications_for_user(current_user.UserID)
+    return jsonify({'message': 'All notifications cleared.'}), 200 

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { HiOutlineUserCircle, HiMenu, HiOutlineLogin, HiOutlineUserAdd, HiOutlineLogout, HiX, HiChevronDown } from 'react-icons/hi';
+import { HiOutlineUserCircle, HiMenu, HiOutlineLogin, HiOutlineUserAdd, HiOutlineLogout, HiX, HiChevronDown, HiOutlineBell } from 'react-icons/hi';
 import { RiAdminFill } from "react-icons/ri";
 import NotificationDropdown from '../notifications/NotificationDropdown';
 
@@ -259,7 +259,21 @@ const NavigationBar = () => {
                 </>
               )}
 
-              {isAuthenticated && <div className="px-4 py-2"><NotificationDropdown /></div>}
+              {isAuthenticated && (
+                <button
+                  onClick={() => {
+                    // Open notification modal via ref or context
+                    if (window && window.dispatchEvent) {
+                      window.dispatchEvent(new CustomEvent('openNotifications'));
+                    }
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="flex items-center w-full px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
+                >
+                  <HiOutlineBell className="h-5 w-5 mr-2 text-emerald-600" />
+                  Notifications
+                </button>
+              )}
 
               {isAdmin && (
                 <Link
