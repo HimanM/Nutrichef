@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { HiOutlineUserCircle, HiMenu, HiOutlineLogin, HiOutlineUserAdd, HiOutlineLogout, HiX, HiChevronDown } from 'react-icons/hi';
 import { RiAdminFill } from "react-icons/ri";
+import NotificationDropdown from '../notifications/NotificationDropdown';
 
 const NavigationBar = () => {
   const { isAuthenticated, currentUser, isAdmin, logout, loading } = useAuth();
@@ -136,6 +137,7 @@ const NavigationBar = () => {
                 )}
               </div>
             )}
+            {isAuthenticated && <NotificationDropdown />}
             {isAdmin && (
               <Link to="/admin" className="btn-ghost text-orange-600 hover:text-orange-700 hover:bg-orange-50">
                 <RiAdminFill className="h-5 w-5" />
@@ -256,6 +258,8 @@ const NavigationBar = () => {
                   )}
                 </>
               )}
+
+              {isAuthenticated && <div className="px-4 py-2"><NotificationDropdown /></div>}
 
               {isAdmin && (
                 <Link

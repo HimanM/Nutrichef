@@ -2,9 +2,11 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_current_user
 from backend.services.main.forum_service import ForumService
 from functools import wraps
+from backend.services.main.notification_service import NotificationService
 
 forum_bp = Blueprint('forum_bp', __name__, url_prefix='/api/forum')
 forum_service = ForumService()
+notification_service = NotificationService()
 
 # Public routes (no authentication required)
 @forum_bp.route('/posts', methods=['GET'])
@@ -161,18 +163,25 @@ def add_comment(post_id):
     """Add a comment to a forum post"""
     current_user = get_current_user()
     data = request.get_json()
-    
     if not data:
         return jsonify({"error": "Request body is required"}), 400
-    
     comment_text = data.get('comment')
-    
     result, error, status = forum_service.add_comment(
         post_id=post_id,
         user_id=current_user.UserID,
         comment_text=comment_text
     )
-    
+    # Notify post author if not the commenter
+    if not error and result:
+        from ..models.forum_post import ForumPost
+        post = ForumPost.query.filter_by(Id=post_id).first()
+        if post and post.UserId != current_user.UserID:
+            notification_service.add_notification(
+                user_id=post.UserId,
+                notif_type='forumComment',
+                reference_id=post_id,
+                message=f"Your forum post received a new comment."
+            )
     if error:
         return jsonify(error), status
     return jsonify(result), status
@@ -194,17 +203,44 @@ def delete_comment(comment_id):
         return jsonify(error), status
     return jsonify(result), status
 
+@forum_bp.route('/comments/<int:comment_id>', methods=['PUT'])
+@jwt_required()
+def update_comment(comment_id):
+    """Update a comment (by author only)"""
+    current_user = get_current_user()
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Request body is required"}), 400
+    new_text = data.get('comment')
+    result, error, status = forum_service.update_comment(
+        comment_id=comment_id,
+        user_id=current_user.UserID,
+        new_text=new_text
+    )
+    if error:
+        return jsonify(error), status
+    return jsonify(result), status
+
 @forum_bp.route('/posts/<int:post_id>/like', methods=['POST'])
 @jwt_required()
 def toggle_like(post_id):
     """Toggle like status for a post"""
     current_user = get_current_user()
-    
     result, error, status = forum_service.toggle_like(
         post_id=post_id,
         user_id=current_user.UserID
     )
-    
+    # Notify post author if not the liker and like was added
+    if not error and result and result.get('liked'):
+        from ..models.forum_post import ForumPost
+        post = ForumPost.query.filter_by(Id=post_id).first()
+        if post and post.UserId != current_user.UserID:
+            notification_service.add_notification(
+                user_id=post.UserId,
+                notif_type='forumLike',
+                reference_id=post_id,
+                message=f"Your forum post received a new like."
+            )
     if error:
         return jsonify(error), status
     return jsonify(result), status

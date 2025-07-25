@@ -9,6 +9,7 @@ class ForumComment(db.Model):
     UserId = db.Column(db.Integer, db.ForeignKey('Users.UserID', ondelete='CASCADE'), nullable=False)
     Comment = db.Column(db.Text, nullable=False)
     CreatedAt = db.Column(db.DateTime, default=datetime.utcnow)
+    UpdatedAt = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
     post = db.relationship('ForumPost', back_populates='comments')

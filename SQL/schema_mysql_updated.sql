@@ -122,6 +122,7 @@ CREATE TABLE IF NOT EXISTS `ForumComments` (
   `UserId` int DEFAULT NULL,
   `Comment` text NOT NULL,
   `CreatedAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `UpdatedAt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`Id`),
   KEY `PostId` (`PostId`),
   KEY `UserId` (`UserId`)
@@ -990,6 +991,27 @@ CREATE TABLE IF NOT EXISTS `Users` (
 INSERT INTO `Users` (`UserID`, `Name`, `Email`, `PasswordHash`, `DietaryPreferences`, `CreatedAt`, `role`, `EmailVerificationToken`, `EmailVerificationTokenExpiresAt`, `IsEmailVerified`, `DailyCalories`, `DailyProtein`, `DailyCarbs`, `DailyFat`, `DailyFiber`, `DailySugar`, `DailySodium`) VALUES
 (1, 'admin', 'Admin@nutrichef.com', 'scrypt:32768:8:1$x8TNac9dKwBri9Cv$d4fa0f5e7177e5b4e6d70885fb4942a5e7d341e451e30850d0d71376e69250dfa14e6903ada8c8d035ebdb890a37f655e627501933c3691e1ccb80f787a4385e', NULL, '2025-06-03 05:46:04', 'admin', NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (2, 'Himan Manduja', 'mandujahiman@gmail.com', 'scrypt:32768:8:1$Ed9p5GJJcxnjtf4P$2903d3f12a7cf23a3cf0fadf5dbbb31e279b8b26d4d9cdcc1e8fe75f354a0a3aed6fab82f7231051f7ef59253ea21e903717e8780489f00f6061d98aefaaabcc', NULL, '2025-06-07 08:22:28', 'user', NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+
+
+--
+-- Table structure for table `Notifications`
+--
+
+DROP TABLE IF EXISTS `Notifications`;
+CREATE TABLE IF NOT EXISTS `Notifications` (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    UserId INT NOT NULL, -- The user who receives the notification
+    Type VARCHAR(50) NOT NULL, -- e.g., 'forumComment', 'forumLike'
+    ReferenceId INT, -- e.g., commentId or likeId or postId
+    Message TEXT NOT NULL, -- Notification message to display
+    IsRead BOOLEAN DEFAULT FALSE, -- Has the user seen this notification?
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserId) REFERENCES User(Id)
+    -- Add additional foreign keys as needed for ReferenceId if you want strict integrity
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
 
 --
 -- Constraints for dumped tables

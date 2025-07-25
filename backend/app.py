@@ -38,6 +38,7 @@ from .routes.favorites_routes import favorites_bp
 from .routes.tags_routes import tags_bp
 from .routes.recipe_comment_routes import recipe_comment_bp
 from .routes.forum_routes import forum_bp
+from .routes.notification_routes import notification_bp
 
 log_header("Application Startup")
 app = Flask(__name__, 
@@ -125,6 +126,7 @@ app.register_blueprint(favorites_bp)
 app.register_blueprint(tags_bp)
 app.register_blueprint(recipe_comment_bp)
 app.register_blueprint(forum_bp)
+app.register_blueprint(notification_bp)
 
 with app.app_context():
     log_header("Service Initialization")

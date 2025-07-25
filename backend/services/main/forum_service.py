@@ -128,21 +128,43 @@ class ForumService:
             log_error(f"Error deleting forum post {post_id}: {str(e)}", "ForumService")
             return None, {"error": "Failed to delete post"}, 500
 
+    def update_comment(self, comment_id, user_id, new_text):
+        """Update a comment (by author only)"""
+        try:
+            if not new_text or not new_text.strip():
+                return None, {"error": "Comment text is required"}, 400
+            comment = self.forum_dao.update_comment(comment_id, user_id, new_text.strip())
+            if not comment:
+                return None, {"error": "Comment not found or unauthorized"}, 404
+            return comment.to_dict(), None, 200
+        except Exception as e:
+            log_error(f"Error updating comment {comment_id}: {str(e)}", "ForumService")
+            return None, {"error": "Failed to update comment"}, 500
+
+    def get_user_comment_for_post(self, post_id, user_id):
+        """Get a user's comment for a specific post (if any)"""
+        try:
+            comment = self.forum_dao.get_user_comment_for_post(post_id, user_id)
+            return comment.to_dict() if comment else None
+        except Exception as e:
+            log_error(f"Error fetching user comment for post {post_id}: {str(e)}", "ForumService")
+            return None
+
     def add_comment(self, post_id, user_id, comment_text):
-        """Add a comment to a forum post"""
+        """Add a comment to a forum post, enforcing one comment per user per post"""
         try:
             if not comment_text or not comment_text.strip():
                 return None, {"error": "Comment text is required"}, 400
-
+            existing_comment = self.forum_dao.get_user_comment_for_post(post_id, user_id)
+            if existing_comment:
+                return None, {"error": "User has already commented on this post. Please edit your comment instead."}, 400
             comment = self.forum_dao.add_comment(
                 post_id=post_id,
                 user_id=user_id,
                 comment_text=comment_text.strip()
             )
-
             log_info(f"Comment added to post {post_id} by user {user_id}", "ForumService")
             return comment.to_dict(), None, 201
-
         except Exception as e:
             log_error(f"Error adding comment to post {post_id}: {str(e)}", "ForumService")
             return None, {"error": "Failed to add comment"}, 500

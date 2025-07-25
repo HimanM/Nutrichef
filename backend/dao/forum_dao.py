@@ -6,6 +6,7 @@ from ..models.forum_post_tag import ForumPostTag
 from ..models.recipe import Recipe
 from sqlalchemy import desc, func
 from sqlalchemy.orm import joinedload
+from datetime import datetime
 
 class ForumDAO:
     def __init__(self):
@@ -147,6 +148,20 @@ class ForumDAO:
             db.session.rollback()
             raise e
 
+    def update_comment(self, comment_id, user_id, new_text):
+        """Update a comment (by author only)"""
+        try:
+            comment = ForumComment.query.filter_by(Id=comment_id, UserId=user_id).first()
+            if not comment:
+                return None
+            comment.Comment = new_text
+            comment.UpdatedAt = datetime.utcnow()
+            db.session.commit()
+            return comment
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
     def get_comments_for_post(self, post_id, page=1, per_page=20):
         """Get paginated comments for a specific post"""
         try:
@@ -219,6 +234,10 @@ class ForumDAO:
             ).limit(limit).all()
         except Exception as e:
             raise e
+
+    def get_user_comment_for_post(self, post_id, user_id):
+        """Get a user's comment for a specific post (if any)"""
+        return ForumComment.query.filter_by(PostId=post_id, UserId=user_id).first()
 
     def get_all_posts_for_admin(self, page=1, per_page=20, sort_by='Id', sort_order='desc'):
         """Get all forum posts for admin management"""
