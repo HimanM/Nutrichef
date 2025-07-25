@@ -164,6 +164,10 @@ h3 {
   @apply inline-flex items-center justify-center text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 font-medium py-2 px-4 rounded-lg transition-all duration-200 ease-out;
 }
 
+.btn-ghost-admin {
+  @apply inline-flex items-center justify-center text-red-600  hover:text-orange-700 hover:bg-orange-50 font-medium py-2 px-4 rounded-lg transition-all duration-200 ease-out;
+}
+
 .btn-danger {
   @apply inline-flex items-center justify-center bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 ease-out transform hover:scale-105 hover:shadow-lg shadow-md;
 }

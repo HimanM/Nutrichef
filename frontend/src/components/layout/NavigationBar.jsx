@@ -137,9 +137,9 @@ const NavigationBar = () => {
                 )}
               </div>
             )}
-            {isAuthenticated && <NotificationDropdown />}
+            
             {isAdmin && (
-              <Link to="/admin" className="btn-ghost text-orange-600 hover:text-orange-700 hover:bg-orange-50">
+              <Link to="/admin" className="btn-ghost-admin text-orange-600">
                 <RiAdminFill className="h-5 w-5" />
               </Link>
             )}
@@ -153,6 +153,7 @@ const NavigationBar = () => {
                   <HiOutlineUserCircle className="h-5 w-5 mr-1.5" />
                   <span className="text-sm">{currentUser?.Name || currentUser?.Email?.split('@')[0] || 'User'}</span>
                 </Link>
+                {isAuthenticated && <NotificationDropdown />}
                 <button
                   onClick={handleLogout}
                   className="btn-danger-outline"

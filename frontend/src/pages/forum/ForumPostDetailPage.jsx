@@ -114,14 +114,30 @@ const ForumPostDetailPage = () => {
     }
   };
 
-  const handleCommentAdded = (newComment) => {
-    setComments(prev => [...prev, newComment]);
-    showAlert('Success', 'Comment added successfully!', { iconType: 'success' });
+  const handleCommentAdded = (newComment, updatedComments = null) => {
+    if (updatedComments) {
+      // Handle comment update
+      setComments(updatedComments);
+    } else if (newComment) {
+      // Handle new comment
+      setComments(prev => [...prev, newComment]);
+      showAlert('Success', 'Comment added successfully!', { iconType: 'success' });
+    }
   };
 
   const handleCommentDeleted = (commentId) => {
     setComments(prev => prev.filter(comment => comment.Id !== commentId));
     showAlert('Success', 'Comment deleted successfully!', { iconType: 'success' });
+  };
+
+  const handleCommentUpdated = (commentId, updatedCommentText) => {
+    setComments(prevComments =>
+      prevComments.map(comment =>
+        comment.Id === commentId
+          ? { ...comment, Comment: updatedCommentText }
+          : comment
+      )
+    );
   };
 
   const handlePostDeleted = () => {
@@ -189,6 +205,7 @@ const ForumPostDetailPage = () => {
               pagination={commentsPagination}
               onCommentAdded={handleCommentAdded}
               onCommentDeleted={handleCommentDeleted}
+              onCommentUpdated={handleCommentUpdated}
               onLoadMore={() => fetchComments(commentsPagination.page + 1)}
               isAuthenticated={isAuthenticated}
               currentUser={currentUser}

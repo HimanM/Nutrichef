@@ -102,7 +102,7 @@ const AdminNavigationBar = () => {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="btn-danger-outline px-3 xl:px-4 py-2 text-sm font-medium"
+                  className="btn-danger-outline"
                 >
                   <HiOutlineLogout className="h-4 w-4 mr-1.5 flex-shrink-0" />
                   <span className="hidden xl:inline">Logout</span>
