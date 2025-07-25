@@ -4,7 +4,6 @@ import { useModal } from '../../context/ModalContext';
 import ForumPostList from '../../components/forum/ForumPostList';
 import CreatePostModal from '../../components/forum/CreatePostModal';
 import { useResponsiveModal } from '../../hooks/useResponsiveModal';
-import { authenticatedFetch } from '../../utils/apiUtil';
 
 const ForumPage = () => {
   const { isAuthenticated } = useAuth();
@@ -72,12 +71,15 @@ const ForumPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-white">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
+      <div className="section-padding">
+        <div className="container-modern">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Recipe Forum</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <div className="text-center mb-6 animate-fade-in">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">
+            <span className="gradient-text">Recipe Forum</span>
+          </h1>
+          <p className="text-sm text-gray-600 max-w-2xl mx-auto">
             Share your culinary experiences, discover new recipes, and connect with fellow food enthusiasts
           </p>
         </div>
@@ -161,6 +163,7 @@ const ForumPage = () => {
           onClose={createPostModal.closeModal}
           onPostCreated={handlePostCreated}
         />
+        </div>
       </div>
     </div>
   );

@@ -148,8 +148,9 @@ const ForumPostDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-white">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
+      <div className="section-padding">
+        <div className="container-modern">
         {/* Back Button */}
         <button
           onClick={() => navigate('/forum')}
@@ -182,6 +183,7 @@ const ForumPostDetailPage = () => {
             isAuthenticated={isAuthenticated}
             currentUser={currentUser}
           />
+        </div>
         </div>
       </div>
     </div>

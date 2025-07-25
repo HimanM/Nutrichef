@@ -61,7 +61,7 @@ const AdminNavigationBar = () => {
 
   return (
     <nav ref={navRef} className="glass sticky top-0 z-50 border-b border-white/20 shadow-soft backdrop-blur-xl">
-      <div className="container-modern">
+      <div className="container-modern-nav">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/admin" className="font-bold text-xl gradient-text animate-fade-in flex-shrink-0">

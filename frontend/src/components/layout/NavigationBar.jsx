@@ -81,7 +81,7 @@ const NavigationBar = () => {
             <Link to="/" className="flex items-center hover:scale-105 transition-transform duration-200">
               <div className="relative flex items-center">
                 <div className="nutrichef-logo nutrichef-logo-md mr-3"></div>
-                
+
               </div>
               <span className="font-bold text-xl navbar-logo">NutriChef</span>
             </Link>
@@ -193,126 +193,126 @@ const NavigationBar = () => {
         {isMobileMenuOpen && (
           <div className="lg:hidden bg-white/95 backdrop-blur-sm border-t border-white/20 shadow-lg absolute left-0 right-0 top-16 z-40 rounded-b-2xl">
             <div className="px-4 py-3 space-y-1">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 ${location.pathname === link.to
-                        ? 'text-emerald-600 bg-emerald-50'
-                        : 'text-gray-600 hover:text-emerald-600 hover:bg-emerald-50'
-                      }`}
-                  >
-                    {link.icon && <span className="mr-2">{link.icon}</span>}
-                    {link.label}
-                  </Link>
-                ))}
+              {navLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 ${location.pathname === link.to
+                    ? 'text-emerald-600 bg-emerald-50'
+                    : 'text-gray-600 hover:text-emerald-600 hover:bg-emerald-50'
+                    }`}
+                >
+                  {link.icon && <span className="mr-2">{link.icon}</span>}
+                  {link.label}
+                </Link>
+              ))}
 
-                {isAuthenticated && (
-                  <div className="border-t border-gray-200 my-2"></div>
-                )}
-
-                {isAuthenticated && (
-                  <>
-                    <button
-                      onClick={() => setMobileToolsOpen(!mobileToolsOpen)}
-                      className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
-                    >
-                      <span>Tools</span>
-                      <HiChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileToolsOpen ? 'rotate-180' : ''}`} />
-                    </button>
-
-                    {mobileToolsOpen && (
-                      <div className="ml-4 space-y-1 animate-fade-in">
-                        <Link
-                          to="/personalized-recipes"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="block px-4 py-2 rounded-lg text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
-                        >
-                          For You
-                        </Link>
-                        <Link
-                          to="/meal-planner"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="block px-4 py-2 rounded-lg text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
-                        >
-                          Meal Plan
-                        </Link>
-                        <Link
-                          to="/pantry"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="block px-4 py-2 rounded-lg text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
-                        >
-                          My Pantry
-                        </Link>
-                        <Link
-                          to="/basket"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="block px-4 py-2 rounded-lg text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
-                        >
-                          Basket
-                        </Link>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block px-4 py-3 rounded-lg text-sm font-medium text-orange-600 hover:text-orange-700 hover:bg-orange-50 transition-colors duration-200"
-                  >
-                    <RiAdminFill className="h-4 w-4 inline mr-2" />
-                    Admin Panel
-                  </Link>
-                )}
-
+              {isAuthenticated && (
                 <div className="border-t border-gray-200 my-2"></div>
+              )}
 
-                {isAuthenticated ? (
-                  <>
-                    <Link
-                      to="/settings"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
-                    >
-                      <HiOutlineUserCircle className="h-4 w-4 inline mr-2" />
-                      Settings
-                    </Link>
-                    <button
-                      onClick={() => {
-                        handleLogout();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors duration-200"
-                    >
-                      <HiOutlineLogout className="h-4 w-4 inline mr-2" />
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
-                    >
-                      <HiOutlineLogin className="h-4 w-4 inline mr-2" />
-                      Login
-                    </Link>
-                    <Link
-                      to="/register"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block px-4 py-3 rounded-lg text-sm font-medium bg-emerald-500 text-white hover:bg-emerald-600 transition-colors duration-200"
-                    >
-                      <HiOutlineUserAdd className="h-4 w-4 inline mr-2" />
-                      Register
-                    </Link>
-                  </>
-                )}
-              </div>
+              {isAuthenticated && (
+                <>
+                  <button
+                    onClick={() => setMobileToolsOpen(!mobileToolsOpen)}
+                    className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
+                  >
+                    <span>Tools</span>
+                    <HiChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileToolsOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {mobileToolsOpen && (
+                    <div className="ml-4 space-y-1 animate-fade-in">
+                      <Link
+                        to="/personalized-recipes"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block px-4 py-2 rounded-lg text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
+                      >
+                        For You
+                      </Link>
+                      <Link
+                        to="/meal-planner"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block px-4 py-2 rounded-lg text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
+                      >
+                        Meal Plan
+                      </Link>
+                      <Link
+                        to="/pantry"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block px-4 py-2 rounded-lg text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
+                      >
+                        My Pantry
+                      </Link>
+                      <Link
+                        to="/basket"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block px-4 py-2 rounded-lg text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
+                      >
+                        Basket
+                      </Link>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-4 py-3 rounded-lg text-sm font-medium text-orange-600 hover:text-orange-700 hover:bg-orange-50 transition-colors duration-200"
+                >
+                  <RiAdminFill className="h-4 w-4 inline mr-2" />
+                  Admin Panel
+                </Link>
+              )}
+
+              <div className="border-t border-gray-200 my-2"></div>
+
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/settings"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
+                  >
+                    <HiOutlineUserCircle className="h-4 w-4 inline mr-2" />
+                    Settings
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors duration-200"
+                  >
+                    <HiOutlineLogout className="h-4 w-4 inline mr-2" />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
+                  >
+                    <HiOutlineLogin className="h-4 w-4 inline mr-2" />
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-4 py-3 rounded-lg text-sm font-medium bg-emerald-500 text-white hover:bg-emerald-600 transition-colors duration-200"
+                  >
+                    <HiOutlineUserAdd className="h-4 w-4 inline mr-2" />
+                    Register
+                  </Link>
+                </>
+              )}
             </div>
+          </div>
         )}
       </div>
     </nav>
