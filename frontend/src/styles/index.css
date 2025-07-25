@@ -1112,6 +1112,57 @@ h3 {
   padding-bottom: env(safe-area-inset-bottom, 1rem);
 }
 
+/* Admin Navigation Enhancements */
+.admin-nav-link {
+  @apply inline-flex items-center text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 font-medium rounded-lg transition-all duration-200 ease-out border border-transparent hover:border-emerald-200;
+  height: 2.5rem;
+  box-sizing: border-box;
+}
+
+.admin-nav-link-active {
+  @apply inline-flex items-center text-emerald-700 bg-emerald-100 font-medium rounded-lg border border-emerald-300;
+  height: 2.5rem;
+  box-sizing: border-box;
+}
+
+.admin-nav-home-link {
+  @apply inline-flex items-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 font-medium rounded-lg transition-all duration-200 ease-out border border-transparent hover:border-blue-200;
+  height: 2.5rem;
+  box-sizing: border-box;
+}
+
+.admin-user-badge {
+  @apply inline-flex items-center px-3 py-2 bg-gray-50 rounded-lg border border-gray-200 text-sm font-medium text-gray-700;
+  height: 2.5rem;
+  box-sizing: border-box;
+}
+
+/* Admin Navigation Enhancements */
+.admin-nav-link {
+  @apply inline-flex items-center justify-center text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 font-medium py-3 px-4 rounded-lg transition-all duration-200 ease-out border border-transparent hover:border-emerald-200;
+}
+
+.admin-nav-link-active {
+  @apply text-emerald-600 bg-emerald-50 font-medium py-3 px-4 rounded-lg border border-emerald-200;
+}
+
+.admin-nav-home-link {
+  @apply inline-flex items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 font-medium py-3 px-4 rounded-lg transition-all duration-200 ease-out border border-transparent hover:border-blue-200;
+}
+
+.admin-user-badge {
+  @apply px-3 py-2 bg-gray-50 rounded-lg border border-gray-200 text-sm font-medium text-gray-700;
+}
+
+/* Enhanced admin navigation height */
+.h-18 {
+  height: 4.5rem;
+}
+
+.h-20 {
+  height: 5rem;
+}
+
 /* Line clamp utility */
 .line-clamp-2 {
   display: -webkit-box;
