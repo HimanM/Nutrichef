@@ -88,7 +88,7 @@ const ForumPage = () => {
                     {/* Header */}
                     <div className="text-center mb-6 animate-fade-in">
                         <h1 className="text-2xl md:text-3xl font-bold mb-2">
-                            <span className="gradient-text">Recipe Forum</span>
+                            <span className="gradient-text">NutriChef Forum</span>
                         </h1>
                         <p className="text-sm text-gray-600 max-w-2xl mx-auto">
                             Share your culinary experiences, discover new recipes, and connect with fellow food enthusiasts
