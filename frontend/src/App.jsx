@@ -42,6 +42,10 @@ import CommentManagementPage from './pages/admin/CommentManagementPage.jsx';
 import ClassificationScoresPage from './pages/admin/ClassificationScoresPage.jsx';
 import AdminContactMessagesPage from './pages/admin/AdminContactMessagesPage.jsx';
 import AdminLogsMonitorPage from './pages/admin/AdminLogsMonitorPage.jsx';
+import AdminForumPage from './pages/admin/AdminForumPage.jsx';
+
+import ForumPage from './pages/forum/ForumPage.jsx';
+import ForumPostDetailPage from './pages/forum/ForumPostDetailPage.jsx';
 
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ModalProvider } from './context/ModalContext.jsx';
@@ -91,6 +95,8 @@ function App() {
                         <Route path="/contact-us" element={<ContactUsPage />} />
                         <Route path="/about" element={<AboutUsPage />} />
                         <Route path="/privacy" element={<PrivacyPolicyPage />} />
+                        <Route path="/forum" element={<ForumPage />} />
+                        <Route path="/forum/posts/:postId" element={<ForumPostDetailPage />} />
 
                         <Route element={<PrivateRoute />}>
                             <Route path="/settings" element={<UserSettingsPage />} />
@@ -108,6 +114,7 @@ function App() {
                             <Route path="classification-scores" element={<ClassificationScoresPage />} />
                             <Route path="contact-messages" element={<AdminContactMessagesPage />} />
                             <Route path="logs-monitor" element={<AdminLogsMonitorPage />} />
+                            <Route path="forum" element={<AdminForumPage />} />
                           </Route>
                         </Route>
 

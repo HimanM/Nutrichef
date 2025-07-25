@@ -65,6 +65,7 @@ const NavigationBar = () => {
   const navLinks = [
     { to: "/", label: "Home" },
     { to: "/recipes", label: "Recipes" },
+    { to: "/forum", label: "Forum" },
     { to: "/classifier", label: "Classify" },
     { to: "/ingredient-substitute", label: "Substitutes" },
     { to: "/food-lookup", label: "Food Lookup" },
@@ -73,13 +74,13 @@ const NavigationBar = () => {
 
   return (
     <nav ref={navRef} className="glass sticky top-0 z-50 border-b border-white/20 shadow-soft backdrop-blur-xl">
-      <div className="container-modern">
+      <div className="container-modern-nav">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center animate-fade-in">
             <Link to="/" className="flex items-center hover:scale-105 transition-transform duration-200">
               <div className="relative flex items-center">
-                <div className="nutrichef-logo nutrichef-logo-md mr-2"></div>
+                <div className="nutrichef-logo nutrichef-logo-md mr-3"></div>
                 
               </div>
               <span className="font-bold text-xl navbar-logo">NutriChef</span>

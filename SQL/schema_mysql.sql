@@ -930,6 +930,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   UNIQUE KEY `Email` (`Email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
+
 --
 -- Dumping data for table `Users`
 --
@@ -937,6 +938,51 @@ CREATE TABLE IF NOT EXISTS `Users` (
 INSERT INTO `Users` (`UserID`, `Name`, `Email`, `PasswordHash`, `DietaryPreferences`, `CreatedAt`, `role`, `EmailVerificationToken`, `EmailVerificationTokenExpiresAt`, `IsEmailVerified`) VALUES
 (1, 'admin', 'Admin@nutrichef.com', 'scrypt:32768:8:1$x8TNac9dKwBri9Cv$d4fa0f5e7177e5b4e6d70885fb4942a5e7d341e451e30850d0d71376e69250dfa14e6903ada8c8d035ebdb890a37f655e627501933c3691e1ccb80f787a4385e', NULL, '2025-06-03 05:46:04', 'admin', NULL, NULL, 1),
 (2, 'Himan Manduja', 'mandujahiman@gmail.com', 'scrypt:32768:8:1$Ed9p5GJJcxnjtf4P$2903d3f12a7cf23a3cf0fadf5dbbb31e279b8b26d4d9cdcc1e8fe75f354a0a3aed6fab82f7231051f7ef59253ea21e903717e8780489f00f6061d98aefaaabcc', NULL, '2025-06-07 08:22:28', 'user', NULL, NULL, 1);
+
+
+CREATE TABLE ForumPosts (
+    Id INT PRIMARY KEY AUTO_INCREMENT,
+    UserId INT,
+    Title VARCHAR(255) NOT NULL,
+    Content TEXT NOT NULL,
+    LikesCount INT DEFAULT 0,
+    ViewsCount INT DEFAULT 0,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserId) REFERENCES Users(UserID) ON DELETE CASCADE
+)ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+
+-- Forum Comments table
+CREATE TABLE ForumComments (
+    Id INT PRIMARY KEY AUTO_INCREMENT,
+    PostId INT,
+    UserId INT,
+    Comment TEXT NOT NULL,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (PostId) REFERENCES ForumPosts(Id) ON DELETE CASCADE,
+    FOREIGN KEY (UserId) REFERENCES Users(UserID) ON DELETE CASCADE
+)ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+
+-- Forum Post Tags table (for recipe tags)
+CREATE TABLE ForumPostTags (
+    Id INT PRIMARY KEY AUTO_INCREMENT,
+    PostId INT,
+    RecipeId INT,
+    FOREIGN KEY (PostId) REFERENCES ForumPosts(Id) ON DELETE CASCADE,
+    FOREIGN KEY (RecipeId) REFERENCES Recipes(RecipeID) ON DELETE CASCADE
+)ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+
+-- Forum Likes table (for user-specific likes)
+CREATE TABLE ForumLikes (
+    Id INT PRIMARY KEY AUTO_INCREMENT,
+    PostId INT,
+    UserId INT,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_user_post_like (PostId, UserId),
+    FOREIGN KEY (PostId) REFERENCES ForumPosts(Id) ON DELETE CASCADE,
+    FOREIGN KEY (UserId) REFERENCES Users(UserID) ON DELETE CASCADE
+)ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+
 
 --
 -- Constraints for dumped tables

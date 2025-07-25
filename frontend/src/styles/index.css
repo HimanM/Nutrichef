@@ -317,6 +317,9 @@ h3 {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
+.container-modern-nav {
+  @apply max-w-full mx-auto px-4 sm:px-6 lg:px-8;
+}
 .section-padding {
   @apply py-12 sm:py-16 lg:py-20;
 }

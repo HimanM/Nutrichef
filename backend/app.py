@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from .db import db
 from .config import Config
 from . import models
-from .models import User, Recipe, Ingredient, RecipeIngredient, ClassificationResult, UserMealPlan
+from .models import User, Recipe, Ingredient, RecipeIngredient, ClassificationResult, UserMealPlan, ForumPost, ForumComment, ForumLike, ForumPostTag
 from .dao import UserDAO, IngredientDAO, RecipeDAO
 from .services import UserService, RecipeService
 from flask_jwt_extended import JWTManager, get_jwt_identity
@@ -37,6 +37,7 @@ from .routes.contact_message_routes import contact_message_bp
 from .routes.favorites_routes import favorites_bp
 from .routes.tags_routes import tags_bp
 from .routes.recipe_comment_routes import recipe_comment_bp
+from .routes.forum_routes import forum_bp
 
 log_header("Application Startup")
 app = Flask(__name__, 
@@ -123,6 +124,7 @@ app.register_blueprint(contact_message_bp)
 app.register_blueprint(favorites_bp)
 app.register_blueprint(tags_bp)
 app.register_blueprint(recipe_comment_bp)
+app.register_blueprint(forum_bp)
 
 with app.app_context():
     log_header("Service Initialization")
@@ -190,7 +192,11 @@ def make_shell_context():
         'IngredientDAO': IngredientDAO,
         'RecipeDAO': RecipeDAO,
         'UserService': UserService,
-        'RecipeService': RecipeService
+        'RecipeService': RecipeService,
+        'ForumPost': ForumPost,
+        'ForumComment': ForumComment,
+        'ForumLike': ForumLike,
+        'ForumPostTag': ForumPostTag
     }
 
 if __name__ == '__main__':

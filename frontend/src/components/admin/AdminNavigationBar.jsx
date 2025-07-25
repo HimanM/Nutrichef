@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { HiOutlineViewGrid, HiOutlineUsers, HiOutlineCollection, HiOutlineChartBar, HiOutlineLogout, HiOutlineHome, HiMenu, HiX, HiTerminal } from 'react-icons/hi';
+import { HiOutlineViewGrid, HiOutlineUsers, HiOutlineCollection, HiOutlineChartBar, HiOutlineLogout, HiOutlineHome, HiMenu, HiX, HiTerminal, HiOutlineChat } from 'react-icons/hi';
 import { MdOutlineMessage } from 'react-icons/md';
 
 const AdminNavigationBar = () => {
@@ -53,6 +53,7 @@ const AdminNavigationBar = () => {
     { to: "/admin", label: "Dashboard", icon: HiOutlineViewGrid },
     { to: "/admin/users", label: "Users", icon: HiOutlineUsers },
     { to: "/admin/recipes", label: "Recipes", icon: HiOutlineCollection },
+    { to: "/admin/forum", label: "Forum", icon: HiOutlineChat },
     { to: "/admin/classification-scores", label: "Analytics", icon: HiOutlineChartBar },
     { to: "/admin/contact-messages", label: "Messages", icon: MdOutlineMessage },
     { to: "/admin/logs-monitor", label: "Monitor", icon: HiTerminal },
