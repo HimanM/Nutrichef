@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_current_user
-from ..services.forum_service import ForumService
+from backend.services.main.forum_service import ForumService
 from functools import wraps
 
 forum_bp = Blueprint('forum_bp', __name__, url_prefix='/api/forum')

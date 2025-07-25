@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
-import { useConditionalAuth } from '../components/auth/AuthGuard.jsx';
-import { authenticatedFetch } from '../utils/apiUtil.js';
-import { consolidateBasketItems } from '../utils/basketUtils.js';
-import { PageLoaderSpinner, InlineSpinner } from '../components/common/LoadingComponents.jsx';
-import StarRating from '../components/ui/StarRating';
-import RequireLoginModal from '../components/auth/RequireLoginModal.jsx';
-import InteractiveModal from '../components/ui/InteractiveModal.jsx';
-import RecipeComments from '../components/pages/recipe/RecipeComments.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { useConditionalAuth } from '../../components/auth/AuthGuard.jsx';
+import { authenticatedFetch } from '../../utils/apiUtil.js';
+import { consolidateBasketItems } from '../../utils/basketUtils.js';
+import { PageLoaderSpinner, InlineSpinner } from '../../components/common/LoadingComponents.jsx';
+import StarRating from '../../components/ui/StarRating';
+import RequireLoginModal from '../../components/auth/RequireLoginModal.jsx';
+import InteractiveModal from '../../components/ui/InteractiveModal.jsx';
+import RecipeComments from '../../components/pages/recipe/RecipeComments.jsx';
 import { FiLock, FiUnlock } from 'react-icons/fi';
 
 const SHOPPING_BASKET_KEY = 'shoppingBasketItems';

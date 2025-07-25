@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request, Response, stream_template, render_template # Added request back
 from functools import wraps
-from backend.services.admin_service import AdminService
-from backend.services.recipe_comment_service import RecipeCommentService
-from backend.services.forum_service import ForumService
+from backend.services.main.admin_service import AdminService
+from backend.services.main.recipe_comment_service import RecipeCommentService
+from backend.services.main.forum_service import ForumService
 from flask_jwt_extended import jwt_required, get_current_user
 from backend.utils.log_monitor import log_monitor
 from backend.dao.user_dao import UserDAO

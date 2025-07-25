@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from ..services import ClassificationService
-from backend.services.nutrition_service import NutritionService
+from backend.services.main.nutrition_service import NutritionService
 
 classification_bp = Blueprint('classification_bp', __name__, url_prefix='/api')
 classification_service = ClassificationService()

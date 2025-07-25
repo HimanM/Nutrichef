@@ -14,7 +14,7 @@ import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import UserRegistrationPage from './pages/UserRegistrationPage.jsx';
 
-import PublicRecipeBrowserPage from './pages/PublicRecipeBrowserPage.jsx';
+import PublicRecipeBrowserPage from './pages/recipes/PublicRecipeBrowserPage.jsx';
 import IngredientClassifierPage from './pages/IngredientClassifierPage.jsx';
 import IngredientSubstitutePage from './pages/IngredientSubstitutePage.jsx';
 import FoodLookupPage from './pages/FoodLookupPage.jsx';
@@ -27,8 +27,8 @@ import ContactUsPage from './pages/ContactUsPage.jsx';
 import AboutUsPage from './pages/AboutUsPage.jsx';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage.jsx';
 
-import RecipeDetailPage from './pages/RecipeDetailPage.jsx';
-import RecipeSuggestionsPage from './pages/RecipeSuggestionsPage.jsx';
+import RecipeDetailPage from './pages/recipes/RecipeDetailPage.jsx';
+import RecipeSuggestionsPage from './pages/recipes/RecipeSuggestionsPage.jsx';
 import ShoppingBasketPage from './pages/ShoppingBasketPage.jsx';
 import UserSettingsPage from './pages/UserSettingsPage.jsx';
 

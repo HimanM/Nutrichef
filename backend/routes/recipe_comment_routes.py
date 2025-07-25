@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from backend.services.recipe_comment_service import RecipeCommentService
+from backend.services.main.recipe_comment_service import RecipeCommentService
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_current_user
 
 recipe_comment_bp = Blueprint('recipe_comment_bp', __name__, url_prefix='/api')

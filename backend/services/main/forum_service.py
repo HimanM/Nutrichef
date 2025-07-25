@@ -1,5 +1,5 @@
-from ..dao.forum_dao import ForumDAO
-from ..utils.logging_utils import log_info, log_error
+from backend.dao.forum_dao import ForumDAO
+from backend.utils.logging_utils import log_info, log_error
 import re
 
 class ForumService:

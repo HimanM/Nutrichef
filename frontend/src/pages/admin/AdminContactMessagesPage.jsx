@@ -200,11 +200,9 @@ const AdminContactMessagesPage = () => {
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">View and respond to messages submitted via the contact form.</p>
         </div>
         
-        {error && (
+        {error && messages.length === 0 ? (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">{error}</div>
-        )}
-        
-        {loading && messages.length === 0 ? (
+        ) : loading && messages.length === 0 ? (
           <div className="flex justify-center items-center h-64">
             <AiOutlineLoading className="animate-spin text-4xl text-emerald-500" />
             <p className="ml-2">Loading messages...</p>

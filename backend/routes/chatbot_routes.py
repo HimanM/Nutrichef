@@ -3,7 +3,7 @@ from werkzeug.exceptions import BadRequest
 import os
 
 try:
-    from backend.services.chatbot_service import ChatbotService
+    from backend.services.main.chatbot_service import ChatbotService
 except ImportError:
     from services.chatbot_service import ChatbotService
 

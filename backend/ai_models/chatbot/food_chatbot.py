@@ -1,8 +1,8 @@
 import spacy
 import os
 from backend.ai_models.food_classification.food_classifier import FoodClassifier
-from backend.services.food_lookup_service import FoodLookupService
-from backend.services.substitution_service import SubstitutionService
+from backend.services.main.food_lookup_service import FoodLookupService
+from backend.services.main.substitution_service import SubstitutionService
 
 class FoodChatbot:
     def __init__(self, food_classifier_instance: FoodClassifier,

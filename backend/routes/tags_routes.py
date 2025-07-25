@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from backend.services.tags_service import TagsService
+from backend.services.main.tags_service import TagsService
 
 tags_bp = Blueprint('tags_bp', __name__, url_prefix='/api')
 

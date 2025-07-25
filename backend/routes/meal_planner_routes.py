@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from ..services.meal_planner_service import MealPlannerService
-from ..services.meal_suggestion_service import MealSuggestionService
+from ..services.main.meal_planner_service import MealPlannerService
+from ..services.main.meal_suggestion_service import MealSuggestionService
 
 meal_planner_bp = Blueprint('meal_planner_bp', __name__, url_prefix='/api/meal-planner')
 meal_planner_service = MealPlannerService()

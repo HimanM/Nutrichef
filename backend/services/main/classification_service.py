@@ -6,7 +6,7 @@ from backend.ai_models.food_classification.food_classifier import FoodClassifier
 import json
 from backend.dao import ClassificationResultDAO
 from backend.db import db
-from backend.services.nutrition_service import NutritionService
+from backend.services.main.nutrition_service import NutritionService
 from backend.utils.logging_utils import log_info, log_warning, log_error
 
 class ClassificationService:

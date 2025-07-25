@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
-import { useConditionalAuth } from '../components/auth/AuthGuard.jsx';
-import RecipeCard from '../components/pages/recipe/RecipeCard.jsx';
-import { authenticatedFetch } from '../utils/apiUtil.js';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { useConditionalAuth } from '../../components/auth/AuthGuard.jsx';
+import RecipeCard from '../../components/pages/recipe/RecipeCard.jsx';
+import { authenticatedFetch } from '../../utils/apiUtil.js';
 import { HiOutlineRefresh } from 'react-icons/hi';
 
 function RecipeSuggestionsPage() {
