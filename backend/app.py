@@ -1,10 +1,4 @@
 from flask import Flask, jsonify
-from .db import db
-from .config import Config
-from . import models
-from .models import User, Recipe, Ingredient, RecipeIngredient, ClassificationResult, UserMealPlan, ForumPost, ForumComment, ForumLike, ForumPostTag
-from .dao import UserDAO, IngredientDAO, RecipeDAO
-from .services import UserService, RecipeService
 from flask_jwt_extended import JWTManager, get_jwt_identity
 from flask_mail import Mail
 import os
@@ -12,35 +6,41 @@ import signal
 import sys
 import atexit
 from datetime import timedelta
-from .utils.logging_utils import suppress_external_warnings, log_header, log_info
-from .utils.log_monitor import log_monitor
+from backend.db import db
+from backend.config import Config
+import backend.models
+from backend.models import User, Recipe, Ingredient, RecipeIngredient, ClassificationResult, UserMealPlan, ForumPost, ForumComment, ForumLike, ForumPostTag
+from backend.dao import UserDAO, IngredientDAO, RecipeDAO
+from backend.services import UserService, RecipeService
+from backend.utils.logging_utils import suppress_external_warnings, log_header, log_info
+from backend.utils.log_monitor import log_monitor
+from backend.routes.user_routes import user_bp
+from backend.routes.recipe_routes import recipe_bp
+from backend.routes.meal_planner_routes import meal_planner_bp
+from backend.routes.shopping_list_routes import shopping_list_bp
+from backend.routes.classification_routes import classification_bp
+from backend.routes.substitution_routes import substitute_bp
+from backend.routes.admin_routes import admin_bp
+from backend.routes.ingredient_routes import ingredient_bp
+from backend.routes.nlp_routes import nlp_bp
+from backend.routes.allergy_routes import allergy_bp
+from backend.routes.personalized_recipe_routes import personalized_recipe_bp
+from backend.routes.nutrition_routes import nutrition_bp
+from backend.routes.food_lookup_routes import food_lookup_bp
+from backend.routes.chatbot_routes import chatbot_bp, initialize_chatbot_service
+from backend.routes.pantry_routes import pantry_bp
+from backend.routes.contact_message_routes import contact_message_bp
+from backend.routes.favorites_routes import favorites_bp
+from backend.routes.tags_routes import tags_bp
+from backend.routes.recipe_comment_routes import recipe_comment_bp
+from backend.routes.forum_routes import forum_bp
+from backend.routes.notification_routes import notification_bp
 
 # Suppress warnings before other imports
 suppress_external_warnings()
 
-from .routes.user_routes import user_bp
-from .routes.recipe_routes import recipe_bp
-from .routes.meal_planner_routes import meal_planner_bp
-from .routes.shopping_list_routes import shopping_list_bp
-from .routes.classification_routes import classification_bp
-from .routes.substitution_routes import substitute_bp
-from .routes.admin_routes import admin_bp
-from .routes.ingredient_routes import ingredient_bp
-from .routes.nlp_routes import nlp_bp
-from .routes.allergy_routes import allergy_bp
-from .routes.personalized_recipe_routes import personalized_recipe_bp
-from .routes.nutrition_routes import nutrition_bp
-from .routes.food_lookup_routes import food_lookup_bp
-from .routes.chatbot_routes import chatbot_bp, initialize_chatbot_service
-from .routes.pantry_routes import pantry_bp
-from .routes.contact_message_routes import contact_message_bp
-from .routes.favorites_routes import favorites_bp
-from .routes.tags_routes import tags_bp
-from .routes.recipe_comment_routes import recipe_comment_bp
-from .routes.forum_routes import forum_bp
-from .routes.notification_routes import notification_bp
-
 log_header("Application Startup")
+
 app = Flask(__name__, 
            static_folder='static', 
            static_url_path='/static',
@@ -60,7 +60,7 @@ app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "your-super-secr
 # app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=1)
 
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)  # Set JWT access token to expire in 1 hour
-app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)  # Set
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)  # Set JWT refresh token to expire in 7 days
 jwt = JWTManager(app)
 
 @jwt.expired_token_loader

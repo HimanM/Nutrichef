@@ -1,5 +1,5 @@
 import os
-from .utils.logging_utils import log_info, log_success, log_warning
+from backend.utils.logging_utils import log_info, log_success, log_warning
 
 class Config:
     DB_USER = os.environ.get('DB_USER')

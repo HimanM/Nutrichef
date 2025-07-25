@@ -1,6 +1,6 @@
 from ..db import db
 from datetime import datetime
-from .allergy_intolerance import AllergyIntolerance
+from backend.models.allergy_intolerance import AllergyIntolerance
 
 ingredient_allergies_association_table = db.Table(
     'IngredientAllergiesIntolerances',
