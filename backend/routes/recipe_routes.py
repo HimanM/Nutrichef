@@ -3,7 +3,7 @@ import os
 import uuid
 from werkzeug.utils import secure_filename
 from ..services import RecipeService, RecipeRatingService # Relative imports
-from ..services.recipe_pipeline_service import RecipePipelineService
+from ..services.main.recipe_pipeline_service import RecipePipelineService
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}

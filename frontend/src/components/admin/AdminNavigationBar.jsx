@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { HiOutlineViewGrid, HiOutlineUsers, HiOutlineCollection, HiOutlineChartBar, HiOutlineLogout, HiOutlineHome, HiMenu, HiX, HiTerminal } from 'react-icons/hi';
+import { HiOutlineViewGrid, HiOutlineUsers, HiOutlineCollection, HiOutlineChartBar, HiOutlineLogout, HiOutlineHome, HiMenu, HiX, HiTerminal, HiOutlineChat } from 'react-icons/hi';
 import { MdOutlineMessage } from 'react-icons/md';
 
 const AdminNavigationBar = () => {
   const { currentUser, logout, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navRef = useRef(null);
 
@@ -53,6 +54,7 @@ const AdminNavigationBar = () => {
     { to: "/admin", label: "Dashboard", icon: HiOutlineViewGrid },
     { to: "/admin/users", label: "Users", icon: HiOutlineUsers },
     { to: "/admin/recipes", label: "Recipes", icon: HiOutlineCollection },
+    { to: "/admin/forum", label: "Forum", icon: HiOutlineChat },
     { to: "/admin/classification-scores", label: "Analytics", icon: HiOutlineChartBar },
     { to: "/admin/contact-messages", label: "Messages", icon: MdOutlineMessage },
     { to: "/admin/logs-monitor", label: "Monitor", icon: HiTerminal },
@@ -60,7 +62,7 @@ const AdminNavigationBar = () => {
 
   return (
     <nav ref={navRef} className="glass sticky top-0 z-50 border-b border-white/20 shadow-soft backdrop-blur-xl">
-      <div className="container-modern">
+      <div className="container-modern-nav">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/admin" className="font-bold text-xl gradient-text animate-fade-in flex-shrink-0">
@@ -71,10 +73,16 @@ const AdminNavigationBar = () => {
           <div className="hidden lg:flex items-center space-x-1 xl:space-x-2 flex-1 ml-6 xl:ml-8">
             {adminNavLinks.map((link) => {
               const IconComponent = link.icon;
+              const isActive = location.pathname === link.to;
               return (
-                <Link key={link.to} to={link.to} className="btn-ghost px-2 xl:px-3 py-2 text-sm whitespace-nowrap">
-                  <IconComponent className="h-4 w-4 mr-1 xl:mr-1.5" />
-                  {link.label}
+                <Link 
+                  key={link.to} 
+                  to={link.to} 
+                  className={`${isActive ? 'admin-nav-link-active' : 'admin-nav-link'} px-3 xl:px-4 py-2 text-sm font-medium whitespace-nowrap`}
+                >
+                  <IconComponent className="h-4 w-4 mr-1.5 flex-shrink-0" />
+                  <span className="hidden xl:inline">{link.label}</span>
+                  <span className="lg:inline xl:hidden">{link.label.split(' ')[0]}</span>
                 </Link>
               );
             })}
@@ -82,26 +90,27 @@ const AdminNavigationBar = () => {
 
           {/* Desktop Auth Section */}
           <div className="hidden lg:flex items-center space-x-2 xl:space-x-3 flex-shrink-0">
-            <Link to="/" className="btn-ghost px-2 xl:px-3 py-2 text-sm whitespace-nowrap">
-              <HiOutlineHome className="h-4 w-4 mr-1 xl:mr-1.5" />
+            <Link to="/" className="admin-nav-home-link px-3 xl:px-4 py-2 text-sm font-medium whitespace-nowrap">
+              <HiOutlineHome className="h-4 w-4 mr-1.5 flex-shrink-0" />
               <span className="hidden xl:inline">Main Site</span>
               <span className="lg:inline xl:hidden">Home</span>
             </Link>
             {currentUser ? (
               <>
-                <span className="text-sm font-medium text-gray-700 max-w-32 xl:max-w-48 truncate">
+                <div className="admin-user-badge max-w-32 xl:max-w-48 truncate">
                   {currentUser.Name || currentUser.Email}
-                </span>
+                </div>
                 <button
                   onClick={handleLogout}
                   className="btn-danger-outline"
                 >
-                  <HiOutlineLogout className="h-4 w-4 mr-1 xl:mr-1.5" />
-                  Logout
+                  <HiOutlineLogout className="h-4 w-4 mr-1.5 flex-shrink-0" />
+                  <span className="hidden xl:inline">Logout</span>
+                  <span className="lg:inline xl:hidden">Exit</span>
                 </button>
               </>
             ) : (
-              <Link to="/login" className="btn-ghost">Login</Link>
+              <Link to="/login" className="btn-ghost px-3 py-2">Login</Link>
             )}
           </div>
 

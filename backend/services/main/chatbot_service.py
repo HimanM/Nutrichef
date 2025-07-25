@@ -5,8 +5,8 @@ from werkzeug.utils import secure_filename
 
 from backend.ai_models.chatbot.food_chatbot import FoodChatbot
 from backend.ai_models.food_classification.food_classifier import FoodClassifier
-from backend.services.food_lookup_service import FoodLookupService
-from backend.services.substitution_service import SubstitutionService
+from backend.services.main.food_lookup_service import FoodLookupService
+from backend.services.main.substitution_service import SubstitutionService
 from backend.utils.logging_utils import log_info, log_success, log_warning, log_error
 
 

@@ -19,7 +19,7 @@ def test_email_integration():
     try:
         # Import Flask app
         from backend.app import app
-        from backend.services.email_service import EmailService
+        from backend.services.util.email_service import EmailService
         
         with app.app_context():
             print("✅ Flask app context created successfully")

@@ -1,5 +1,5 @@
-from ..dao.tags_dao import TagsDAO
-from ..dao.recipe_dao import RecipeDAO
+from backend.dao.tags_dao import TagsDAO
+from backend.dao.recipe_dao import RecipeDAO
 
 class TagsService:
     def __init__(self):

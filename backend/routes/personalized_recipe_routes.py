@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from backend.services.recipe_service import RecipeService
+from backend.services.main.recipe_service import RecipeService
 
 personalized_recipe_bp = Blueprint('personalized_recipe_bp', __name__, url_prefix='/api')
 

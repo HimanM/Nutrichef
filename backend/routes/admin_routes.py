@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request, Response, stream_template, render_template # Added request back
 from functools import wraps
-from backend.services.admin_service import AdminService
-from backend.services.recipe_comment_service import RecipeCommentService
+from backend.services.main.admin_service import AdminService
+from backend.services.main.recipe_comment_service import RecipeCommentService
+from backend.services.main.forum_service import ForumService
 from flask_jwt_extended import jwt_required, get_current_user
 from backend.utils.log_monitor import log_monitor
 from backend.dao.user_dao import UserDAO
@@ -12,6 +13,7 @@ import uuid
 admin_bp = Blueprint('admin_bp', __name__, url_prefix='/api/admin')
 admin_service = AdminService()
 comment_service = RecipeCommentService()
+forum_service = ForumService()
 
 def admin_required(fn):
     @wraps(fn)
@@ -262,3 +264,70 @@ def admin_delete_comment(comment_id):
         
     except Exception as e:
         return jsonify({'error': 'Failed to delete comment'}), 500
+
+# Forum management routes
+@admin_bp.route('/forum/posts', methods=['GET'])
+@admin_required
+def get_all_forum_posts():
+    """Get all forum posts for admin management"""
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 20, type=int)
+        sort_by = request.args.get('sort_by', 'Id')
+        sort_order = request.args.get('sort_order', 'desc')
+        
+        data, error, status = forum_service.get_all_posts_for_admin(page, per_page, sort_by, sort_order)
+        
+        if error:
+            return jsonify(error), status
+        return jsonify(data), status
+        
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch forum posts'}), 500
+
+@admin_bp.route('/forum/posts/<int:post_id>', methods=['DELETE'])
+@admin_required
+def admin_delete_forum_post(post_id):
+    """Admin delete a forum post"""
+    try:
+        data, error, status = forum_service.delete_post(post_id, is_admin=True)
+        
+        if error:
+            return jsonify(error), status
+        return jsonify(data), status
+        
+    except Exception as e:
+        return jsonify({'error': 'Failed to delete forum post'}), 500
+
+@admin_bp.route('/forum/comments', methods=['GET'])
+@admin_required
+def get_all_forum_comments():
+    """Get all forum comments for admin management"""
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 20, type=int)
+        sort_by = request.args.get('sort_by', 'Id')
+        sort_order = request.args.get('sort_order', 'desc')
+        
+        data, error, status = forum_service.get_all_comments_for_admin(page, per_page, sort_by, sort_order)
+        
+        if error:
+            return jsonify(error), status
+        return jsonify(data), status
+        
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch forum comments'}), 500
+
+@admin_bp.route('/forum/comments/<int:comment_id>', methods=['DELETE'])
+@admin_required
+def admin_delete_forum_comment(comment_id):
+    """Admin delete a forum comment"""
+    try:
+        data, error, status = forum_service.delete_comment(comment_id, is_admin=True)
+        
+        if error:
+            return jsonify(error), status
+        return jsonify(data), status
+        
+    except Exception as e:
+        return jsonify({'error': 'Failed to delete forum comment'}), 500

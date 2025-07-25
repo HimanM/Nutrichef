@@ -164,6 +164,10 @@ h3 {
   @apply inline-flex items-center justify-center text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 font-medium py-2 px-4 rounded-lg transition-all duration-200 ease-out;
 }
 
+.btn-ghost-admin {
+  @apply inline-flex items-center justify-center text-red-600  hover:text-orange-700 hover:bg-orange-50 font-medium py-2 px-4 rounded-lg transition-all duration-200 ease-out;
+}
+
 .btn-danger {
   @apply inline-flex items-center justify-center bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 ease-out transform hover:scale-105 hover:shadow-lg shadow-md;
 }
@@ -317,6 +321,9 @@ h3 {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
+.container-modern-nav {
+  @apply max-w-full mx-auto px-4 sm:px-6 lg:px-8;
+}
 .section-padding {
   @apply py-12 sm:py-16 lg:py-20;
 }
@@ -1109,6 +1116,57 @@ h3 {
   padding-bottom: env(safe-area-inset-bottom, 1rem);
 }
 
+/* Admin Navigation Enhancements */
+.admin-nav-link {
+  @apply inline-flex items-center text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 font-medium rounded-lg transition-all duration-200 ease-out border border-transparent hover:border-emerald-200;
+  height: 2.5rem;
+  box-sizing: border-box;
+}
+
+.admin-nav-link-active {
+  @apply inline-flex items-center text-emerald-700 bg-emerald-100 font-medium rounded-lg border border-emerald-300;
+  height: 2.5rem;
+  box-sizing: border-box;
+}
+
+.admin-nav-home-link {
+  @apply inline-flex items-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 font-medium rounded-lg transition-all duration-200 ease-out border border-transparent hover:border-blue-200;
+  height: 2.5rem;
+  box-sizing: border-box;
+}
+
+.admin-user-badge {
+  @apply inline-flex items-center px-3 py-2 bg-gray-50 rounded-lg border border-gray-200 text-sm font-medium text-gray-700;
+  height: 2.5rem;
+  box-sizing: border-box;
+}
+
+/* Admin Navigation Enhancements */
+.admin-nav-link {
+  @apply inline-flex items-center justify-center text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 font-medium py-3 px-4 rounded-lg transition-all duration-200 ease-out border border-transparent hover:border-emerald-200;
+}
+
+.admin-nav-link-active {
+  @apply text-emerald-600 bg-emerald-50 font-medium py-3 px-4 rounded-lg border border-emerald-200;
+}
+
+.admin-nav-home-link {
+  @apply inline-flex items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 font-medium py-3 px-4 rounded-lg transition-all duration-200 ease-out border border-transparent hover:border-blue-200;
+}
+
+.admin-user-badge {
+  @apply px-3 py-2 bg-gray-50 rounded-lg border border-gray-200 text-sm font-medium text-gray-700;
+}
+
+/* Enhanced admin navigation height */
+.h-18 {
+  height: 4.5rem;
+}
+
+.h-20 {
+  height: 5rem;
+}
+
 /* Line clamp utility */
 .line-clamp-2 {
   display: -webkit-box;
@@ -1167,4 +1225,80 @@ h3 {
 
 .mobile-modal-content {
   overscroll-behavior: contain;
+}
+
+/* Enhanced Notification Styles */
+.notification-card {
+  @apply relative rounded-xl border transition-all duration-200 hover:shadow-md;
+}
+
+.notification-card-unread {
+  @apply bg-emerald-50 border-emerald-200 hover:border-emerald-300;
+}
+
+.notification-card-read {
+  @apply bg-white border-gray-200 hover:border-gray-300;
+}
+
+.notification-button {
+  @apply w-full text-left p-4 rounded-xl hover:bg-gray-50 transition-colors duration-200 touch-manipulation;
+}
+
+.notification-unread-indicator {
+  @apply w-2 h-2 bg-emerald-500 rounded-full flex-shrink-0;
+}
+
+.notification-action-button {
+  @apply flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 touch-manipulation;
+}
+
+.notification-action-button:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.notification-mark-read {
+  @apply text-emerald-700 bg-emerald-50 hover:bg-emerald-100;
+}
+
+.notification-clear-all {
+  @apply text-red-600 bg-red-50 hover:bg-red-100;
+}
+
+.notification-empty-state {
+  @apply flex flex-col items-center justify-center py-12 text-gray-500;
+}
+
+.notification-empty-icon {
+  @apply w-16 h-16 mb-4 rounded-full bg-gray-100 flex items-center justify-center;
+}
+
+.notification-timestamp {
+  @apply text-xs text-gray-500 mt-2 flex items-center gap-1;
+}
+
+/* Mobile-specific notification enhancements */
+@media (max-width: 640px) {
+  .notification-card {
+    @apply mx-0 rounded-lg;
+  }
+  
+  .notification-button {
+    @apply p-3;
+  }
+  
+  .notification-action-button {
+    @apply px-2 py-1.5 text-xs;
+  }
+  
+  .notification-action-button span {
+    @apply hidden;
+  }
+  
+  .notification-empty-state {
+    @apply py-8;
+  }
+  
+  .notification-empty-icon {
+    @apply w-12 h-12 mb-3;
+  }
 }

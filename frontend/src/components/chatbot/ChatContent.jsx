@@ -115,7 +115,7 @@ const ChatContent = ({
       </div>
 
       {/* Input Area */}
-      <div className="p-4 bg-white border-t border-gray-100">
+      <div className="p-4 border-t border-gray-100">
         <form onSubmit={handleSubmit} className="space-y-3">
           {imagePreviewUrl && (
             <div className="relative">

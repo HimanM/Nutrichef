@@ -11,6 +11,10 @@ from .recipe_rating import RecipeRating
 from .user_favorite_recipe import UserFavoriteRecipe
 from .recipe_tag import RecipeTag, RecipeTagAssignment
 from .recipe_comment import RecipeComment
+from .forum_post import ForumPost
+from .forum_comment import ForumComment
+from .forum_like import ForumLike
+from .forum_post_tag import ForumPostTag
 
 __all__ = [
     'User',
@@ -27,5 +31,9 @@ __all__ = [
     'UserFavoriteRecipe',
     'RecipeTag',
     'RecipeTagAssignment',
-    'RecipeComment'
+    'RecipeComment',
+    'ForumPost',
+    'ForumComment',
+    'ForumLike',
+    'ForumPostTag'
 ]

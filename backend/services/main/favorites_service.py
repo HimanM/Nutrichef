@@ -1,5 +1,5 @@
-from ..dao.favorites_dao import FavoritesDAO
-from ..dao.recipe_dao import RecipeDAO
+from backend.dao.favorites_dao import FavoritesDAO
+from backend.dao.recipe_dao import RecipeDAO
 
 class FavoritesService:
     def __init__(self):

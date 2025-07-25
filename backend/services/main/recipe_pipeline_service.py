@@ -2,7 +2,7 @@ from backend.dao.recipe_dao import RecipeDAO
 from backend.dao.ingredient_dao import IngredientDAO
 from backend.ai_models.gemini_nlp.gemini_nlp_parser import GeminiNlpParser
 from backend.ai_models.allergy_analyzer.allergy_analyzer import AllergyAnalyzer
-from backend.services.tags_service import TagsService
+from backend.services.main.tags_service import TagsService
 from backend.db import db # For transaction management (db.session)
 from backend.models.ingredient import Ingredient # For type checking if needed
 from backend.models.recipe import Recipe # For type checking if needed
