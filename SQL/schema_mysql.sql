@@ -1001,14 +1001,13 @@ INSERT INTO `Users` (`UserID`, `Name`, `Email`, `PasswordHash`, `DietaryPreferen
 DROP TABLE IF EXISTS `Notifications`;
 CREATE TABLE IF NOT EXISTS `Notifications` (
     Id INT AUTO_INCREMENT PRIMARY KEY,
-    UserId INT NOT NULL, -- The user who receives the notification
-    Type VARCHAR(50) NOT NULL, -- e.g., 'forumComment', 'forumLike'
-    ReferenceId INT, -- e.g., commentId or likeId or postId
-    Message TEXT NOT NULL, -- Notification message to display
-    IsRead BOOLEAN DEFAULT FALSE, -- Has the user seen this notification?
+    UserId INT NOT NULL, 
+    Type VARCHAR(50) NOT NULL,
+    ReferenceId INT, 
+    Message TEXT NOT NULL,
+    IsRead BOOLEAN DEFAULT FALSE, 
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (UserId) REFERENCES User(Id)
-    -- Add additional foreign keys as needed for ReferenceId if you want strict integrity
+    FOREIGN KEY (UserId) REFERENCES Users(UserId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
