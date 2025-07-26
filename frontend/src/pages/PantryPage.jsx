@@ -6,6 +6,7 @@ import { useModal } from '../context/ModalContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { ButtonSpinner, PageLoaderSpinner } from '../components/common/LoadingComponents.jsx';
 import PantryViews from '../components/pages/pantry/PantryViews.jsx';
+import { StyledErrorDisplay } from '../components/common/ErrorDisplay.jsx';
 
 function PantryPage() {
     const { showModal } = useModal();

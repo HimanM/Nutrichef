@@ -7,6 +7,7 @@ import ResponsiveTable from '../../components/admin/ResponsiveTable';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { MdCheckCircle, MdError, MdOutlineRemoveRedEye, MdReply } from 'react-icons/md';
 import { HiX, HiEye, HiChat } from 'react-icons/hi';
+import { AdminErrorDisplay, AdminFullPageError } from '../../components/common/ErrorDisplay.jsx';
 
 const AdminContactMessagesPage = () => {
   const authContextValue = useAuth(); // Use the full auth context value
@@ -192,6 +193,17 @@ const AdminContactMessagesPage = () => {
     rowsPerPage: itemsPerPage
   };
 
+  if (error && messages.length === 0) {
+    return (
+      <AdminFullPageError 
+        error={error}
+        title="Contact Messages"
+        onRetry={fetchMessages}
+        retryText="Retry"
+      />
+    );
+  }
+
   return (
     <div className="section-padding">
       <div className="container-modern">
@@ -200,9 +212,7 @@ const AdminContactMessagesPage = () => {
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">View and respond to messages submitted via the contact form.</p>
         </div>
         
-        {error && messages.length === 0 ? (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">{error}</div>
-        ) : loading && messages.length === 0 ? (
+        {loading && messages.length === 0 ? (
           <div className="flex justify-center items-center h-64">
             <AiOutlineLoading className="animate-spin text-4xl text-emerald-500" />
             <p className="ml-2">Loading messages...</p>
@@ -212,14 +222,26 @@ const AdminContactMessagesPage = () => {
             No messages found.
           </div>
         ) : (
-          <ResponsiveTable
-            data={messages}
-            columns={columns}
-            loading={loading}
-            actions={actions}
-            pagination={pagination}
-            tableTitle="Messages"
-          />
+          <>
+            {error && messages.length > 0 && (
+              <div className="mb-4">
+                <AdminErrorDisplay 
+                  error={`Could not refresh messages: ${error}`}
+                  type="warning"
+                  onRetry={fetchMessages}
+                  retryText="Retry"
+                />
+              </div>
+            )}
+            <ResponsiveTable
+              data={messages}
+              columns={columns}
+              loading={loading}
+              actions={actions}
+              pagination={pagination}
+              tableTitle="Messages"
+            />
+          </>
         )}
 
         {/* View/Reply Modal */}

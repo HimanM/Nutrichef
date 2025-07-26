@@ -14,6 +14,7 @@ from backend.dao import UserDAO, IngredientDAO, RecipeDAO
 from backend.services import UserService, RecipeService
 from backend.utils.logging_utils import suppress_external_warnings, log_header, log_info
 from backend.utils.log_monitor import log_monitor
+from backend.utils.db_health_check import check_database_health
 from backend.routes.user_routes import user_bp
 from backend.routes.recipe_routes import recipe_bp
 from backend.routes.meal_planner_routes import meal_planner_bp
@@ -35,6 +36,7 @@ from backend.routes.tags_routes import tags_bp
 from backend.routes.recipe_comment_routes import recipe_comment_bp
 from backend.routes.forum_routes import forum_bp
 from backend.routes.notification_routes import notification_bp
+from backend.routes.health_routes import health_bp
 
 # Suppress warnings before other imports
 suppress_external_warnings()
@@ -54,6 +56,11 @@ log_info("Log monitoring initialized.", "Startup")
 app.config.from_object(Config)
 log_info("Configuration loaded from object.", "Startup")
 app.extensions = {}
+
+# Check database connectivity before proceeding
+log_header("Database Health Check")
+check_database_health(max_retries=3, retry_delay=2, exit_on_failure=True)
+log_info("Database connectivity verified.", "Startup")
 
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "your-super-secret-jwt-key-fallback")
 # # Set JWT access token to expire in 1 minute for testing
@@ -127,6 +134,7 @@ app.register_blueprint(tags_bp)
 app.register_blueprint(recipe_comment_bp)
 app.register_blueprint(forum_bp)
 app.register_blueprint(notification_bp)
+app.register_blueprint(health_bp)
 
 with app.app_context():
     log_header("Service Initialization")

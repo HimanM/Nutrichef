@@ -34,3 +34,17 @@ class Config:
         log_warning("GEMINI_API_KEY not found in environment variables.", "Config")
         
     PROJECT_NUMBER = os.environ.get('PROJECT_NUMBER')
+    
+    @classmethod
+    def get_db_connection_params(cls):
+        """
+        Get database connection parameters for health checks.
+        Returns a dictionary with connection parameters.
+        """
+        return {
+            'host': cls.DB_HOST or 'localhost',
+            'port': int(cls.DB_PORT or '3306'),
+            'user': cls.DB_USER or 'root',
+            'password': cls.DB_PASS or '',
+            'database': cls.DB_NAME or 'nutrichef_db'
+        }

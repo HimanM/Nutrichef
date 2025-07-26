@@ -4,6 +4,7 @@ import { useConditionalAuth } from '../components/auth/AuthGuard.jsx';
 import RecipeCard from '../components/pages/recipe/RecipeCard.jsx'; // Tailwind version
 import { authenticatedFetch } from '../utils/apiUtil.js';
 import { HiOutlineRefresh } from 'react-icons/hi';
+import { StyledErrorDisplay } from '../components/common/ErrorDisplay.jsx';
 
 function PersonalizedRecipesPage() {
     const [recipes, setRecipes] = useState([]);

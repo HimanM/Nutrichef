@@ -3,6 +3,7 @@ import { HiTrash, HiInformationCircle, HiChartBar } from 'react-icons/hi2';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useModal } from '../../context/ModalContext.jsx';
 import { authenticatedFetch } from '../../utils/apiUtil.js';
+import { AdminErrorDisplay, AdminFullPageError } from '../../components/common/ErrorDisplay.jsx';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -18,6 +19,7 @@ import {
 
 // Import custom components
 import SystemMetricsCards from '../../components/admin/SystemMetricsCards.jsx';
+import HealthCheckCards from '../../components/admin/HealthCheckCards.jsx';
 import PerformanceChart from '../../components/admin/PerformanceChart.jsx';
 import LogControls from '../../components/admin/LogControls.jsx';
 import LogsDisplay from '../../components/admin/LogsDisplay.jsx';
@@ -46,7 +48,7 @@ const PageLoaderSpinner = () => (
 const AdminLogsMonitorPage = () => {
     const authContextValue = useAuth();
     const { showModal } = useModal();
-    
+
     const [logs, setLogs] = useState([]);
     const [systemMetrics, setSystemMetrics] = useState({});
     const [connectionStatus, setConnectionStatus] = useState('connecting');
@@ -57,7 +59,7 @@ const AdminLogsMonitorPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
-    
+
     const [chartData, setChartData] = useState({
         labels: [],
         datasets: [
@@ -85,7 +87,7 @@ const AdminLogsMonitorPage = () => {
         warnings: 0,
         requests: 0
     });
-    
+
     const logContainerRef = useRef(null);
     const eventSourceRef = useRef(null);
     const chartRef = useRef(null);
@@ -99,7 +101,7 @@ const AdminLogsMonitorPage = () => {
         connectToStream();
         loadInitialData();
         initializeChart();
-        
+
         return () => {
             if (eventSourceRef.current) {
                 eventSourceRef.current.close();
@@ -125,14 +127,14 @@ const AdminLogsMonitorPage = () => {
         }
 
         eventSourceRef.current = new EventSource(`/api/admin/logs/stream?token=${token}`);
-        
+
         eventSourceRef.current.onopen = () => {
             setConnectionStatus('connected');
         };
 
         eventSourceRef.current.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            
+
             if (data.type === 'logs') {
                 data.data.forEach(addLogEntry);
             } else if (data.type === 'metrics') {
@@ -143,7 +145,7 @@ const AdminLogsMonitorPage = () => {
 
         eventSourceRef.current.onerror = (event) => {
             setConnectionStatus('error');
-            
+
             // Try to reconnect after 5 seconds
             setTimeout(connectToStream, 5000);
         };
@@ -157,17 +159,17 @@ const AdminLogsMonitorPage = () => {
                 authenticatedFetch('/api/admin/logs/recent?limit=50', { method: 'GET' }, authContextValue),
                 authenticatedFetch('/api/admin/system/metrics', { method: 'GET' }, authContextValue)
             ]);
-            
+
             if (!logsResponse.ok) {
                 throw new Error(`Failed to fetch logs: ${logsResponse.status}`);
             }
             if (!metricsResponse.ok) {
                 throw new Error(`Failed to fetch metrics: ${metricsResponse.status}`);
             }
-            
+
             const logsData = await logsResponse.json();
             const metricsData = await metricsResponse.json();
-            
+
             logsData.logs.forEach(addLogEntry);
             setSystemMetrics(metricsData);
         } catch (error) {
@@ -184,15 +186,15 @@ const AdminLogsMonitorPage = () => {
             // Keep only last 100 logs to prevent memory issues
             return newLogs.slice(-100);
         });
-        
+
         setLogStats(prevStats => {
             const newStats = { ...prevStats };
             newStats.total++;
-            
+
             if (logEntry.type === 'error') newStats.errors++;
             else if (logEntry.type === 'warning') newStats.warnings++;
             else if (logEntry.type === 'request') newStats.requests++;
-            
+
             return newStats;
         });
     };
@@ -224,14 +226,14 @@ const AdminLogsMonitorPage = () => {
 
     const updatePerformanceChart = (metrics) => {
         if (!metrics) return;
-        
+
         const now = new Date().toLocaleTimeString();
         const data = performanceDataRef.current;
-        
+
         data.labels.push(now);
         data.cpu.push(metrics.cpu_percent || 0);
         data.memory.push(metrics.memory?.percent || 0);
-        
+
         // Keep only last 20 data points
         if (data.labels.length > 20) {
             data.labels.shift();
@@ -274,7 +276,7 @@ const AdminLogsMonitorPage = () => {
         }
         if (hideLogStreamRequests && log.type === 'request' && log.message) {
             // Hide log monitoring API requests
-            if (log.message.includes('/api/admin/logs/') || 
+            if (log.message.includes('/api/admin/logs/') ||
                 log.message.includes('/api/admin/system/metrics') ||
                 log.message.includes('logs/stream')) {
                 return false;
@@ -288,27 +290,27 @@ const AdminLogsMonitorPage = () => {
     const clearLogs = async () => {
         try {
             const userConfirmed = await showModal(
-                'confirm', 
-                'Clear All Logs', 
+                'confirm',
+                'Clear All Logs',
                 'Are you sure you want to clear all logs? This action cannot be undone.',
                 { iconType: 'warning' }
             );
-            
+
             if (!userConfirmed) return;
-            
+
             setModalLoading(true);
-            const response = await authenticatedFetch('/api/admin/logs/clear', 
-                { method: 'POST' }, 
+            const response = await authenticatedFetch('/api/admin/logs/clear',
+                { method: 'POST' },
                 authContextValue
             );
-            
+
             if (!response.ok) {
                 throw new Error(`Failed to clear logs: ${response.status}`);
             }
-            
+
             setLogs([]);
             setLogStats({ total: 0, errors: 0, warnings: 0, requests: 0 });
-            
+
             await showModal('alert', 'Success', 'All logs have been cleared successfully.', {
                 iconType: 'success'
             });
@@ -325,15 +327,15 @@ const AdminLogsMonitorPage = () => {
     const showSystemInfo = async () => {
         try {
             setModalLoading(true);
-            const response = await authenticatedFetch('/api/admin/system/info', 
-                { method: 'GET' }, 
+            const response = await authenticatedFetch('/api/admin/system/info',
+                { method: 'GET' },
                 authContextValue
             );
-            
+
             if (!response.ok) {
                 throw new Error(`Failed to get system info: ${response.status}`);
             }
-            
+
             const info = await response.json();
             const infoText = `
 System: ${info.platform?.system || 'Unknown'}
@@ -343,7 +345,7 @@ Processor: ${info.platform?.processor || 'Unknown'}
 Python Version: ${info.platform?.python_version?.split(' ')[0] || 'Unknown'}
 Environment: ${info.flask_info?.environment || 'Unknown'}
             `.trim();
-            
+
             await showModal('alert', 'System Information', infoText, {
                 iconType: 'info'
             });
@@ -377,26 +379,11 @@ Environment: ${info.flask_info?.environment || 'Unknown'}
     // Error state  
     if (error && logs.length === 0) {
         return (
-            <div className="section-padding">
-                <div className="container-modern">
-                    <div className="text-center mb-8 sm:mb-10 animate-fade-in">
-                        <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">System Monitoring</h1>
-                        <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-                            Real-time logs and system metrics monitoring
-                        </p>
-                        <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full mx-auto mt-6"></div>
-                    </div>
-                    <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
-                        <p>Error loading system monitoring: {error}</p>
-                        <button 
-                            onClick={loadInitialData}
-                            className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                        >
-                            Retry
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <AdminFullPageError 
+                error={`Error loading system monitoring: ${error}`}
+                title="System Monitoring"
+                onRetry={loadInitialData}
+            />
         );
     }
 
@@ -414,8 +401,11 @@ Environment: ${info.flask_info?.environment || 'Unknown'}
 
                 {/* Error Alert */}
                 {error && logs.length > 0 && (
-                    <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-md text-sm">
-                        Could not refresh data: {error}
+                    <div className="mb-4">
+                        <AdminErrorDisplay 
+                            error={`Could not refresh data: ${error}`}
+                            type="warning"
+                        />
                     </div>
                 )}
 
@@ -434,7 +424,7 @@ Environment: ${info.flask_info?.environment || 'Unknown'}
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="flex flex-wrap items-center gap-2">
                             <button
                                 onClick={clearLogs}
@@ -444,7 +434,7 @@ Environment: ${info.flask_info?.environment || 'Unknown'}
                                 <HiTrash className="w-4 h-4" />
                                 Clear Logs
                             </button>
-                            
+
                             <button
                                 onClick={showSystemInfo}
                                 disabled={modalLoading}
@@ -457,18 +447,23 @@ Environment: ${info.flask_info?.environment || 'Unknown'}
                     </div>
                 </div>
 
+                {/* Health Check Cards */}
+                <div className="mb-6">
+                    <HealthCheckCards />
+                </div>
+
                 {/* System Metrics */}
                 <div className="mb-6">
-                    <SystemMetricsCards 
-                        systemMetrics={systemMetrics} 
-                        formatBytes={formatBytes} 
+                    <SystemMetricsCards
+                        systemMetrics={systemMetrics}
+                        formatBytes={formatBytes}
                     />
                 </div>
 
                 {/* Performance Chart */}
                 <div className="mb-6">
-                    <PerformanceChart 
-                        chartData={chartData} 
+                    <PerformanceChart
+                        chartData={chartData}
                     />
                 </div>
 
@@ -476,8 +471,8 @@ Environment: ${info.flask_info?.environment || 'Unknown'}
                 <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
                     {/* Log Controls */}
                     <div className="xl:col-span-1 order-2 xl:order-1">
-                       
-                        <LogControls 
+
+                        <LogControls
                             logStats={logStats}
                             logLevelFilter={logLevelFilter}
                             setLogLevelFilter={setLogLevelFilter}
@@ -492,7 +487,7 @@ Environment: ${info.flask_info?.environment || 'Unknown'}
 
                     {/* Logs Display */}
                     <div className="xl:col-span-3 order-1 xl:order-2">
-                        <LogsDisplay 
+                        <LogsDisplay
                             filteredLogs={filteredLogs}
                             logs={logs}
                             logContainerRef={logContainerRef}

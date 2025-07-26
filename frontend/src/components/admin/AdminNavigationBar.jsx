@@ -57,7 +57,7 @@ const AdminNavigationBar = () => {
     { to: "/admin/forum", label: "Forum", icon: HiOutlineChat },
     { to: "/admin/classification-scores", label: "Analytics", icon: HiOutlineChartBar },
     { to: "/admin/contact-messages", label: "Messages", icon: MdOutlineMessage },
-    { to: "/admin/logs-monitor", label: "Monitor", icon: HiTerminal },
+    { to: "/admin/logs-monitor", label: "Monitor", icon: HiTerminal }
   ];
 
   return (
