@@ -6,6 +6,7 @@ import ResponsiveTable from '../../components/admin/ResponsiveTable';
 import ResponsiveModal from '../../components/ui/ResponsiveModal';
 import { HiTrash, HiEye, HiChat, HiHeart } from 'react-icons/hi';
 import { PageLoaderSpinner } from '../../components/common/LoadingComponents';
+import { AdminErrorDisplay, AdminFullPageError } from '../../components/common/ErrorDisplay.jsx';
 
 // Post Detail Content Component for ResponsiveModal
 const PostDetailContent = ({ post }) => {
@@ -507,19 +508,11 @@ const AdminForumPage = () => {
   // Error state
   if (error && ((activeTab === 'posts' && posts.length === 0) || (activeTab === 'comments' && comments.length === 0))) {
     return (
-      <div className="section-padding">
-        <div className="container-modern">
-          <div className="text-center mb-10 animate-fade-in">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Forum Management</h1>
-            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-              Manage forum posts and comments, monitor community activity
-            </p>
-          </div>
-          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
-            <p>Error fetching {activeTab}: {error}</p>
-          </div>
-        </div>
-      </div>
+      <AdminFullPageError 
+        error={`Error fetching ${activeTab}: ${error}`}
+        title="Forum Management"
+        onRetry={() => activeTab === 'posts' ? fetchPosts(postsPage, postsRowsPerPage) : fetchComments(commentsPage, commentsRowsPerPage)}
+      />
     );
   }
 
@@ -536,15 +529,22 @@ const AdminForumPage = () => {
 
         {/* Action Error */}
         {actionError && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
-            Action Error: {actionError}
+          <div className="mb-4">
+            <AdminErrorDisplay 
+              error={`Action Error: ${actionError}`}
+              onRetry={() => setActionError(null)}
+              retryText="Dismiss"
+            />
           </div>
         )}
 
         {/* Loading Error for existing data */}
         {error && ((activeTab === 'posts' && posts.length > 0) || (activeTab === 'comments' && comments.length > 0)) && (
-          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-md text-sm">
-            Could not refresh {activeTab}: {error}
+          <div className="mb-4">
+            <AdminErrorDisplay 
+              error={`Could not refresh ${activeTab}: ${error}`}
+              type="warning"
+            />
           </div>
         )}
 

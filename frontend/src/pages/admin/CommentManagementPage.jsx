@@ -5,6 +5,7 @@ import { authenticatedFetch } from '../../utils/apiUtil.js';
 import { PageLoaderSpinner } from '../../components/common/LoadingComponents.jsx';
 import ResponsiveTable from '../../components/admin/ResponsiveTable.jsx';
 import { HiTrash, HiEye, HiClock, HiSearch, HiX, HiFilter } from 'react-icons/hi';
+import { AdminErrorDisplay } from '../../components/common/ErrorDisplay.jsx';
 
 function CommentManagementPage() {
   const authContextValue = useAuth();
@@ -374,14 +375,21 @@ function CommentManagementPage() {
         </div>
 
         {actionError && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
-            Action Error: {actionError}
+          <div className="mb-4">
+            <AdminErrorDisplay 
+              error={`Action Error: ${actionError}`}
+              onRetry={() => setActionError(null)}
+              retryText="Dismiss"
+            />
           </div>
         )}
 
         {error && comments.length > 0 && (
-          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-md text-sm">
-            Could not refresh comments: {error}
+          <div className="mb-4">
+            <AdminErrorDisplay 
+              error={`Could not refresh comments: ${error}`}
+              type="warning"
+            />
           </div>
         )}
 

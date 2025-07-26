@@ -7,6 +7,7 @@ import { PageLoaderSpinner } from '../../components/common/LoadingComponents.jsx
 import ResponsiveTable from '../../components/admin/ResponsiveTable.jsx';
 import { HiTrash, HiEye, HiChat } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
+import { AdminErrorDisplay, AdminFullPageError } from '../../components/common/ErrorDisplay.jsx';
 
 function RecipeManagementPage() {
   const authContextValue = useAuth();
@@ -161,15 +162,11 @@ function RecipeManagementPage() {
 
   if (error && recipes.length === 0) {
     return (
-      <div className="section-padding">
-        <div className="container-modern">
-          <div className="text-center mb-10 animate-fade-in">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Recipe Management</h1>
-            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">View and manage user-submitted recipes.</p>
-          </div>
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">{error}</div>
-        </div>
-      </div>
+      <AdminFullPageError 
+        error={error}
+        title="Recipe Management"
+        onRetry={() => fetchRecipes(page, rowsPerPage)}
+      />
     );
   }
 
@@ -193,14 +190,21 @@ function RecipeManagementPage() {
         </div>
         
         {actionError && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
-            Action Error: {actionError}
+          <div className="mb-4">
+            <AdminErrorDisplay 
+              error={`Action Error: ${actionError}`}
+              onRetry={() => setActionError(null)}
+              retryText="Dismiss"
+            />
           </div>
         )}
         
         {error && recipes.length > 0 && (
-          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-md text-sm">
-            Could not refresh recipes: {error}
+          <div className="mb-4">
+            <AdminErrorDisplay 
+              error={`Could not refresh recipes: ${error}`}
+              type="warning"
+            />
           </div>
         )}
         
