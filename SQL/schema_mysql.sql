@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 17, 2025 at 08:55 AM
+-- Generation Time: Jul 25, 2025 at 02:37 AM
 -- Server version: 8.3.0
 -- PHP Version: 8.2.18
 
@@ -108,6 +108,101 @@ CREATE TABLE IF NOT EXISTS `ContactMessages` (
   `CreatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`MessageID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ForumComments`
+--
+
+DROP TABLE IF EXISTS `ForumComments`;
+CREATE TABLE IF NOT EXISTS `ForumComments` (
+  `Id` int NOT NULL AUTO_INCREMENT,
+  `PostId` int DEFAULT NULL,
+  `UserId` int DEFAULT NULL,
+  `Comment` text NOT NULL,
+  `CreatedAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `UpdatedAt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`Id`),
+  KEY `PostId` (`PostId`),
+  KEY `UserId` (`UserId`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ForumLikes`
+--
+
+DROP TABLE IF EXISTS `ForumLikes`;
+CREATE TABLE IF NOT EXISTS `ForumLikes` (
+  `Id` int NOT NULL AUTO_INCREMENT,
+  `PostId` int DEFAULT NULL,
+  `UserId` int DEFAULT NULL,
+  `CreatedAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `unique_user_post_like` (`PostId`,`UserId`),
+  KEY `UserId` (`UserId`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `ForumLikes`
+--
+
+INSERT INTO `ForumLikes` (`Id`, `PostId`, `UserId`, `CreatedAt`) VALUES
+(14, 8, 1, '2025-07-25 02:37:08'),
+(15, 7, 1, '2025-07-25 02:37:25');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ForumPosts`
+--
+
+DROP TABLE IF EXISTS `ForumPosts`;
+CREATE TABLE IF NOT EXISTS `ForumPosts` (
+  `Id` int NOT NULL AUTO_INCREMENT,
+  `UserId` int DEFAULT NULL,
+  `Title` varchar(255) NOT NULL,
+  `Content` text NOT NULL,
+  `LikesCount` int DEFAULT '0',
+  `ViewsCount` int DEFAULT '0',
+  `CreatedAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `UpdatedAt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`Id`),
+  KEY `UserId` (`UserId`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `ForumPosts`
+--
+
+INSERT INTO `ForumPosts` (`Id`, `UserId`, `Title`, `Content`, `LikesCount`, `ViewsCount`, `CreatedAt`, `UpdatedAt`) VALUES
+(7, 1, 'My First Attempt at Homemade Pasta!', 'Just tried making fresh pasta from scratch for the first time and WOW! 🍝 It was so much easier than I expected. Used the #Classic Tomato Basil Pasta  recipe from the site and it turned out amazing!\n\nThe key was getting the egg-to-cheese ratio just right. Pro tip: save some pasta water - it really makes a difference in the sauce consistency!\nAnyone else tried making fresh pasta? Would love to hear your experiences and tips! \n\nNext up: trying to make ravioli 😅', 1, 2, '2025-07-25 02:36:27', '2025-07-25 02:37:25'),
+(8, 1, 'Meal Prep Sunday Success!', 'Spent the whole Sunday meal prepping and I\'m so proud of the results! 💪\n\nMade a big batch of Chicken Teriyaki Bowl and Quinoa Buddha Bowl - these recipes are perfect for meal prep because they keep so well.\n\nHere\'s what I learned:\n- Cook grains separately and add them fresh each day\n- Store dressings in small containers to keep everything crisp\n- Invest in good glass containers - game changer!\n\nWhat are your go-to meal prep recipes? Always looking for new ideas! 🥗', 1, 2, '2025-07-25 02:37:04', '2025-07-25 02:37:08');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ForumPostTags`
+--
+
+DROP TABLE IF EXISTS `ForumPostTags`;
+CREATE TABLE IF NOT EXISTS `ForumPostTags` (
+  `Id` int NOT NULL AUTO_INCREMENT,
+  `PostId` int DEFAULT NULL,
+  `RecipeId` int DEFAULT NULL,
+  PRIMARY KEY (`Id`),
+  KEY `PostId` (`PostId`),
+  KEY `RecipeId` (`RecipeId`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `ForumPostTags`
+--
+
+INSERT INTO `ForumPostTags` (`Id`, `PostId`, `RecipeId`) VALUES
+(7, 7, 1);
 
 -- --------------------------------------------------------
 
@@ -349,7 +444,9 @@ CREATE TABLE IF NOT EXISTS `RecipeComments` (
   UNIQUE KEY `uq_recipe_user_comment` (`RecipeID`,`UserID`),
   KEY `UserID` (`UserID`),
   KEY `idx_recipe_comments_recipe_created` (`RecipeID`,`CreatedAt`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `RecipeIngredients`
@@ -582,7 +679,7 @@ CREATE TABLE IF NOT EXISTS `RecipeRatings` (
   PRIMARY KEY (`RatingID`),
   UNIQUE KEY `uq_recipe_user_rating` (`RecipeID`,`UserID`),
   KEY `UserID` (`UserID`)
-) ;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `RecipeRatings`
@@ -596,6 +693,156 @@ INSERT INTO `RecipeRatings` (`RatingID`, `RecipeID`, `UserID`, `Rating`, `Create
 (5, 2, 1, 3, '2025-06-17 02:07:22', '2025-06-17 02:38:14'),
 (6, 10, 1, 4, '2025-06-17 02:07:26', '2025-06-17 02:07:28'),
 (7, 21, 2, 5, '2025-06-17 03:18:05', '2025-06-17 03:18:05');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Recipes`
+--
+
+DROP TABLE IF EXISTS `Recipes`;
+CREATE TABLE IF NOT EXISTS `Recipes` (
+  `RecipeID` int NOT NULL AUTO_INCREMENT,
+  `UserID` int NOT NULL,
+  `Title` varchar(255) NOT NULL,
+  `Description` text,
+  `Instructions` text NOT NULL,
+  `PreparationTimeMinutes` int DEFAULT NULL,
+  `CookingTimeMinutes` int DEFAULT NULL,
+  `Servings` int DEFAULT NULL,
+  `ImageURL` varchar(2083) DEFAULT NULL,
+  `is_public` tinyint(1) DEFAULT '0',
+  `NutritionInfoJSON` json DEFAULT NULL,
+  `CreatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `UpdatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`RecipeID`),
+  KEY `UserID` (`UserID`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `Recipes`
+--
+
+INSERT INTO `Recipes` (`RecipeID`, `UserID`, `Title`, `Description`, `Instructions`, `PreparationTimeMinutes`, `CookingTimeMinutes`, `Servings`, `ImageURL`, `is_public`, `NutritionInfoJSON`, `CreatedAt`, `UpdatedAt`) VALUES
+(1, 2, 'Classic Tomato Basil Pasta', 'A simple yet incredibly flavorful pasta dish perfect for a quick weeknight meal.', 'Cook pasta according to package directions until al dente. Drain and set aside.\nWhile pasta is cooking, heat olive oil in a large skillet or pot over medium heat. Add minced garlic and cook for 1-2 minutes until fragrant, being careful not to burn it.\nPour in crushed tomatoes, red pepper flakes (if using), salt, and pepper. Bring to a simmer, then reduce heat to low and cook for 10-15 minutes, allowing the sauce to thicken slightly.\nStir in chopped fresh basil and cooked pasta. Toss to coat evenly.\nRemove from heat and stir in 1/4 cup Parmesan cheese.\nServe immediately, garnished with extra Parmesan cheese.', 15, 20, 4, '/static/recipe_images/9dcefe2312b74d17b9b1f2312f5c6a81.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 8}, \"fiber\": {\"unit\": \"g\", \"amount\": 4}, \"sugar\": {\"unit\": \"g\", \"amount\": 3}, \"sodium\": {\"unit\": \"mg\", \"amount\": 450}, \"protein\": {\"unit\": \"g\", \"amount\": 14}, \"calories\": {\"unit\": \"kcal\", \"amount\": 380}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 65}}, \"per_serving\": true}', '2025-06-16 19:23:38', '2025-07-06 08:43:42'),
+(2, 2, 'Quick Chicken Stir-Fry', 'A versatile and healthy stir-fry that can be adapted with your favorite vegetables.', 'In a bowl, toss chicken pieces with 2 tbsp soy sauce and 1 tbsp cornstarch. Set aside for 10 minutes.\nIn a small bowl, whisk together all stir-fry sauce ingredients until smooth.\nHeat vegetable oil and sesame oil in a large skillet or wok over medium-high heat. Add chicken and cook until browned and cooked through, about 5-7 minutes. Remove chicken from the pan and set aside.\nAdd broccoli, carrots, bell pepper, and onion to the same pan. Stir-fry for 3-5 minutes until vegetables are tender-crisp.\nAdd minced garlic and grated ginger to the vegetables and cook for 1 minute more until fragrant.\nReturn chicken to the pan. Give the stir-fry sauce a quick whisk (as cornstarch settles) and pour it over the chicken and vegetables. Cook, stirring constantly, until the sauce thickens and coats everything, about 1-2 minutes.\nServe immediately with steamed rice or noodles.', 20, 15, 3, '/static/recipe_images/f13d9c0bc41a474f8230976cbea21e0e.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 18}, \"fiber\": {\"unit\": \"g\", \"amount\": 6}, \"sugar\": {\"unit\": \"g\", \"amount\": 8}, \"sodium\": {\"unit\": \"mg\", \"amount\": 680}, \"protein\": {\"unit\": \"g\", \"amount\": 28}, \"calories\": {\"unit\": \"kcal\", \"amount\": 420}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 35}}, \"per_serving\": true}', '2025-06-16 19:24:37', '2025-07-06 08:43:38'),
+(3, 2, 'Creamy Mushroom Soup', 'A rich and comforting soup, perfect for a cozy evening.', 'In a large pot or Dutch oven, melt butter over medium heat.\nAdd chopped onion and cook until softened, about 5 minutes.\nAdd sliced mushrooms and cook, stirring occasionally, until they release their liquid and start to brown, about 8-10 minutes.\nStir in minced garlic and cook for 1 minute until fragrant.\nSprinkle flour over the mushrooms and stir for 1 minute to cook out the raw flour taste.\nGradually whisk in the broth, stirring constantly to prevent lumps.\nBring to a simmer, then reduce heat to low and cook for 10 minutes to allow flavors to meld.\nStir in heavy cream.\nSeason with salt and pepper to taste.\nFor a smoother soup, you can use an immersion blender to partially or fully blend the soup to your desired consistency.\nServe hot, garnished with fresh parsley or chives.', 15, 25, 4, '/static/recipe_images/9d2fb4449da2444c9fb38785c5fb2bb2.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 22}, \"fiber\": {\"unit\": \"g\", \"amount\": 2}, \"sugar\": {\"unit\": \"g\", \"amount\": 4}, \"sodium\": {\"unit\": \"mg\", \"amount\": 520}, \"protein\": {\"unit\": \"g\", \"amount\": 8}, \"calories\": {\"unit\": \"kcal\", \"amount\": 280}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 12}}, \"per_serving\": true}', '2025-06-16 19:25:38', '2025-07-06 08:43:36'),
+(4, 2, 'Lentil Salad with Roasted Vegetables', 'A hearty and healthy vegetarian salad, great for meal prep or a light lunch/dinner.', 'Preheat oven to 200°C (400°F).\nOn a large baking sheet, toss diced sweet potato, red bell pepper, zucchini, and red onion with 2 tbsp olive oil, salt, and pepper. Roast for 25-30 minutes, or until vegetables are tender and slightly caramelized, flipping halfway through.\nWhile vegetables are roasting, combine rinsed lentils with broth or water in a saucepan. Bring to a boil, then reduce heat to low, cover, and simmer for 20-25 minutes, or until lentils are tender but not mushy. Drain any excess liquid.\nIn a small bowl, whisk together all dressing ingredients.\nIn a large bowl, combine cooked lentils, roasted vegetables, and fresh parsley. Pour the dressing over the salad and toss gently to combine.\nTaste and adjust seasoning if needed. If using, gently fold in crumbled feta cheese.\nServe warm or at room temperature.', 20, 55, 4, '/static/recipe_images/aa21cc729b5749af9fae44ef707156f9.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 12}, \"fiber\": {\"unit\": \"g\", \"amount\": 18}, \"sugar\": {\"unit\": \"g\", \"amount\": 8}, \"sodium\": {\"unit\": \"mg\", \"amount\": 380}, \"protein\": {\"unit\": \"g\", \"amount\": 16}, \"calories\": {\"unit\": \"kcal\", \"amount\": 320}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 45}}, \"per_serving\": true}', '2025-06-16 19:27:04', '2025-07-06 08:43:35'),
+(5, 2, 'Garlic Butter Shrimp Scampi with Linguine', 'A classic Italian-American dish thats quick to make and full of flavor.', 'Cook linguine according to package directions until al dente. Reserve 1/2 cup pasta water before draining.\nWhile pasta is cooking, melt butter in a large skillet over medium heat. Add minced garlic and red pepper flakes (if using) and cook for 1-2 minutes until fragrant, being careful not to burn the garlic.\nAdd shrimp to the skillet and cook for 2-3 minutes per side, or until pink and opaque. Do not overcook. Remove shrimp from the pan and set aside.\nPour white wine (or broth) and lemon juice into the skillet. Bring to a simmer and cook for 2-3 minutes, scraping up any browned bits from the bottom of the pan.\nReturn shrimp to the skillet. Add cooked linguine and chopped parsley. Toss to combine, adding a splash of reserved pasta water if needed to create a light sauce.\nSeason with salt and pepper to taste.\nServe immediately.', 15, 15, 2, '/static/recipe_images/be781b8347c845988c76e7f4f394f386.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 24}, \"fiber\": {\"unit\": \"g\", \"amount\": 3}, \"sugar\": {\"unit\": \"g\", \"amount\": 2}, \"sodium\": {\"unit\": \"mg\", \"amount\": 720}, \"protein\": {\"unit\": \"g\", \"amount\": 32}, \"calories\": {\"unit\": \"kcal\", \"amount\": 580}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 65}}, \"per_serving\": true}', '2025-06-16 19:28:22', '2025-07-06 08:43:34'),
+(6, 2, 'Fluffy Scrambled Eggs with Toast', 'A simple yet perfectly executed breakfast staple.', 'In a bowl, whisk eggs with milk or cream (if using), salt, and pepper until well combined and slightly foamy.\nMelt butter in a non-stick skillet over medium-low heat.\nPour the egg mixture into the skillet. Let it sit undisturbed for about 30 seconds until the edges just begin to set.\nUsing a spatula, gently push the cooked egg from the edges towards the center, tilting the pan to allow uncooked egg to flow underneath. Continue this process, folding and stirring gently, until the eggs are mostly set but still slightly moist. Do not overcook.\nRemove from heat immediately. Serve hot with toast.', 5, 5, 1, '/static/recipe_images/db3cae26fc3145a7a2a8d55fe9e3164f.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 18}, \"fiber\": {\"unit\": \"g\", \"amount\": 2}, \"sugar\": {\"unit\": \"g\", \"amount\": 3}, \"sodium\": {\"unit\": \"mg\", \"amount\": 480}, \"protein\": {\"unit\": \"g\", \"amount\": 18}, \"calories\": {\"unit\": \"kcal\", \"amount\": 320}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 25}}, \"per_serving\": true}', '2025-06-16 19:29:12', '2025-07-06 08:43:32'),
+(7, 2, 'Black Bean Burgers', 'A flavorful and satisfying vegetarian burger, great for grilling or pan-frying.', 'In a large bowl, mash the black beans with a fork or potato masher until mostly mashed but still with some texture.\nAdd cooked brown rice (or breadcrumbs), chopped red onion, bell pepper, minced garlic, egg, chili powder, cumin, salt, and pepper to the bowl. Mix well until everything is combined.\nDivide the mixture into 4 equal portions and shape into patties.\nHeat olive oil in a large skillet over medium heat. Cook the black bean burgers for 5-7 minutes per side, or until browned and heated through. Alternatively, grill them on a preheated grill.\nServe on burger buns with your favorite toppings.', 20, 10, 4, '/static/recipe_images/a3fc0aeb87b847a9892314c5f281e5b5.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 10}, \"fiber\": {\"unit\": \"g\", \"amount\": 8}, \"sugar\": {\"unit\": \"g\", \"amount\": 2}, \"sodium\": {\"unit\": \"mg\", \"amount\": 420}, \"protein\": {\"unit\": \"g\", \"amount\": 12}, \"calories\": {\"unit\": \"kcal\", \"amount\": 280}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 35}}, \"per_serving\": true}', '2025-06-16 19:30:12', '2025-07-06 08:43:31'),
+(8, 2, 'Simple Roasted Chicken Thighs with Root Vegetables', 'An easy and delicious one-pan meal perfect for a comforting dinner.', 'Preheat oven to 200°C (400°F).\nIn a large bowl, toss potatoes, carrots, and onion with 2 tbsp olive oil, rosemary, thyme, paprika, salt, and pepper. Spread the vegetables in an even layer on a large baking sheet.\nPat chicken thighs dry with paper towels. Drizzle with the remaining 1 tbsp olive oil and season generously with salt and pepper.\nPlace the chicken thighs skin-side up on top of the vegetables on the baking sheet.\nRoast for 40-50 minutes, or until the chicken is cooked through (internal temperature reaches 74°C/165°F) and the skin is crispy, and vegetables are tender. Flip vegetables halfway through cooking for even browning.\nServe hot.', 15, 40, 4, '/static/recipe_images/3c909140e0b6443c8195111f3ebcc46a.jpeg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 32}, \"fiber\": {\"unit\": \"g\", \"amount\": 5}, \"sugar\": {\"unit\": \"g\", \"amount\": 6}, \"sodium\": {\"unit\": \"mg\", \"amount\": 580}, \"protein\": {\"unit\": \"g\", \"amount\": 35}, \"calories\": {\"unit\": \"kcal\", \"amount\": 520}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 28}}, \"per_serving\": true}', '2025-06-16 19:31:40', '2025-07-06 08:43:30'),
+(9, 2, 'Caprese Salad', 'A fresh, simple, and elegant Italian salad perfect as an appetizer or light meal.', 'Arrange alternating slices of tomato, mozzarella, and fresh basil leaves on a serving platter or individual plates.\nDrizzle generously with extra virgin olive oil.\nSeason with salt and freshly ground black pepper.\nIf desired, drizzle with balsamic glaze just before serving.', 10, 0, 2, '/static/recipe_images/6dbf7154641a4cad962692462549b005.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 16}, \"fiber\": {\"unit\": \"g\", \"amount\": 2}, \"sugar\": {\"unit\": \"g\", \"amount\": 5}, \"sodium\": {\"unit\": \"mg\", \"amount\": 280}, \"protein\": {\"unit\": \"g\", \"amount\": 12}, \"calories\": {\"unit\": \"kcal\", \"amount\": 220}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 8}}, \"per_serving\": true}', '2025-06-16 19:32:43', '2025-07-06 08:43:28'),
+(10, 2, 'Berry Smoothie', 'A quick, healthy, and refreshing drink, perfect for breakfast or a snack.', 'Combine all ingredients in a blender.\nBlend until smooth and creamy, adding more milk if needed to reach your desired consistency.\nTaste and add honey or maple syrup if desired.\nPour into a glass and serve immediately.', 5, 0, 1, '/static/recipe_images/ed7539f6cdd342dcb63f921d976ddd85.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 4}, \"fiber\": {\"unit\": \"g\", \"amount\": 4}, \"sugar\": {\"unit\": \"g\", \"amount\": 22}, \"sodium\": {\"unit\": \"mg\", \"amount\": 120}, \"protein\": {\"unit\": \"g\", \"amount\": 8}, \"calories\": {\"unit\": \"kcal\", \"amount\": 180}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 28}}, \"per_serving\": true}', '2025-06-16 19:34:19', '2025-07-06 08:43:26'),
+(11, 2, 'Sheet Pan Lemon Herb Salmon and Asparagus', 'An incredibly easy and healthy one-pan meal with minimal cleanup.', 'Preheat your oven to 200°C (400°F). Line a baking sheet with parchment paper for easy cleanup.\nOn the prepared baking sheet, toss the asparagus with 1/2 tablespoon of olive oil, salt, and pepper. Arrange in a single layer.\nPlace the salmon fillets on the same baking sheet, nestled among the asparagus.\nDrizzle the remaining 1/2 tablespoon of olive oil over the salmon. Season with salt, pepper, and dried dill.\nArrange lemon slices on top of the salmon fillets.\nRoast for 15-20 minutes, or until the salmon is cooked through and flakes easily with a fork, and the asparagus is tender-crisp.\nSqueeze fresh lemon juice over everything before serving.', 10, 15, 2, '/static/recipe_images/1febfcd1327d4039a459f0309c30ff16.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 22}, \"fiber\": {\"unit\": \"g\", \"amount\": 4}, \"sugar\": {\"unit\": \"g\", \"amount\": 3}, \"sodium\": {\"unit\": \"mg\", \"amount\": 420}, \"protein\": {\"unit\": \"g\", \"amount\": 42}, \"calories\": {\"unit\": \"kcal\", \"amount\": 380}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 8}}, \"per_serving\": true}', '2025-06-16 19:35:34', '2025-07-06 08:43:25'),
+(12, 2, 'Chicken and Vegetable Skewers (Grill or Oven)', 'A colorful and flavorful dish, perfect for a barbecue or a light dinner.', 'In a bowl, whisk together all marinade ingredients. Add the chicken cubes and toss to coat.\nCover and refrigerate for at least 30 minutes, or up to 2 hours.\nIf using a grill, preheat it to medium-high heat. If using an oven, preheat to 200°C (400°F) and line a baking sheet with foil.\nThread the marinated chicken and cut vegetables alternately onto the skewers.\nLightly brush the vegetables with olive oil.\nTo Grill: Place skewers on the preheated grill. Cook for 15-20 minutes, turning occasionally, until chicken is cooked through and vegetables are tender with some char marks.\nTo Bake: Place skewers on the prepared baking sheet. Bake for 20-25 minutes, flipping halfway through, until chicken is cooked through and vegetables are tender.\nServe immediately.', 20, 20, 4, '/static/recipe_images/e5790a9dd4b340bf851aa8ad6391861b.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 14}, \"fiber\": {\"unit\": \"g\", \"amount\": 3}, \"sugar\": {\"unit\": \"g\", \"amount\": 6}, \"sodium\": {\"unit\": \"mg\", \"amount\": 480}, \"protein\": {\"unit\": \"g\", \"amount\": 32}, \"calories\": {\"unit\": \"kcal\", \"amount\": 280}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 12}}, \"per_serving\": true}', '2025-06-16 19:37:21', '2025-07-06 08:43:23'),
+(13, 2, 'Simple Cheese Omelette', 'A classic, quick, and satisfying breakfast or light meal.', 'In a small bowl, whisk the eggs with milk or water, salt, and pepper until well combined.\nMelt the butter in an 8-inch non-stick skillet over medium-low heat until it sizzles.\nPour the egg mixture into the skillet. Let it cook undisturbed for about 30 seconds until the edges start to set.\nSprinkle the grated cheese over one half of the omelette.\nUsing a spatula, gently lift one side of the omelette and fold it over the cheese.\nCook for another 1-2 minutes, or until the cheese is melted and the eggs are cooked to your liking.\nSlide the omelette onto a plate and serve immediately.', 2, 3, 1, '/static/recipe_images/e2a9289ecece4f49af065521bc264e99.jpeg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 22}, \"fiber\": {\"unit\": \"g\", \"amount\": 0}, \"sugar\": {\"unit\": \"g\", \"amount\": 1}, \"sodium\": {\"unit\": \"mg\", \"amount\": 520}, \"protein\": {\"unit\": \"g\", \"amount\": 20}, \"calories\": {\"unit\": \"kcal\", \"amount\": 280}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 2}}, \"per_serving\": true}', '2025-06-16 19:38:32', '2025-07-06 08:43:21'),
+(14, 2, 'Veggie Fried Rice', 'A great way to use up leftover rice and vegetables. Customizable to your liking!', 'Heat 1 tablespoon of vegetable oil in a large skillet or wok over medium-high heat. Add chopped onion and carrot and cook for 3-4 minutes until slightly softened.\nStir in peas, corn, minced garlic, and ginger (if using). Cook for 2-3 minutes more until fragrant. Push vegetables to one side of the pan.\nAdd the remaining 1 tablespoon of vegetable oil to the empty side of the pan. Pour in the beaten eggs and scramble them until cooked through. Break them into small pieces with your spatula.\nAdd the cold cooked rice to the pan. Drizzle with soy sauce and sesame oil.\nToss everything together, breaking up any clumps of rice, and cook for 3-5 minutes, stirring occasionally, until the rice is heated through and slightly golden.\nGarnish with sliced green onions before serving.', 15, 10, 2, '/static/recipe_images/d1d56cc664104f09b5ae45ee56d3f89b.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 14}, \"fiber\": {\"unit\": \"g\", \"amount\": 4}, \"sugar\": {\"unit\": \"g\", \"amount\": 3}, \"sodium\": {\"unit\": \"mg\", \"amount\": 680}, \"protein\": {\"unit\": \"g\", \"amount\": 12}, \"calories\": {\"unit\": \"kcal\", \"amount\": 420}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 65}}, \"per_serving\": true}', '2025-06-16 19:39:13', '2025-07-06 08:43:20'),
+(15, 2, 'Simple Guacamole', 'A fresh and healthy dip perfect for snacking or as a topping.', 'Cut avocados in half, remove the pit, and scoop the flesh into a medium bowl.\nUsing a fork or potato masher, mash the avocado to your desired consistency (chunky or smooth).\nAdd diced red onion, chopped cilantro, minced jalapeño (if using), and lime juice to the bowl.\nStir everything together gently until well combined.\nSeason with salt to taste, starting with 1/2 teaspoon and adding more if needed.\nServe immediately with tortilla chips, as a topping for tacos, or in sandwiches.', 10, 0, 4, '/static/recipe_images/e51a79359e924c0faf9860d94acfcf34.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 10}, \"fiber\": {\"unit\": \"g\", \"amount\": 4}, \"sugar\": {\"unit\": \"g\", \"amount\": 1}, \"sodium\": {\"unit\": \"mg\", \"amount\": 180}, \"protein\": {\"unit\": \"g\", \"amount\": 2}, \"calories\": {\"unit\": \"kcal\", \"amount\": 120}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 8}}, \"per_serving\": true}', '2025-06-16 19:39:43', '2025-07-06 08:43:19'),
+(16, 2, 'Microwave Mug Cake', 'A quick and easy single-serving dessert when a craving strikes!', 'In a microwave-safe mug, whisk together the flour, sugar, cocoa powder, baking powder, and salt until there are no lumps.\nAdd the milk, vegetable oil, and vanilla extract (if using) to the mug. Stir well with a fork until the batter is smooth and all dry ingredients are incorporated.\nStir in the chocolate chips (if using).\nMicrowave on high for 60-90 seconds. Cooking time may vary depending on your microwaves wattage. The cake should be set but still slightly moist in the center.\nLet it cool for a minute before enjoying directly from the mug. Be careful, the mug will be hot!', 2, 1, 1, '/static/recipe_images/8873418195594cc3a7c3e46581094f7e.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 14}, \"fiber\": {\"unit\": \"g\", \"amount\": 2}, \"sugar\": {\"unit\": \"g\", \"amount\": 28}, \"sodium\": {\"unit\": \"mg\", \"amount\": 280}, \"protein\": {\"unit\": \"g\", \"amount\": 6}, \"calories\": {\"unit\": \"kcal\", \"amount\": 320}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 45}}, \"per_serving\": true}', '2025-06-16 19:40:11', '2025-07-06 08:43:18'),
+(17, 2, 'Classic Tomato Soup (from Canned Tomatoes)', 'A comforting and simple tomato soup, perfect for a rainy day.', 'In a large pot or Dutch oven, heat olive oil over medium heat. Add chopped onion and cook until softened, about 5-7 minutes.\nAdd minced garlic and cook for 1 minute until fragrant.\nPour in the crushed tomatoes and broth. Stir in dried oregano and basil. Bring the soup to a simmer.\nReduce heat to low, cover, and let it simmer for 15-20 minutes, allowing the flavors to meld.\nFor a smoother soup, use an immersion blender to blend the soup directly in the pot until it reaches your desired consistency. Alternatively, carefully transfer batches to a regular blender (vent the lid!).\nStir in heavy cream or milk (if using). Season with salt and pepper to taste.\nServe hot, garnished with fresh basil or croutons.', 10, 25, 4, '/static/recipe_images/db31d1d8fce748279885be09caa6b349.jpeg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 10}, \"fiber\": {\"unit\": \"g\", \"amount\": 4}, \"sugar\": {\"unit\": \"g\", \"amount\": 8}, \"sodium\": {\"unit\": \"mg\", \"amount\": 480}, \"protein\": {\"unit\": \"g\", \"amount\": 6}, \"calories\": {\"unit\": \"kcal\", \"amount\": 180}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 18}}, \"per_serving\": true}', '2025-06-16 19:40:37', '2025-07-06 08:43:17'),
+(18, 2, 'Pan-Seared Pork Chops', 'A quick and flavorful way to cook tender pork chops.', 'Pat the pork chops dry with paper towels.\nSeason generously on both sides with salt, pepper, paprika, and garlic powder.\nHeat olive oil or butter in a heavy-bottomed skillet (cast iron works great) over medium-high heat until shimmering.\nPlace the seasoned pork chops in the hot skillet.\nSear for 4-6 minutes per side, or until a nice golden-brown crust forms and the internal temperature reaches 63°C (145°F).\nFor thicker chops, after searing, you can transfer the skillet to a preheated 200°C (400°F) oven for a few minutes to finish cooking through if needed.\nRemove from heat and let the pork chops rest on a cutting board for 5 minutes before serving. This helps keep them juicy.', 5, 10, 2, '/static/recipe_images/1f4b0e378adb4f4c9cadf7a8419cf6a1.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 22}, \"fiber\": {\"unit\": \"g\", \"amount\": 0}, \"sugar\": {\"unit\": \"g\", \"amount\": 1}, \"sodium\": {\"unit\": \"mg\", \"amount\": 580}, \"protein\": {\"unit\": \"g\", \"amount\": 42}, \"calories\": {\"unit\": \"kcal\", \"amount\": 380}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 2}}, \"per_serving\": true}', '2025-06-16 19:41:03', '2025-07-06 08:43:15'),
+(19, 2, 'Berry Chia Pudding', 'A healthy, no-cook breakfast or snack thats great for meal prep.', 'In a jar or bowl, whisk together the chia seeds, milk, honey/maple syrup, and vanilla extract (if using) until well combined and no clumps of chia seeds remain.\nStir in 1/2 cup of mixed berries.\nCover and refrigerate for at least 4 hours, or preferably overnight, until the pudding has thickened.\nBefore serving, give it a quick stir. If its too thick, add a splash more milk.\nServe in bowls or glasses, topped with more fresh berries and any other desired toppings.', 5, 0, 2, '/static/recipe_images/ea03de21d5a8431ea00d65d4cd76ce3d.jpeg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 10}, \"fiber\": {\"unit\": \"g\", \"amount\": 12}, \"sugar\": {\"unit\": \"g\", \"amount\": 18}, \"sodium\": {\"unit\": \"mg\", \"amount\": 80}, \"protein\": {\"unit\": \"g\", \"amount\": 8}, \"calories\": {\"unit\": \"kcal\", \"amount\": 220}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 28}}, \"per_serving\": true}', '2025-06-16 19:41:30', '2025-07-06 08:43:14'),
+(20, 2, 'Classic Grilled Cheese Sandwich', 'A comforting, gooey, and easy-to-make classic.', 'Butter one side of each slice of bread, spreading it evenly to the edges.\nPlace one slice of bread, butter-side down, in a non-stick skillet over medium-low heat.\nLay the cheese slices on top of the bread in the skillet.\nTop with the second slice of bread, butter-side up.\nCook for 3-4 minutes per side, or until the bread is golden brown and crispy and the cheese is completely melted and gooey. Gently press down on the sandwich with a spatula occasionally to ensure even browning.\nRemove from the skillet, slice in half if desired, and serve immediately.', 2, 5, 1, '/static/recipe_images/55f375e5039b4a18976648968acd15f0.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 24}, \"fiber\": {\"unit\": \"g\", \"amount\": 2}, \"sugar\": {\"unit\": \"g\", \"amount\": 3}, \"sodium\": {\"unit\": \"mg\", \"amount\": 680}, \"protein\": {\"unit\": \"g\", \"amount\": 16}, \"calories\": {\"unit\": \"kcal\", \"amount\": 420}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 35}}, \"per_serving\": true}', '2025-06-16 19:42:06', '2025-07-06 08:43:12'),
+(21, 2, 'Speedy Black Bean and Corn Salsa', 'A vibrant, fresh, and easy salsa that\'s perfect as a dip, salad topping, or side dish. It\'s a great no-cook option when you need something quick and flavorful.', 'In a large bowl, combine the rinsed and drained black beans, corn, diced tomato, finely diced red onion, and finely diced red bell pepper.\nAdd the chopped fresh cilantro and minced jalapeño (if using).\nIn a small separate bowl, whisk together the lime juice, olive oil, and ground cumin (if using).\nPour the dressing over the bean and vegetable mixture.\nToss everything gently until all the ingredients are well combined and coated with the dressing.\nSeason with salt and black pepper to taste. Start with 1/2 teaspoon of salt and add more if needed.\nFor best flavor, let the salsa sit for at least 10-15 minutes at room temperature before serving to allow the flavors to meld.', 15, 0, 4, '/static/recipe_images/1fb76832e23e46c79699a55eef64a95b.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"fat\": {\"unit\": \"g\", \"amount\": 4}, \"fiber\": {\"unit\": \"g\", \"amount\": 5}, \"sugar\": {\"unit\": \"g\", \"amount\": 3}, \"sodium\": {\"unit\": \"mg\", \"amount\": 220}, \"protein\": {\"unit\": \"g\", \"amount\": 6}, \"calories\": {\"unit\": \"kcal\", \"amount\": 120}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 18}}, \"per_serving\": true}', '2025-06-17 03:17:46', '2025-07-06 08:43:11');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `RecipeTagAssignments`
+--
+
+DROP TABLE IF EXISTS `RecipeTagAssignments`;
+CREATE TABLE IF NOT EXISTS `RecipeTagAssignments` (
+  `AssignmentID` int NOT NULL AUTO_INCREMENT,
+  `RecipeID` int NOT NULL,
+  `TagID` int NOT NULL,
+  `AssignedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`AssignmentID`),
+  UNIQUE KEY `unique_recipe_tag` (`RecipeID`,`TagID`),
+  KEY `TagID` (`TagID`)
+) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `RecipeTagAssignments`
+--
+
+INSERT INTO `RecipeTagAssignments` (`AssignmentID`, `RecipeID`, `TagID`, `AssignedAt`) VALUES
+(1, 1, 10, '2025-07-13 12:32:22'),
+(2, 1, 6, '2025-07-13 12:32:22'),
+(3, 1, 1, '2025-07-13 12:32:22'),
+(4, 1, 15, '2025-07-13 12:32:22'),
+(5, 2, 6, '2025-07-13 12:32:22'),
+(6, 2, 11, '2025-07-13 12:32:22'),
+(7, 2, 15, '2025-07-13 12:32:22'),
+(8, 2, 17, '2025-07-13 12:32:22'),
+(9, 3, 1, '2025-07-13 12:32:22'),
+(10, 3, 15, '2025-07-13 12:32:22'),
+(11, 3, 6, '2025-07-13 12:32:22'),
+(12, 4, 1, '2025-07-13 12:32:22'),
+(13, 4, 2, '2025-07-13 12:32:22'),
+(14, 4, 17, '2025-07-13 12:32:22'),
+(15, 4, 14, '2025-07-13 12:32:22'),
+(16, 4, 15, '2025-07-13 12:32:22'),
+(17, 5, 6, '2025-07-13 12:32:22'),
+(18, 5, 10, '2025-07-13 12:32:22'),
+(19, 5, 15, '2025-07-13 12:32:22'),
+(20, 6, 6, '2025-07-13 12:32:22'),
+(21, 6, 13, '2025-07-13 12:32:22'),
+(22, 6, 1, '2025-07-13 12:32:22'),
+(23, 7, 1, '2025-07-13 12:32:22'),
+(24, 7, 2, '2025-07-13 12:32:22'),
+(25, 7, 17, '2025-07-13 12:32:22'),
+(26, 7, 15, '2025-07-13 12:32:22'),
+(27, 8, 15, '2025-07-13 12:32:22'),
+(28, 8, 17, '2025-07-13 12:32:22'),
+(29, 9, 6, '2025-07-13 12:32:22'),
+(30, 9, 10, '2025-07-13 12:32:22'),
+(31, 9, 1, '2025-07-13 12:32:22'),
+(32, 9, 17, '2025-07-13 12:32:22'),
+(33, 9, 14, '2025-07-13 12:32:22'),
+(34, 10, 6, '2025-07-13 12:32:22'),
+(35, 10, 13, '2025-07-13 12:32:22'),
+(36, 10, 17, '2025-07-13 12:32:22'),
+(37, 10, 1, '2025-07-13 12:32:22'),
+(38, 11, 6, '2025-07-13 12:32:22'),
+(39, 11, 17, '2025-07-13 12:32:22'),
+(40, 11, 15, '2025-07-13 12:32:22'),
+(41, 12, 17, '2025-07-13 12:32:22'),
+(42, 12, 15, '2025-07-13 12:32:22'),
+(43, 13, 6, '2025-07-13 12:32:22'),
+(44, 13, 13, '2025-07-13 12:32:22'),
+(45, 13, 1, '2025-07-13 12:32:22'),
+(46, 14, 6, '2025-07-13 12:32:22'),
+(47, 14, 1, '2025-07-13 12:32:22'),
+(48, 14, 11, '2025-07-13 12:32:22'),
+(49, 14, 15, '2025-07-13 12:32:22'),
+(50, 15, 6, '2025-07-13 12:32:22'),
+(51, 15, 1, '2025-07-13 12:32:22'),
+(52, 15, 2, '2025-07-13 12:32:22'),
+(53, 15, 17, '2025-07-13 12:32:22'),
+(54, 15, 12, '2025-07-13 12:32:22'),
+(55, 16, 6, '2025-07-13 12:32:22'),
+(56, 16, 16, '2025-07-13 12:32:22'),
+(57, 16, 1, '2025-07-13 12:32:22'),
+(58, 17, 6, '2025-07-13 12:32:22'),
+(59, 17, 1, '2025-07-13 12:32:22'),
+(60, 17, 17, '2025-07-13 12:32:22'),
+(61, 17, 14, '2025-07-13 12:32:22'),
+(62, 18, 6, '2025-07-13 12:32:22'),
+(63, 18, 15, '2025-07-13 12:32:22'),
+(64, 19, 17, '2025-07-13 12:32:22'),
+(65, 19, 13, '2025-07-13 12:32:22'),
+(66, 19, 1, '2025-07-13 12:32:22'),
+(67, 19, 2, '2025-07-13 12:32:22'),
+(68, 20, 6, '2025-07-13 12:32:22'),
+(69, 20, 1, '2025-07-13 12:32:22'),
+(70, 20, 14, '2025-07-13 12:32:22'),
+(71, 21, 6, '2025-07-13 12:32:22'),
+(72, 21, 1, '2025-07-13 12:32:22'),
+(73, 21, 2, '2025-07-13 12:32:22'),
+(74, 21, 17, '2025-07-13 12:32:22'),
+(75, 21, 12, '2025-07-13 12:32:22');
 
 -- --------------------------------------------------------
 
@@ -640,144 +887,20 @@ INSERT INTO `RecipeTags` (`TagID`, `TagName`, `TagCategory`, `TagColor`, `Create
 -- --------------------------------------------------------
 
 --
--- Table structure for table `RecipeTagAssignments`
+-- Table structure for table `UserAllergies`
 --
 
-DROP TABLE IF EXISTS `RecipeTagAssignments`;
-CREATE TABLE IF NOT EXISTS `RecipeTagAssignments` (
-  `AssignmentID` int NOT NULL AUTO_INCREMENT,
-  `RecipeID` int NOT NULL,
-  `TagID` int NOT NULL,
-  `AssignedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`AssignmentID`),
-  UNIQUE KEY `unique_recipe_tag` (`RecipeID`, `TagID`),
-  KEY `TagID` (`TagID`)
+DROP TABLE IF EXISTS `UserAllergies`;
+CREATE TABLE IF NOT EXISTS `UserAllergies` (
+  `UserAllergyID` int NOT NULL AUTO_INCREMENT,
+  `UserID` int NOT NULL,
+  `AllergyID` int NOT NULL,
+  `CreatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`UserAllergyID`),
+  UNIQUE KEY `uq_user_allergy` (`UserID`,`AllergyID`),
+  KEY `AllergyID` (`AllergyID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-
---
--- Dumping data for table `RecipeTagAssignments`
---
-
-INSERT INTO `RecipeTagAssignments` (`AssignmentID`, `RecipeID`, `TagID`, `AssignedAt`) VALUES
--- Recipe 1: Classic Tomato Basil Pasta
-(1, 1, 10, '2025-07-13 12:32:22'), -- Italian
-(2, 1, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(3, 1, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-(4, 1, 15, '2025-07-13 12:32:22'), -- Dinner
-
--- Recipe 2: Quick Chicken Stir-Fry
-(5, 2, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(6, 2, 11, '2025-07-13 12:32:22'), -- Asian
-(7, 2, 15, '2025-07-13 12:32:22'), -- Dinner
-(8, 2, 17, '2025-07-13 12:32:22'), -- Healthy
-
--- Recipe 3: Creamy Mushroom Soup
-(9, 3, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-(10, 3, 15, '2025-07-13 12:32:22'), -- Dinner
-(11, 3, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-
--- Recipe 4: Lentil Salad with Roasted Vegetables
-(12, 4, 1, '2025-07-13 12:32:22'), -- Vegetarian
-(13, 4, 2, '2025-07-13 12:32:22'), -- Vegan
-(14, 4, 17, '2025-07-13 12:32:22'), -- Healthy
-(15, 4, 14, '2025-07-13 12:32:22'), -- Lunch
-(16, 4, 15, '2025-07-13 12:32:22'), -- Dinner
-
--- Recipe 5: Garlic Butter Shrimp Scampi with Linguine
-(17, 5, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(18, 5, 10, '2025-07-13 12:32:22'), -- Italian
-(19, 5, 15, '2025-07-13 12:32:22'), -- Dinner
-
--- Recipe 6: Fluffy Scrambled Eggs with Toast
-(20, 6, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(21, 6, 13, '2025-07-13 12:32:22'), -- Breakfast
-(22, 6, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-
--- Recipe 7: Black Bean Burgers
-(23, 7, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-(24, 7, 2, '2025-07-13 12:32:22'),  -- Vegan
-(25, 7, 17, '2025-07-13 12:32:22'), -- Healthy
-(26, 7, 15, '2025-07-13 12:32:22'), -- Dinner
-
--- Recipe 8: Simple Roasted Chicken Thighs with Root Vegetables
-(27, 8, 15, '2025-07-13 12:32:22'), -- Dinner
-(28, 8, 17, '2025-07-13 12:32:22'), -- Healthy
-
--- Recipe 9: Caprese Salad
-(29, 9, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(30, 9, 10, '2025-07-13 12:32:22'), -- Italian
-(31, 9, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-(32, 9, 17, '2025-07-13 12:32:22'), -- Healthy
-(33, 9, 14, '2025-07-13 12:32:22'), -- Lunch
-
--- Recipe 10: Berry Smoothie
-(34, 10, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(35, 10, 13, '2025-07-13 12:32:22'), -- Breakfast
-(36, 10, 17, '2025-07-13 12:32:22'), -- Healthy
-(37, 10, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-
--- Recipe 11: Sheet Pan Lemon Herb Salmon and Asparagus
-(38, 11, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(39, 11, 17, '2025-07-13 12:32:22'), -- Healthy
-(40, 11, 15, '2025-07-13 12:32:22'), -- Dinner
-
--- Recipe 12: Chicken and Vegetable Skewers
-(41, 12, 17, '2025-07-13 12:32:22'), -- Healthy
-(42, 12, 15, '2025-07-13 12:32:22'), -- Dinner
-
--- Recipe 13: Simple Cheese Omelette
-(43, 13, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(44, 13, 13, '2025-07-13 12:32:22'), -- Breakfast
-(45, 13, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-
--- Recipe 14: Veggie Fried Rice
-(46, 14, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(47, 14, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-(48, 14, 11, '2025-07-13 12:32:22'), -- Asian
-(49, 14, 15, '2025-07-13 12:32:22'), -- Dinner
-
--- Recipe 15: Simple Guacamole
-(50, 15, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(51, 15, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-(52, 15, 2, '2025-07-13 12:32:22'),  -- Vegan
-(53, 15, 17, '2025-07-13 12:32:22'), -- Healthy
-(54, 15, 12, '2025-07-13 12:32:22'), -- Mexican
-
--- Recipe 16: Microwave Mug Cake
-(55, 16, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(56, 16, 16, '2025-07-13 12:32:22'), -- Dessert
-(57, 16, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-
--- Recipe 17: Classic Tomato Soup
-(58, 17, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(59, 17, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-(60, 17, 17, '2025-07-13 12:32:22'), -- Healthy
-(61, 17, 14, '2025-07-13 12:32:22'), -- Lunch
-
--- Recipe 18: Pan-Seared Pork Chops
-(62, 18, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(63, 18, 15, '2025-07-13 12:32:22'), -- Dinner
-
--- Recipe 19: Berry Chia Pudding
-(64, 19, 17, '2025-07-13 12:32:22'), -- Healthy
-(65, 19, 13, '2025-07-13 12:32:22'), -- Breakfast
-(66, 19, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-(67, 19, 2, '2025-07-13 12:32:22'),  -- Vegan
-
--- Recipe 20: Classic Grilled Cheese Sandwich
-(68, 20, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(69, 20, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-(70, 20, 14, '2025-07-13 12:32:22'), -- Lunch
-
--- Recipe 21: Speedy Black Bean and Corn Salsa
-(71, 21, 6, '2025-07-13 12:32:22'),  -- Quick & Easy
-(72, 21, 1, '2025-07-13 12:32:22'),  -- Vegetarian
-(73, 21, 2, '2025-07-13 12:32:22'),  -- Vegan
-(74, 21, 17, '2025-07-13 12:32:22'), -- Healthy
-(75, 21, 12, '2025-07-13 12:32:22'); -- Mexican
-
--- --------------------------------------------------------
 -- --------------------------------------------------------
 
 --
@@ -791,77 +914,8 @@ CREATE TABLE IF NOT EXISTS `UserFavoriteRecipes` (
   `RecipeID` int NOT NULL,
   `CreatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`FavoriteID`),
-  UNIQUE KEY `unique_user_recipe` (`UserID`, `RecipeID`),
+  UNIQUE KEY `unique_user_recipe` (`UserID`,`RecipeID`),
   KEY `RecipeID` (`RecipeID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `Recipes`
---
-
-DROP TABLE IF EXISTS `Recipes`;
-CREATE TABLE IF NOT EXISTS `Recipes` (
-  `RecipeID` int NOT NULL AUTO_INCREMENT,
-  `UserID` int NOT NULL,
-  `Title` varchar(255) NOT NULL,
-  `Description` text,
-  `Instructions` text NOT NULL,
-  `PreparationTimeMinutes` int DEFAULT NULL,
-  `CookingTimeMinutes` int DEFAULT NULL,
-  `Servings` int DEFAULT NULL,
-  `ImageURL` varchar(2083) DEFAULT NULL,
-  `is_public` tinyint(1) DEFAULT '0',
-  `NutritionInfoJSON` json DEFAULT NULL,
-  `CreatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `UpdatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`RecipeID`),
-  KEY `UserID` (`UserID`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `Recipes`
---
-
-INSERT INTO `Recipes` (`RecipeID`, `UserID`, `Title`, `Description`, `Instructions`, `PreparationTimeMinutes`, `CookingTimeMinutes`, `Servings`, `ImageURL`, `is_public`, `NutritionInfoJSON`, `CreatedAt`, `UpdatedAt`) VALUES
-(1, 2, 'Classic Tomato Basil Pasta', 'A simple yet incredibly flavorful pasta dish perfect for a quick weeknight meal.', 'Cook pasta according to package directions until al dente. Drain and set aside.\nWhile pasta is cooking, heat olive oil in a large skillet or pot over medium heat. Add minced garlic and cook for 1-2 minutes until fragrant, being careful not to burn it.\nPour in crushed tomatoes, red pepper flakes (if using), salt, and pepper. Bring to a simmer, then reduce heat to low and cook for 10-15 minutes, allowing the sauce to thicken slightly.\nStir in chopped fresh basil and cooked pasta. Toss to coat evenly.\nRemove from heat and stir in 1/4 cup Parmesan cheese.\nServe immediately, garnished with extra Parmesan cheese.', 15, 20, 4, '/static/recipe_images/9dcefe2312b74d17b9b1f2312f5c6a81.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 380}, \"protein\": {\"unit\": \"g\", \"amount\": 14}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 65}, \"fat\": {\"unit\": \"g\", \"amount\": 8}, \"fiber\": {\"unit\": \"g\", \"amount\": 4}, \"sugar\": {\"unit\": \"g\", \"amount\": 3}, \"sodium\": {\"unit\": \"mg\", \"amount\": 450}}, \"per_serving\": true}', '2025-06-16 19:23:38', '2025-07-06 08:43:42'),
-(2, 2, 'Quick Chicken Stir-Fry', 'A versatile and healthy stir-fry that can be adapted with your favorite vegetables.', 'In a bowl, toss chicken pieces with 2 tbsp soy sauce and 1 tbsp cornstarch. Set aside for 10 minutes.\nIn a small bowl, whisk together all stir-fry sauce ingredients until smooth.\nHeat vegetable oil and sesame oil in a large skillet or wok over medium-high heat. Add chicken and cook until browned and cooked through, about 5-7 minutes. Remove chicken from the pan and set aside.\nAdd broccoli, carrots, bell pepper, and onion to the same pan. Stir-fry for 3-5 minutes until vegetables are tender-crisp.\nAdd minced garlic and grated ginger to the vegetables and cook for 1 minute more until fragrant.\nReturn chicken to the pan. Give the stir-fry sauce a quick whisk (as cornstarch settles) and pour it over the chicken and vegetables. Cook, stirring constantly, until the sauce thickens and coats everything, about 1-2 minutes.\nServe immediately with steamed rice or noodles.', 20, 15, 3, '/static/recipe_images/f13d9c0bc41a474f8230976cbea21e0e.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 420}, \"protein\": {\"unit\": \"g\", \"amount\": 28}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 35}, \"fat\": {\"unit\": \"g\", \"amount\": 18}, \"fiber\": {\"unit\": \"g\", \"amount\": 6}, \"sugar\": {\"unit\": \"g\", \"amount\": 8}, \"sodium\": {\"unit\": \"mg\", \"amount\": 680}}, \"per_serving\": true}', '2025-06-16 19:24:37', '2025-07-06 08:43:38'),
-(3, 2, 'Creamy Mushroom Soup', 'A rich and comforting soup, perfect for a cozy evening.', 'In a large pot or Dutch oven, melt butter over medium heat.\nAdd chopped onion and cook until softened, about 5 minutes.\nAdd sliced mushrooms and cook, stirring occasionally, until they release their liquid and start to brown, about 8-10 minutes.\nStir in minced garlic and cook for 1 minute until fragrant.\nSprinkle flour over the mushrooms and stir for 1 minute to cook out the raw flour taste.\nGradually whisk in the broth, stirring constantly to prevent lumps.\nBring to a simmer, then reduce heat to low and cook for 10 minutes to allow flavors to meld.\nStir in heavy cream.\nSeason with salt and pepper to taste.\nFor a smoother soup, you can use an immersion blender to partially or fully blend the soup to your desired consistency.\nServe hot, garnished with fresh parsley or chives.', 15, 25, 4, '/static/recipe_images/9d2fb4449da2444c9fb38785c5fb2bb2.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 280}, \"protein\": {\"unit\": \"g\", \"amount\": 8}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 12}, \"fat\": {\"unit\": \"g\", \"amount\": 22}, \"fiber\": {\"unit\": \"g\", \"amount\": 2}, \"sugar\": {\"unit\": \"g\", \"amount\": 4}, \"sodium\": {\"unit\": \"mg\", \"amount\": 520}}, \"per_serving\": true}', '2025-06-16 19:25:38', '2025-07-06 08:43:36'),
-(4, 2, 'Lentil Salad with Roasted Vegetables', 'A hearty and healthy vegetarian salad, great for meal prep or a light lunch/dinner.', 'Preheat oven to 200°C (400°F).\nOn a large baking sheet, toss diced sweet potato, red bell pepper, zucchini, and red onion with 2 tbsp olive oil, salt, and pepper. Roast for 25-30 minutes, or until vegetables are tender and slightly caramelized, flipping halfway through.\nWhile vegetables are roasting, combine rinsed lentils with broth or water in a saucepan. Bring to a boil, then reduce heat to low, cover, and simmer for 20-25 minutes, or until lentils are tender but not mushy. Drain any excess liquid.\nIn a small bowl, whisk together all dressing ingredients.\nIn a large bowl, combine cooked lentils, roasted vegetables, and fresh parsley. Pour the dressing over the salad and toss gently to combine.\nTaste and adjust seasoning if needed. If using, gently fold in crumbled feta cheese.\nServe warm or at room temperature.', 20, 55, 4, '/static/recipe_images/aa21cc729b5749af9fae44ef707156f9.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 320}, \"protein\": {\"unit\": \"g\", \"amount\": 16}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 45}, \"fat\": {\"unit\": \"g\", \"amount\": 12}, \"fiber\": {\"unit\": \"g\", \"amount\": 18}, \"sugar\": {\"unit\": \"g\", \"amount\": 8}, \"sodium\": {\"unit\": \"mg\", \"amount\": 380}}, \"per_serving\": true}', '2025-06-16 19:27:04', '2025-07-06 08:43:35'),
-(5, 2, 'Garlic Butter Shrimp Scampi with Linguine', 'A classic Italian-American dish thats quick to make and full of flavor.', 'Cook linguine according to package directions until al dente. Reserve 1/2 cup pasta water before draining.\nWhile pasta is cooking, melt butter in a large skillet over medium heat. Add minced garlic and red pepper flakes (if using) and cook for 1-2 minutes until fragrant, being careful not to burn the garlic.\nAdd shrimp to the skillet and cook for 2-3 minutes per side, or until pink and opaque. Do not overcook. Remove shrimp from the pan and set aside.\nPour white wine (or broth) and lemon juice into the skillet. Bring to a simmer and cook for 2-3 minutes, scraping up any browned bits from the bottom of the pan.\nReturn shrimp to the skillet. Add cooked linguine and chopped parsley. Toss to combine, adding a splash of reserved pasta water if needed to create a light sauce.\nSeason with salt and pepper to taste.\nServe immediately.', 15, 15, 2, '/static/recipe_images/be781b8347c845988c76e7f4f394f386.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 580}, \"protein\": {\"unit\": \"g\", \"amount\": 32}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 65}, \"fat\": {\"unit\": \"g\", \"amount\": 24}, \"fiber\": {\"unit\": \"g\", \"amount\": 3}, \"sugar\": {\"unit\": \"g\", \"amount\": 2}, \"sodium\": {\"unit\": \"mg\", \"amount\": 720}}, \"per_serving\": true}', '2025-06-16 19:28:22', '2025-07-06 08:43:34'),
-(6, 2, 'Fluffy Scrambled Eggs with Toast', 'A simple yet perfectly executed breakfast staple.', 'In a bowl, whisk eggs with milk or cream (if using), salt, and pepper until well combined and slightly foamy.\nMelt butter in a non-stick skillet over medium-low heat.\nPour the egg mixture into the skillet. Let it sit undisturbed for about 30 seconds until the edges just begin to set.\nUsing a spatula, gently push the cooked egg from the edges towards the center, tilting the pan to allow uncooked egg to flow underneath. Continue this process, folding and stirring gently, until the eggs are mostly set but still slightly moist. Do not overcook.\nRemove from heat immediately. Serve hot with toast.', 5, 5, 1, '/static/recipe_images/db3cae26fc3145a7a2a8d55fe9e3164f.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 320}, \"protein\": {\"unit\": \"g\", \"amount\": 18}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 25}, \"fat\": {\"unit\": \"g\", \"amount\": 18}, \"fiber\": {\"unit\": \"g\", \"amount\": 2}, \"sugar\": {\"unit\": \"g\", \"amount\": 3}, \"sodium\": {\"unit\": \"mg\", \"amount\": 480}}, \"per_serving\": true}', '2025-06-16 19:29:12', '2025-07-06 08:43:32'),
-(7, 2, 'Black Bean Burgers', 'A flavorful and satisfying vegetarian burger, great for grilling or pan-frying.', 'In a large bowl, mash the black beans with a fork or potato masher until mostly mashed but still with some texture.\nAdd cooked brown rice (or breadcrumbs), chopped red onion, bell pepper, minced garlic, egg, chili powder, cumin, salt, and pepper to the bowl. Mix well until everything is combined.\nDivide the mixture into 4 equal portions and shape into patties.\nHeat olive oil in a large skillet over medium heat. Cook the black bean burgers for 5-7 minutes per side, or until browned and heated through. Alternatively, grill them on a preheated grill.\nServe on burger buns with your favorite toppings.', 20, 10, 4, '/static/recipe_images/a3fc0aeb87b847a9892314c5f281e5b5.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 280}, \"protein\": {\"unit\": \"g\", \"amount\": 12}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 35}, \"fat\": {\"unit\": \"g\", \"amount\": 10}, \"fiber\": {\"unit\": \"g\", \"amount\": 8}, \"sugar\": {\"unit\": \"g\", \"amount\": 2}, \"sodium\": {\"unit\": \"mg\", \"amount\": 420}}, \"per_serving\": true}', '2025-06-16 19:30:12', '2025-07-06 08:43:31'),
-(8, 2, 'Simple Roasted Chicken Thighs with Root Vegetables', 'An easy and delicious one-pan meal perfect for a comforting dinner.', 'Preheat oven to 200°C (400°F).\nIn a large bowl, toss potatoes, carrots, and onion with 2 tbsp olive oil, rosemary, thyme, paprika, salt, and pepper. Spread the vegetables in an even layer on a large baking sheet.\nPat chicken thighs dry with paper towels. Drizzle with the remaining 1 tbsp olive oil and season generously with salt and pepper.\nPlace the chicken thighs skin-side up on top of the vegetables on the baking sheet.\nRoast for 40-50 minutes, or until the chicken is cooked through (internal temperature reaches 74°C/165°F) and the skin is crispy, and vegetables are tender. Flip vegetables halfway through cooking for even browning.\nServe hot.', 15, 40, 4, '/static/recipe_images/3c909140e0b6443c8195111f3ebcc46a.jpeg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 520}, \"protein\": {\"unit\": \"g\", \"amount\": 35}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 28}, \"fat\": {\"unit\": \"g\", \"amount\": 32}, \"fiber\": {\"unit\": \"g\", \"amount\": 5}, \"sugar\": {\"unit\": \"g\", \"amount\": 6}, \"sodium\": {\"unit\": \"mg\", \"amount\": 580}}, \"per_serving\": true}', '2025-06-16 19:31:40', '2025-07-06 08:43:30'),
-(9, 2, 'Caprese Salad', 'A fresh, simple, and elegant Italian salad perfect as an appetizer or light meal.', 'Arrange alternating slices of tomato, mozzarella, and fresh basil leaves on a serving platter or individual plates.\nDrizzle generously with extra virgin olive oil.\nSeason with salt and freshly ground black pepper.\nIf desired, drizzle with balsamic glaze just before serving.', 10, 0, 2, '/static/recipe_images/6dbf7154641a4cad962692462549b005.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 220}, \"protein\": {\"unit\": \"g\", \"amount\": 12}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 8}, \"fat\": {\"unit\": \"g\", \"amount\": 16}, \"fiber\": {\"unit\": \"g\", \"amount\": 2}, \"sugar\": {\"unit\": \"g\", \"amount\": 5}, \"sodium\": {\"unit\": \"mg\", \"amount\": 280}}, \"per_serving\": true}', '2025-06-16 19:32:43', '2025-07-06 08:43:28'),
-(10, 2, 'Berry Smoothie', 'A quick, healthy, and refreshing drink, perfect for breakfast or a snack.', 'Combine all ingredients in a blender.\nBlend until smooth and creamy, adding more milk if needed to reach your desired consistency.\nTaste and add honey or maple syrup if desired.\nPour into a glass and serve immediately.', 5, 0, 1, '/static/recipe_images/ed7539f6cdd342dcb63f921d976ddd85.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 180}, \"protein\": {\"unit\": \"g\", \"amount\": 8}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 28}, \"fat\": {\"unit\": \"g\", \"amount\": 4}, \"fiber\": {\"unit\": \"g\", \"amount\": 4}, \"sugar\": {\"unit\": \"g\", \"amount\": 22}, \"sodium\": {\"unit\": \"mg\", \"amount\": 120}}, \"per_serving\": true}', '2025-06-16 19:34:19', '2025-07-06 08:43:26'),
-(11, 2, 'Sheet Pan Lemon Herb Salmon and Asparagus', 'An incredibly easy and healthy one-pan meal with minimal cleanup.', 'Preheat your oven to 200°C (400°F). Line a baking sheet with parchment paper for easy cleanup.\nOn the prepared baking sheet, toss the asparagus with 1/2 tablespoon of olive oil, salt, and pepper. Arrange in a single layer.\nPlace the salmon fillets on the same baking sheet, nestled among the asparagus.\nDrizzle the remaining 1/2 tablespoon of olive oil over the salmon. Season with salt, pepper, and dried dill.\nArrange lemon slices on top of the salmon fillets.\nRoast for 15-20 minutes, or until the salmon is cooked through and flakes easily with a fork, and the asparagus is tender-crisp.\nSqueeze fresh lemon juice over everything before serving.', 10, 15, 2, '/static/recipe_images/1febfcd1327d4039a459f0309c30ff16.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 380}, \"protein\": {\"unit\": \"g\", \"amount\": 42}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 8}, \"fat\": {\"unit\": \"g\", \"amount\": 22}, \"fiber\": {\"unit\": \"g\", \"amount\": 4}, \"sugar\": {\"unit\": \"g\", \"amount\": 3}, \"sodium\": {\"unit\": \"mg\", \"amount\": 420}}, \"per_serving\": true}', '2025-06-16 19:35:34', '2025-07-06 08:43:25'),
-(12, 2, 'Chicken and Vegetable Skewers (Grill or Oven)', 'A colorful and flavorful dish, perfect for a barbecue or a light dinner.', 'In a bowl, whisk together all marinade ingredients. Add the chicken cubes and toss to coat.\nCover and refrigerate for at least 30 minutes, or up to 2 hours.\nIf using a grill, preheat it to medium-high heat. If using an oven, preheat to 200°C (400°F) and line a baking sheet with foil.\nThread the marinated chicken and cut vegetables alternately onto the skewers.\nLightly brush the vegetables with olive oil.\nTo Grill: Place skewers on the preheated grill. Cook for 15-20 minutes, turning occasionally, until chicken is cooked through and vegetables are tender with some char marks.\nTo Bake: Place skewers on the prepared baking sheet. Bake for 20-25 minutes, flipping halfway through, until chicken is cooked through and vegetables are tender.\nServe immediately.', 20, 20, 4, '/static/recipe_images/e5790a9dd4b340bf851aa8ad6391861b.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 280}, \"protein\": {\"unit\": \"g\", \"amount\": 32}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 12}, \"fat\": {\"unit\": \"g\", \"amount\": 14}, \"fiber\": {\"unit\": \"g\", \"amount\": 3}, \"sugar\": {\"unit\": \"g\", \"amount\": 6}, \"sodium\": {\"unit\": \"mg\", \"amount\": 480}}, \"per_serving\": true}', '2025-06-16 19:37:21', '2025-07-06 08:43:23'),
-(13, 2, 'Simple Cheese Omelette', 'A classic, quick, and satisfying breakfast or light meal.', 'In a small bowl, whisk the eggs with milk or water, salt, and pepper until well combined.\nMelt the butter in an 8-inch non-stick skillet over medium-low heat until it sizzles.\nPour the egg mixture into the skillet. Let it cook undisturbed for about 30 seconds until the edges start to set.\nSprinkle the grated cheese over one half of the omelette.\nUsing a spatula, gently lift one side of the omelette and fold it over the cheese.\nCook for another 1-2 minutes, or until the cheese is melted and the eggs are cooked to your liking.\nSlide the omelette onto a plate and serve immediately.', 2, 3, 1, '/static/recipe_images/e2a9289ecece4f49af065521bc264e99.jpeg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 280}, \"protein\": {\"unit\": \"g\", \"amount\": 20}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 2}, \"fat\": {\"unit\": \"g\", \"amount\": 22}, \"fiber\": {\"unit\": \"g\", \"amount\": 0}, \"sugar\": {\"unit\": \"g\", \"amount\": 1}, \"sodium\": {\"unit\": \"mg\", \"amount\": 520}}, \"per_serving\": true}', '2025-06-16 19:38:32', '2025-07-06 08:43:21'),
-(14, 2, 'Veggie Fried Rice', 'A great way to use up leftover rice and vegetables. Customizable to your liking!', 'Heat 1 tablespoon of vegetable oil in a large skillet or wok over medium-high heat. Add chopped onion and carrot and cook for 3-4 minutes until slightly softened.\nStir in peas, corn, minced garlic, and ginger (if using). Cook for 2-3 minutes more until fragrant. Push vegetables to one side of the pan.\nAdd the remaining 1 tablespoon of vegetable oil to the empty side of the pan. Pour in the beaten eggs and scramble them until cooked through. Break them into small pieces with your spatula.\nAdd the cold cooked rice to the pan. Drizzle with soy sauce and sesame oil.\nToss everything together, breaking up any clumps of rice, and cook for 3-5 minutes, stirring occasionally, until the rice is heated through and slightly golden.\nGarnish with sliced green onions before serving.', 15, 10, 2, '/static/recipe_images/d1d56cc664104f09b5ae45ee56d3f89b.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 420}, \"protein\": {\"unit\": \"g\", \"amount\": 12}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 65}, \"fat\": {\"unit\": \"g\", \"amount\": 14}, \"fiber\": {\"unit\": \"g\", \"amount\": 4}, \"sugar\": {\"unit\": \"g\", \"amount\": 3}, \"sodium\": {\"unit\": \"mg\", \"amount\": 680}}, \"per_serving\": true}', '2025-06-16 19:39:13', '2025-07-06 08:43:20'),
-(15, 2, 'Simple Guacamole', 'A fresh and healthy dip perfect for snacking or as a topping.', 'Cut avocados in half, remove the pit, and scoop the flesh into a medium bowl.\nUsing a fork or potato masher, mash the avocado to your desired consistency (chunky or smooth).\nAdd diced red onion, chopped cilantro, minced jalapeño (if using), and lime juice to the bowl.\nStir everything together gently until well combined.\nSeason with salt to taste, starting with 1/2 teaspoon and adding more if needed.\nServe immediately with tortilla chips, as a topping for tacos, or in sandwiches.', 10, 0, 4, '/static/recipe_images/e51a79359e924c0faf9860d94acfcf34.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 120}, \"protein\": {\"unit\": \"g\", \"amount\": 2}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 8}, \"fat\": {\"unit\": \"g\", \"amount\": 10}, \"fiber\": {\"unit\": \"g\", \"amount\": 4}, \"sugar\": {\"unit\": \"g\", \"amount\": 1}, \"sodium\": {\"unit\": \"mg\", \"amount\": 180}}, \"per_serving\": true}', '2025-06-16 19:39:43', '2025-07-06 08:43:19'),
-(16, 2, 'Microwave Mug Cake', 'A quick and easy single-serving dessert when a craving strikes!', 'In a microwave-safe mug, whisk together the flour, sugar, cocoa powder, baking powder, and salt until there are no lumps.\nAdd the milk, vegetable oil, and vanilla extract (if using) to the mug. Stir well with a fork until the batter is smooth and all dry ingredients are incorporated.\nStir in the chocolate chips (if using).\nMicrowave on high for 60-90 seconds. Cooking time may vary depending on your microwaves wattage. The cake should be set but still slightly moist in the center.\nLet it cool for a minute before enjoying directly from the mug. Be careful, the mug will be hot!', 2, 1, 1, '/static/recipe_images/8873418195594cc3a7c3e46581094f7e.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 320}, \"protein\": {\"unit\": \"g\", \"amount\": 6}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 45}, \"fat\": {\"unit\": \"g\", \"amount\": 14}, \"fiber\": {\"unit\": \"g\", \"amount\": 2}, \"sugar\": {\"unit\": \"g\", \"amount\": 28}, \"sodium\": {\"unit\": \"mg\", \"amount\": 280}}, \"per_serving\": true}', '2025-06-16 19:40:11', '2025-07-06 08:43:18'),
-(17, 2, 'Classic Tomato Soup (from Canned Tomatoes)', 'A comforting and simple tomato soup, perfect for a rainy day.', 'In a large pot or Dutch oven, heat olive oil over medium heat. Add chopped onion and cook until softened, about 5-7 minutes.\nAdd minced garlic and cook for 1 minute until fragrant.\nPour in the crushed tomatoes and broth. Stir in dried oregano and basil. Bring the soup to a simmer.\nReduce heat to low, cover, and let it simmer for 15-20 minutes, allowing the flavors to meld.\nFor a smoother soup, use an immersion blender to blend the soup directly in the pot until it reaches your desired consistency. Alternatively, carefully transfer batches to a regular blender (vent the lid!).\nStir in heavy cream or milk (if using). Season with salt and pepper to taste.\nServe hot, garnished with fresh basil or croutons.', 10, 25, 4, '/static/recipe_images/db31d1d8fce748279885be09caa6b349.jpeg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 180}, \"protein\": {\"unit\": \"g\", \"amount\": 6}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 18}, \"fat\": {\"unit\": \"g\", \"amount\": 10}, \"fiber\": {\"unit\": \"g\", \"amount\": 4}, \"sugar\": {\"unit\": \"g\", \"amount\": 8}, \"sodium\": {\"unit\": \"mg\", \"amount\": 480}}, \"per_serving\": true}', '2025-06-16 19:40:37', '2025-07-06 08:43:17'),
-(18, 2, 'Pan-Seared Pork Chops', 'A quick and flavorful way to cook tender pork chops.', 'Pat the pork chops dry with paper towels.\nSeason generously on both sides with salt, pepper, paprika, and garlic powder.\nHeat olive oil or butter in a heavy-bottomed skillet (cast iron works great) over medium-high heat until shimmering.\nPlace the seasoned pork chops in the hot skillet.\nSear for 4-6 minutes per side, or until a nice golden-brown crust forms and the internal temperature reaches 63°C (145°F).\nFor thicker chops, after searing, you can transfer the skillet to a preheated 200°C (400°F) oven for a few minutes to finish cooking through if needed.\nRemove from heat and let the pork chops rest on a cutting board for 5 minutes before serving. This helps keep them juicy.', 5, 10, 2, '/static/recipe_images/1f4b0e378adb4f4c9cadf7a8419cf6a1.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 380}, \"protein\": {\"unit\": \"g\", \"amount\": 42}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 2}, \"fat\": {\"unit\": \"g\", \"amount\": 22}, \"fiber\": {\"unit\": \"g\", \"amount\": 0}, \"sugar\": {\"unit\": \"g\", \"amount\": 1}, \"sodium\": {\"unit\": \"mg\", \"amount\": 580}}, \"per_serving\": true}', '2025-06-16 19:41:03', '2025-07-06 08:43:15'),
-(19, 2, 'Berry Chia Pudding', 'A healthy, no-cook breakfast or snack thats great for meal prep.', 'In a jar or bowl, whisk together the chia seeds, milk, honey/maple syrup, and vanilla extract (if using) until well combined and no clumps of chia seeds remain.\nStir in 1/2 cup of mixed berries.\nCover and refrigerate for at least 4 hours, or preferably overnight, until the pudding has thickened.\nBefore serving, give it a quick stir. If its too thick, add a splash more milk.\nServe in bowls or glasses, topped with more fresh berries and any other desired toppings.', 5, 0, 2, '/static/recipe_images/ea03de21d5a8431ea00d65d4cd76ce3d.jpeg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 220}, \"protein\": {\"unit\": \"g\", \"amount\": 8}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 28}, \"fat\": {\"unit\": \"g\", \"amount\": 10}, \"fiber\": {\"unit\": \"g\", \"amount\": 12}, \"sugar\": {\"unit\": \"g\", \"amount\": 18}, \"sodium\": {\"unit\": \"mg\", \"amount\": 80}}, \"per_serving\": true}', '2025-06-16 19:41:30', '2025-07-06 08:43:14'),
-(20, 2, 'Classic Grilled Cheese Sandwich', 'A comforting, gooey, and easy-to-make classic.', 'Butter one side of each slice of bread, spreading it evenly to the edges.\nPlace one slice of bread, butter-side down, in a non-stick skillet over medium-low heat.\nLay the cheese slices on top of the bread in the skillet.\nTop with the second slice of bread, butter-side up.\nCook for 3-4 minutes per side, or until the bread is golden brown and crispy and the cheese is completely melted and gooey. Gently press down on the sandwich with a spatula occasionally to ensure even browning.\nRemove from the skillet, slice in half if desired, and serve immediately.', 2, 5, 1, '/static/recipe_images/55f375e5039b4a18976648968acd15f0.jpg', 0, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 420}, \"protein\": {\"unit\": \"g\", \"amount\": 16}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 35}, \"fat\": {\"unit\": \"g\", \"amount\": 24}, \"fiber\": {\"unit\": \"g\", \"amount\": 2}, \"sugar\": {\"unit\": \"g\", \"amount\": 3}, \"sodium\": {\"unit\": \"mg\", \"amount\": 680}}, \"per_serving\": true}', '2025-06-16 19:42:06', '2025-07-06 08:43:12'),
-(21, 2, 'Speedy Black Bean and Corn Salsa', 'A vibrant, fresh, and easy salsa that\'s perfect as a dip, salad topping, or side dish. It\'s a great no-cook option when you need something quick and flavorful.', 'In a large bowl, combine the rinsed and drained black beans, corn, diced tomato, finely diced red onion, and finely diced red bell pepper.\nAdd the chopped fresh cilantro and minced jalapeño (if using).\nIn a small separate bowl, whisk together the lime juice, olive oil, and ground cumin (if using).\nPour the dressing over the bean and vegetable mixture.\nToss everything gently until all the ingredients are well combined and coated with the dressing.\nSeason with salt and black pepper to taste. Start with 1/2 teaspoon of salt and add more if needed.\nFor best flavor, let the salsa sit for at least 10-15 minutes at room temperature before serving to allow the flavors to meld.', 15, 0, 4, '/static/recipe_images/1fb76832e23e46c79699a55eef64a95b.jpg', 1, '{\"notes\": \"Nutritional values are estimates based on typical ingredient values\", \"success\": true, \"nutrition\": {\"calories\": {\"unit\": \"kcal\", \"amount\": 120}, \"protein\": {\"unit\": \"g\", \"amount\": 6}, \"carbohydrates\": {\"unit\": \"g\", \"amount\": 18}, \"fat\": {\"unit\": \"g\", \"amount\": 4}, \"fiber\": {\"unit\": \"g\", \"amount\": 5}, \"sugar\": {\"unit\": \"g\", \"amount\": 3}, \"sodium\": {\"unit\": \"mg\", \"amount\": 220}}, \"per_serving\": true}', '2025-06-17 03:17:46', '2025-07-06 08:43:11');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `UserAllergies`
---
-
-DROP TABLE IF EXISTS `UserAllergies`;
-CREATE TABLE IF NOT EXISTS `UserAllergies` (
-  `UserAllergyID` int NOT NULL AUTO_INCREMENT,
-  `UserID` int NOT NULL,
-  `AllergyID` int NOT NULL,
-  `CreatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`UserAllergyID`),
-  UNIQUE KEY `uq_user_allergy` (`UserID`,`AllergyID`),
-  KEY `AllergyID` (`AllergyID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -930,58 +984,33 @@ CREATE TABLE IF NOT EXISTS `Users` (
   UNIQUE KEY `Email` (`Email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
-
 --
 -- Dumping data for table `Users`
 --
 
-INSERT INTO `Users` (`UserID`, `Name`, `Email`, `PasswordHash`, `DietaryPreferences`, `CreatedAt`, `role`, `EmailVerificationToken`, `EmailVerificationTokenExpiresAt`, `IsEmailVerified`) VALUES
-(1, 'admin', 'Admin@nutrichef.com', 'scrypt:32768:8:1$x8TNac9dKwBri9Cv$d4fa0f5e7177e5b4e6d70885fb4942a5e7d341e451e30850d0d71376e69250dfa14e6903ada8c8d035ebdb890a37f655e627501933c3691e1ccb80f787a4385e', NULL, '2025-06-03 05:46:04', 'admin', NULL, NULL, 1),
-(2, 'Himan Manduja', 'mandujahiman@gmail.com', 'scrypt:32768:8:1$Ed9p5GJJcxnjtf4P$2903d3f12a7cf23a3cf0fadf5dbbb31e279b8b26d4d9cdcc1e8fe75f354a0a3aed6fab82f7231051f7ef59253ea21e903717e8780489f00f6061d98aefaaabcc', NULL, '2025-06-07 08:22:28', 'user', NULL, NULL, 1);
+INSERT INTO `Users` (`UserID`, `Name`, `Email`, `PasswordHash`, `DietaryPreferences`, `CreatedAt`, `role`, `EmailVerificationToken`, `EmailVerificationTokenExpiresAt`, `IsEmailVerified`, `DailyCalories`, `DailyProtein`, `DailyCarbs`, `DailyFat`, `DailyFiber`, `DailySugar`, `DailySodium`) VALUES
+(1, 'admin', 'Admin@nutrichef.com', 'scrypt:32768:8:1$x8TNac9dKwBri9Cv$d4fa0f5e7177e5b4e6d70885fb4942a5e7d341e451e30850d0d71376e69250dfa14e6903ada8c8d035ebdb890a37f655e627501933c3691e1ccb80f787a4385e', NULL, '2025-06-03 05:46:04', 'admin', NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 'Himan Manduja', 'mandujahiman@gmail.com', 'scrypt:32768:8:1$Ed9p5GJJcxnjtf4P$2903d3f12a7cf23a3cf0fadf5dbbb31e279b8b26d4d9cdcc1e8fe75f354a0a3aed6fab82f7231051f7ef59253ea21e903717e8780489f00f6061d98aefaaabcc', NULL, '2025-06-07 08:22:28', 'user', NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
-CREATE TABLE ForumPosts (
-    Id INT PRIMARY KEY AUTO_INCREMENT,
-    UserId INT,
-    Title VARCHAR(255) NOT NULL,
-    Content TEXT NOT NULL,
-    LikesCount INT DEFAULT 0,
-    ViewsCount INT DEFAULT 0,
-    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UpdatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (UserId) REFERENCES Users(UserID) ON DELETE CASCADE
-)ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
--- Forum Comments table
-CREATE TABLE ForumComments (
-    Id INT PRIMARY KEY AUTO_INCREMENT,
-    PostId INT,
-    UserId INT,
-    Comment TEXT NOT NULL,
-    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (PostId) REFERENCES ForumPosts(Id) ON DELETE CASCADE,
-    FOREIGN KEY (UserId) REFERENCES Users(UserID) ON DELETE CASCADE
-)ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+--
+-- Table structure for table `Notifications`
+--
 
--- Forum Post Tags table (for recipe tags)
-CREATE TABLE ForumPostTags (
-    Id INT PRIMARY KEY AUTO_INCREMENT,
-    PostId INT,
-    RecipeId INT,
-    FOREIGN KEY (PostId) REFERENCES ForumPosts(Id) ON DELETE CASCADE,
-    FOREIGN KEY (RecipeId) REFERENCES Recipes(RecipeID) ON DELETE CASCADE
-)ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+DROP TABLE IF EXISTS `Notifications`;
+CREATE TABLE IF NOT EXISTS `Notifications` (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    UserId INT NOT NULL, -- The user who receives the notification
+    Type VARCHAR(50) NOT NULL, -- e.g., 'forumComment', 'forumLike'
+    ReferenceId INT, -- e.g., commentId or likeId or postId
+    Message TEXT NOT NULL, -- Notification message to display
+    IsRead BOOLEAN DEFAULT FALSE, -- Has the user seen this notification?
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserId) REFERENCES User(Id)
+    -- Add additional foreign keys as needed for ReferenceId if you want strict integrity
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Forum Likes table (for user-specific likes)
-CREATE TABLE ForumLikes (
-    Id INT PRIMARY KEY AUTO_INCREMENT,
-    PostId INT,
-    UserId INT,
-    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY unique_user_post_like (PostId, UserId),
-    FOREIGN KEY (PostId) REFERENCES ForumPosts(Id) ON DELETE CASCADE,
-    FOREIGN KEY (UserId) REFERENCES Users(UserID) ON DELETE CASCADE
-)ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 
 --
@@ -989,71 +1018,37 @@ CREATE TABLE ForumLikes (
 --
 
 --
--- Constraints for table `ClassificationResults`
+-- Constraints for table `ForumComments`
 --
-ALTER TABLE `ClassificationResults`
-  ADD CONSTRAINT `classificationresults_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE SET NULL;
+ALTER TABLE `ForumComments`
+  ADD CONSTRAINT `forumcomments_ibfk_1` FOREIGN KEY (`PostId`) REFERENCES `ForumPosts` (`Id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `forumcomments_ibfk_2` FOREIGN KEY (`UserId`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE;
 
 --
--- Constraints for table `RecipeComments`
+-- Constraints for table `ForumLikes`
 --
-ALTER TABLE `RecipeComments`
-  ADD CONSTRAINT `recipecomments_ibfk_1` FOREIGN KEY (`RecipeID`) REFERENCES `recipes` (`RecipeID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `recipecomments_ibfk_2` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`) ON DELETE CASCADE;
+ALTER TABLE `ForumLikes`
+  ADD CONSTRAINT `forumlikes_ibfk_1` FOREIGN KEY (`PostId`) REFERENCES `ForumPosts` (`Id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `forumlikes_ibfk_2` FOREIGN KEY (`UserId`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE;
 
 --
--- Constraints for table `RecipeIngredients`
+-- Constraints for table `ForumPosts`
 --
-ALTER TABLE `RecipeIngredients`
-  ADD CONSTRAINT `recipeingredients_ibfk_1` FOREIGN KEY (`RecipeID`) REFERENCES `Recipes` (`RecipeID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `recipeingredients_ibfk_2` FOREIGN KEY (`IngredientID`) REFERENCES `Ingredients` (`IngredientID`) ON DELETE CASCADE;
+ALTER TABLE `ForumPosts`
+  ADD CONSTRAINT `forumposts_ibfk_1` FOREIGN KEY (`UserId`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE;
 
 --
--- Constraints for table `RecipeRatings`
+-- Constraints for table `ForumPostTags`
 --
-ALTER TABLE `RecipeRatings`
-  ADD CONSTRAINT `reciperatings_ibfk_1` FOREIGN KEY (`RecipeID`) REFERENCES `Recipes` (`RecipeID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `reciperatings_ibfk_2` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE;
+ALTER TABLE `ForumPostTags`
+  ADD CONSTRAINT `forumposttags_ibfk_1` FOREIGN KEY (`PostId`) REFERENCES `ForumPosts` (`Id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `forumposttags_ibfk_2` FOREIGN KEY (`RecipeId`) REFERENCES `Recipes` (`RecipeID`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `Recipes`
 --
 ALTER TABLE `Recipes`
-  ADD CONSTRAINT `recipes_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE;
-
---
--- Constraints for table `RecipeTagAssignments`
---
-ALTER TABLE `RecipeTagAssignments`
-  ADD CONSTRAINT `recipetagassignments_ibfk_1` FOREIGN KEY (`RecipeID`) REFERENCES `Recipes` (`RecipeID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `recipetagassignments_ibfk_2` FOREIGN KEY (`TagID`) REFERENCES `RecipeTags` (`TagID`) ON DELETE CASCADE;
-
---
--- Constraints for table `UserFavoriteRecipes`
---
-ALTER TABLE `UserFavoriteRecipes`
-  ADD CONSTRAINT `userfavoriterecipes_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `userfavoriterecipes_ibfk_2` FOREIGN KEY (`RecipeID`) REFERENCES `Recipes` (`RecipeID`) ON DELETE CASCADE;
-
---
--- Constraints for table `UserAllergies`
---
-ALTER TABLE `UserAllergies`
-  ADD CONSTRAINT `user_allergies_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `user_allergies_ibfk_2` FOREIGN KEY (`AllergyID`) REFERENCES `AllergyIntolerances` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `UserMealPlans`
---
-ALTER TABLE `UserMealPlans`
-  ADD CONSTRAINT `usermealplans_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE;
-
---
--- Constraints for table `UserPantryIngredients`
---
-ALTER TABLE `UserPantryIngredients`
-  ADD CONSTRAINT `userpantryingredients_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `userpantryingredients_ibfk_2` FOREIGN KEY (`IngredientID`) REFERENCES `Ingredients` (`IngredientID`) ON DELETE CASCADE;
+  ADD CONSTRAINT `recipes_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
