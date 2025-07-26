@@ -155,6 +155,10 @@ function UserManagementPage() {
     return (
       <div className="section-padding">
         <div className="container-modern">
+          <div className="text-center mb-10 animate-fade-in">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">User Management</h1>
+            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">View, edit, and manage user accounts and roles.</p>
+          </div>
           <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
             <p>Error fetching users: {error}</p>
           </div>

@@ -66,8 +66,8 @@ function ClassificationScoresPage() {
       <div className="section-padding">
         <div className="container-modern">
           <div className="text-center mb-10 animate-fade-in">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">Classification Scores</h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">Review and analyze ingredient classification accuracy and scores.</p>
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Classification Scores</h1>
+            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Review and analyze ingredient classification accuracy and scores.</p>
           </div>
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">{error}</div>
         </div>
@@ -79,8 +79,8 @@ function ClassificationScoresPage() {
     <div className="section-padding">
       <div className="container-modern">
         <div className="text-center mb-10 animate-fade-in">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">Classification Scores</h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">Review and analyze ingredient classification accuracy and scores.</p>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Classification Scores</h1>
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Review and analyze ingredient classification accuracy and scores.</p>
         </div>
         {error && scoresSummary.length > 0 && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">{error}</div>

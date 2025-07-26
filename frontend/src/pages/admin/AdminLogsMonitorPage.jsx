@@ -379,6 +379,13 @@ Environment: ${info.flask_info?.environment || 'Unknown'}
         return (
             <div className="section-padding">
                 <div className="container-modern">
+                    <div className="text-center mb-8 sm:mb-10 animate-fade-in">
+                        <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">System Monitoring</h1>
+                        <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+                            Real-time logs and system metrics monitoring
+                        </p>
+                        <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full mx-auto mt-6"></div>
+                    </div>
                     <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
                         <p>Error loading system monitoring: {error}</p>
                         <button 

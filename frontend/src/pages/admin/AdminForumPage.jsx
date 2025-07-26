@@ -509,6 +509,12 @@ const AdminForumPage = () => {
     return (
       <div className="section-padding">
         <div className="container-modern">
+          <div className="text-center mb-10 animate-fade-in">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Forum Management</h1>
+            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+              Manage forum posts and comments, monitor community activity
+            </p>
+          </div>
           <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
             <p>Error fetching {activeTab}: {error}</p>
           </div>

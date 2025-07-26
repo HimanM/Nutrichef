@@ -16,7 +16,7 @@ function CommentManagementPage() {
   const [page, setPage] = useState(0); // 0-indexed
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
-  
+
   // Filter states
   const [showFilters, setShowFilters] = useState(false);
   const [usernameFilter, setUsernameFilter] = useState('');
@@ -30,8 +30,8 @@ function CommentManagementPage() {
   const [sortDirection, setSortDirection] = useState('asc');
 
   const fetchComments = useCallback(async (currentPage, currentRowsPerPage) => {
-    setLoading(true); 
-    setError(null); 
+    setLoading(true);
+    setError(null);
     const backendPage = currentPage + 1;
     try {
       const response = await authenticatedFetch(
@@ -61,8 +61,8 @@ function CommentManagementPage() {
   const handleDeleteComment = async (commentId) => {
     const commentToDelete = comments.find(c => c.CommentID === commentId);
     const userConfirmed = await showModal(
-      'confirm', 
-      'Confirm Deletion', 
+      'confirm',
+      'Confirm Deletion',
       `Delete comment by "${commentToDelete?.Username || 'Unknown User'}"?`,
       'This action cannot be undone.'
     );
@@ -101,30 +101,30 @@ function CommentManagementPage() {
     if (usernameFilter && !comment.Username.toLowerCase().includes(usernameFilter.toLowerCase())) {
       return false;
     }
-    
+
     // Edited filter
     if (editedFilter === 'edited' && !comment.IsEdited) return false;
     if (editedFilter === 'original' && comment.IsEdited) return false;
-    
+
     // Recipe filter
     if (recipeFilter && !comment.RecipeTitle?.toLowerCase().includes(recipeFilter.toLowerCase())) {
       return false;
     }
-    
+
     // Date filters
     if (dateFromFilter || dateToFilter) {
       const commentDate = new Date(comment.CreatedAt);
       if (dateFromFilter && commentDate < new Date(dateFromFilter)) return false;
       if (dateToFilter && commentDate > new Date(dateToFilter + 'T23:59:59')) return false;
     }
-    
+
     return true;
   }).sort((a, b) => {
     if (!sortColumn) return 0;
-    
+
     let aValue = a[sortColumn];
     let bValue = b[sortColumn];
-    
+
     // Handle different data types
     if (sortColumn === 'CreatedAt' || sortColumn === 'UpdatedAt') {
       aValue = new Date(aValue);
@@ -136,7 +136,7 @@ function CommentManagementPage() {
       aValue = aValue.toLowerCase();
       bValue = bValue?.toLowerCase() || '';
     }
-    
+
     if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
     if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
     return 0;
@@ -163,8 +163,8 @@ function CommentManagementPage() {
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString() + ' ' + 
-           new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return new Date(dateString).toLocaleDateString() + ' ' +
+      new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   const truncateText = (text, maxLength = 100) => {
@@ -174,9 +174,9 @@ function CommentManagementPage() {
 
   const columns = [
     { key: 'CommentID', label: 'ID', sortable: true },
-    { 
-      key: 'Username', 
-      label: 'User', 
+    {
+      key: 'Username',
+      label: 'User',
       sortable: true,
       render: (comment) => (
         <span className="flex items-center gap-2">
@@ -187,9 +187,9 @@ function CommentManagementPage() {
         </span>
       )
     },
-    { 
-      key: 'RecipeTitle', 
-      label: 'Recipe', 
+    {
+      key: 'RecipeTitle',
+      label: 'Recipe',
       sortable: true,
       render: (comment) => (
         <span className="inline-block max-w-xs">
@@ -199,9 +199,9 @@ function CommentManagementPage() {
         </span>
       )
     },
-    { 
-      key: 'Comment', 
-      label: 'Comment', 
+    {
+      key: 'Comment',
+      label: 'Comment',
       sortable: false,
       render: (comment) => (
         <span className="inline-block max-w-md">
@@ -214,9 +214,9 @@ function CommentManagementPage() {
         </span>
       )
     },
-    { 
-      key: 'CreatedAt', 
-      label: 'Posted', 
+    {
+      key: 'CreatedAt',
+      label: 'Posted',
       sortable: true,
       render: (comment) => (
         <span className="inline-block text-sm">
@@ -252,208 +252,197 @@ function CommentManagementPage() {
   };
 
   if (loading && comments.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <PageLoaderSpinner />
-          <p className="mt-4 text-gray-600">Loading comments...</p>
-        </div>
-      </div>
-    );
+    return <div className="flex justify-center items-center min-h-[calc(100vh-200px)]"><PageLoaderSpinner /></div>;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
-      <div className="section-padding">
-        <div className="container-modern">
-          {/* Header */}
-          <div className="text-center mb-10 animate-fade-in">
-            <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-4">
-              Comment Management
-            </h1>
-            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-              View and manage user comments on recipes
-            </p>
-          </div>
+    <div className="section-padding">
+      <div className="container-modern">
+        {/* Header */}
+        <div className="text-center mb-10 animate-fade-in">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Comment Management</h1>
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+            View and manage user comments on recipes
+          </p>
+        </div>
 
-          {/* Filter Controls */}
-          <div className="bg-white/60 rounded-xl p-6 border border-emerald-100 shadow-sm mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-emerald-700 flex items-center gap-2">
-                <HiFilter className="w-5 h-5" />
-                Filters
-              </h3>
-              <div className="flex items-center gap-2">
-                {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter) && (
-                  <button
-                    onClick={clearFilters}
-                    className="flex items-center gap-1 px-3 py-1 text-sm text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                  >
-                    <HiX className="w-4 h-4" />
-                    Clear All
-                  </button>
-                )}
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-1 px-3 py-1 text-sm text-emerald-600 hover:text-emerald-800 bg-emerald-100 hover:bg-emerald-200 rounded-lg transition-colors"
-                >
-                  {showFilters ? 'Hide Filters' : 'Show Filters'}
-                </button>
-              </div>
-            </div>
-
-            {showFilters && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Username Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Username
-                  </label>
-                  <div className="relative">
-                    <HiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      value={usernameFilter}
-                      onChange={(e) => setUsernameFilter(e.target.value)}
-                      placeholder="Search by username..."
-                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-
-                {/* Recipe Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Recipe
-                  </label>
-                  <div className="relative">
-                    <HiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      value={recipeFilter}
-                      onChange={(e) => setRecipeFilter(e.target.value)}
-                      placeholder="Search by recipe title..."
-                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-
-                {/* Edited Status Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Edit Status
-                  </label>
-                  <select
-                    value={editedFilter}
-                    onChange={(e) => setEditedFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  >
-                    <option value="all">All Comments</option>
-                    <option value="original">Original Only</option>
-                    <option value="edited">Edited Only</option>
-                  </select>
-                </div>
-
-                {/* Date From Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    From Date
-                  </label>
-                  <input
-                    type="date"
-                    value={dateFromFilter}
-                    onChange={(e) => setDateFromFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  />
-                </div>
-
-                {/* Date To Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    To Date
-                  </label>
-                  <input
-                    type="date"
-                    value={dateToFilter}
-                    onChange={(e) => setDateToFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-          
-          {actionError && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
-              Action Error: {actionError}
-            </div>
-          )}
-          
-          {error && comments.length > 0 && (
-            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-md text-sm">
-              Could not refresh comments: {error}
-            </div>
-          )}
-
-          {/* Results Summary */}
-          {!loading && comments.length > 0 && (
-            <div className="mb-4 flex items-center justify-between text-sm text-gray-600">
-              <div>
-                Showing {filteredComments.length} of {comments.length} comments
-                {filteredComments.length !== comments.length && (
-                  <span className="text-emerald-600 font-medium"> (filtered)</span>
-                )}
-              </div>
-              {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter) && (
-                <div className="text-emerald-600">
-                  {filteredComments.length === 0 ? 'No matches found' : 'Filters applied'}
-                </div>
-              )}
-            </div>
-          )}
-          
-          {filteredComments.length === 0 && !loading && !error ? (
-            <div className="text-center py-12 bg-white/60 rounded-xl border border-emerald-100 shadow-sm">
-              <div className="mx-auto h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <HiEye className="h-6 w-6 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter) 
-                  ? 'No matching comments found' 
-                  : 'No comments found'
-                }
-              </h3>
-              <p className="text-gray-500">
-                {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter)
-                  ? 'Try adjusting your filters to see more results.'
-                  : 'No recipe comments are currently available in the system.'
-                }
-              </p>
+        {/* Filter Controls */}
+        <div className="bg-white/60 rounded-xl p-6 border border-emerald-100 shadow-sm mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-emerald-700 flex items-center gap-2">
+              <HiFilter className="w-5 h-5" />
+              Filters
+            </h3>
+            <div className="flex items-center gap-2">
               {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter) && (
                 <button
                   onClick={clearFilters}
-                  className="mt-4 px-4 py-2 text-sm text-emerald-600 hover:text-emerald-800 bg-emerald-100 hover:bg-emerald-200 rounded-lg transition-colors"
+                  className="flex items-center gap-1 px-3 py-1 text-sm text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
-                  Clear All Filters
+                  <HiX className="w-4 h-4" />
+                  Clear All
                 </button>
               )}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-1 px-3 py-1 text-sm text-emerald-600 hover:text-emerald-800 bg-emerald-100 hover:bg-emerald-200 rounded-lg transition-colors"
+              >
+                {showFilters ? 'Hide Filters' : 'Show Filters'}
+              </button>
             </div>
-          ) : (
-            <div className="bg-white/60 rounded-xl shadow-lg border border-emerald-100 overflow-hidden">
-              <ResponsiveTable
-                data={filteredComments}
-                columns={columns}
-                actions={actions}
-                pagination={pagination}
-                loading={loading}
-                emptyStateMessage="No comments found"
-                onSort={handleSort}
-                sortColumn={sortColumn}
-                sortDirection={sortDirection}
-              />
+          </div>
+
+          {showFilters && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Username Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Username
+                </label>
+                <div className="relative">
+                  <HiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    value={usernameFilter}
+                    onChange={(e) => setUsernameFilter(e.target.value)}
+                    placeholder="Search by username..."
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Recipe Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Recipe
+                </label>
+                <div className="relative">
+                  <HiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    value={recipeFilter}
+                    onChange={(e) => setRecipeFilter(e.target.value)}
+                    placeholder="Search by recipe title..."
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Edited Status Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Edit Status
+                </label>
+                <select
+                  value={editedFilter}
+                  onChange={(e) => setEditedFilter(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                >
+                  <option value="all">All Comments</option>
+                  <option value="original">Original Only</option>
+                  <option value="edited">Edited Only</option>
+                </select>
+              </div>
+
+              {/* Date From Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  From Date
+                </label>
+                <input
+                  type="date"
+                  value={dateFromFilter}
+                  onChange={(e) => setDateFromFilter(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Date To Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  To Date
+                </label>
+                <input
+                  type="date"
+                  value={dateToFilter}
+                  onChange={(e) => setDateToFilter(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                />
+              </div>
             </div>
           )}
         </div>
+
+        {actionError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
+            Action Error: {actionError}
+          </div>
+        )}
+
+        {error && comments.length > 0 && (
+          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-md text-sm">
+            Could not refresh comments: {error}
+          </div>
+        )}
+
+        {/* Results Summary */}
+        {!loading && comments.length > 0 && (
+          <div className="mb-4 flex items-center justify-between text-sm text-gray-600">
+            <div>
+              Showing {filteredComments.length} of {comments.length} comments
+              {filteredComments.length !== comments.length && (
+                <span className="text-emerald-600 font-medium"> (filtered)</span>
+              )}
+            </div>
+            {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter) && (
+              <div className="text-emerald-600">
+                {filteredComments.length === 0 ? 'No matches found' : 'Filters applied'}
+              </div>
+            )}
+          </div>
+        )}
+
+        {filteredComments.length === 0 && !loading && !error ? (
+          <div className="text-center py-12 bg-white/60 rounded-xl border border-emerald-100 shadow-sm">
+            <div className="mx-auto h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <HiEye className="h-6 w-6 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter)
+                ? 'No matching comments found'
+                : 'No comments found'
+              }
+            </h3>
+            <p className="text-gray-500">
+              {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter)
+                ? 'Try adjusting your filters to see more results.'
+                : 'No recipe comments are currently available in the system.'
+              }
+            </p>
+            {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter) && (
+              <button
+                onClick={clearFilters}
+                className="mt-4 px-4 py-2 text-sm text-emerald-600 hover:text-emerald-800 bg-emerald-100 hover:bg-emerald-200 rounded-lg transition-colors"
+              >
+                Clear All Filters
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="bg-white/60 rounded-xl shadow-lg border border-emerald-100 overflow-hidden">
+            <ResponsiveTable
+              data={filteredComments}
+              columns={columns}
+              actions={actions}
+              pagination={pagination}
+              loading={loading}
+              emptyStateMessage="No comments found"
+              onSort={handleSort}
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
