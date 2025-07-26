@@ -166,24 +166,26 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
         <div className={dropdownClass} style={{ minWidth: 320 }}>
           <div className="flex items-center justify-between p-4 border-b border-gray-100 font-semibold text-gray-800 bg-emerald-50 rounded-t-xl">
             <span>Notifications</span>
-            <div className="flex gap-2">
-              <button
-                className="p-1 rounded hover:bg-emerald-100 text-emerald-700"
-                title="Mark all as read"
-                onClick={handleMarkAllRead}
-                aria-label="Mark all as read"
-              >
-                <HiCheck className="w-5 h-5" />
-              </button>
-              <button
-                className="p-1 rounded hover:bg-red-100 text-red-500"
-                title="Clear all"
-                onClick={handleClearAll}
-                aria-label="Clear all"
-              >
-                <HiOutlineTrash className="w-5 h-5" />
-              </button>
-            </div>
+            {notifications.length > 0 && (
+              <div className="flex gap-2">
+                <button
+                  className="p-1 rounded hover:bg-emerald-100 text-emerald-700"
+                  title="Mark all as read"
+                  onClick={handleMarkAllRead}
+                  aria-label="Mark all as read"
+                >
+                  <HiCheck className="w-5 h-5" />
+                </button>
+                <button
+                  className="p-1 rounded hover:bg-red-100 text-red-500"
+                  title="Clear all"
+                  onClick={handleClearAll}
+                  aria-label="Clear all"
+                >
+                  <HiOutlineTrash className="w-5 h-5" />
+                </button>
+              </div>
+            )}
           </div>
           <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 rounded-b-xl">
             {notifications.length === 0 ? (
@@ -209,33 +211,35 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
         showCloseButton
       >
         {/* Action Buttons - Better mobile layout */}
-        <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            {unreadCount > 0 && (
-              <span className="text-sm text-gray-600">
-                {unreadCount} unread
-              </span>
-            )}
+        {notifications.length > 0 && (
+          <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              {unreadCount > 0 && (
+                <span className="text-sm text-gray-600">
+                  {unreadCount} unread
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors duration-200 touch-manipulation"
+                onClick={handleMarkAllRead}
+                disabled={unreadCount === 0}
+              >
+                <HiCheck className="w-4 h-4" />
+                <span className="hidden sm:inline">Mark all read</span>
+              </button>
+              <button
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors duration-200 touch-manipulation"
+                onClick={handleClearAll}
+                disabled={notifications.length === 0}
+              >
+                <HiOutlineTrash className="w-4 h-4" />
+                <span className="hidden sm:inline">Clear all</span>
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors duration-200 touch-manipulation"
-              onClick={handleMarkAllRead}
-              disabled={unreadCount === 0}
-            >
-              <HiCheck className="w-4 h-4" />
-              <span className="hidden sm:inline">Mark all read</span>
-            </button>
-            <button
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors duration-200 touch-manipulation"
-              onClick={handleClearAll}
-              disabled={notifications.length === 0}
-            >
-              <HiOutlineTrash className="w-4 h-4" />
-              <span className="hidden sm:inline">Clear all</span>
-            </button>
-          </div>
-        </div>
+        )}
 
         {/* Notifications List */}
         <div className="space-y-2">
