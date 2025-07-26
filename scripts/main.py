@@ -30,6 +30,51 @@ class Colors:
     UNDERLINE = '\033[4m'
 
 class NutriChefDemo:
+    def docker_menu(self):
+        """Present Docker hosting options and execute commands"""
+        print(f"\n{Colors.OKCYAN}🐳 Docker Hosting Options:{Colors.ENDC}")
+        print("  1. Full rebuild (delete old images and containers)")
+        print("  2. Update current image (rebuild and restart)")
+        choice = input("Enter choice (1/2, or Enter to skip): ").strip()
+        if choice == "1":
+            print(f"{Colors.WARNING}Deleting old NutriChef Docker images...{Colors.ENDC}")
+            subprocess.run('docker images --filter "reference=*nutrichef*" --format "{{.ID}}" | % { docker rmi -f $_ }', shell=True)
+            subprocess.run('docker-compose down --volumes --remove-orphans', shell=True)
+            subprocess.run('docker-compose build', shell=True)
+            subprocess.run('docker-compose up -d', shell=True)
+            print(f"{Colors.OKGREEN}✅ Full rebuild complete!{Colors.ENDC}")
+        elif choice == "2":
+            print(f"{Colors.OKCYAN}Rebuilding and restarting NutriChef Docker containers...{Colors.ENDC}")
+            subprocess.run('docker-compose build', shell=True)
+            subprocess.run('docker-compose up -d', shell=True)
+            print(f"{Colors.OKGREEN}✅ Update complete!{Colors.ENDC}")
+        else:
+            print(f"{Colors.WARNING}Skipping Docker hosting step.{Colors.ENDC}")
+
+    def start_ngrok(self):
+        """Prompt user to start ngrok and enter the public URL"""
+        print(f"\n{Colors.OKCYAN}🚀 Please start ngrok in a separate terminal with:{Colors.ENDC}")
+        print(f"   ngrok http 3000")
+        print(f"{Colors.OKCYAN}Once ngrok is running, copy the public URL (http://xxxx.ngrok.io) and paste it below.{Colors.ENDC}")
+        url = input(f"Enter ngrok public URL: ").strip()
+        if url:
+            print(f"{Colors.OKGREEN}🌐 ngrok public URL: {url}{Colors.ENDC}")
+        else:
+            print(f"{Colors.FAIL}❌ No URL entered. Skipping QR code display.{Colors.ENDC}")
+        return url
+
+    def display_qr(self, url):
+        """Generate and display QR code for a URL in terminal"""
+        print(f"\n{Colors.OKCYAN}📱 Scan this QR code to open the app on your device:{Colors.ENDC}")
+        try:
+            import qrcode
+            qr = qrcode.QRCode()
+            qr.add_data(url)
+            qr.make()
+            qr.print_ascii(invert=True)
+        except ImportError:
+            print(f"{Colors.WARNING}qrcode library not installed. Run 'pip install qrcode[pil]' to enable QR code display.{Colors.ENDC}")
+            print(f"URL: {url}")
     def __init__(self):
         self.root_dir = Path(__file__).parent.parent  # Go up to project root from scripts folder
         self.backend_dir = self.root_dir / "backend"
@@ -686,24 +731,38 @@ pause"""
         
         try:
             self.print_banner()
-            
             if not self.check_requirements():
                 return False
-                
+
             # Ask user if they want to install dependencies
             install_deps = input(f"\n{Colors.OKCYAN}Install/update dependencies? (y/N): {Colors.ENDC}").lower().strip()
             if install_deps in ['y', 'yes']:
                 self.install_dependencies()
-            
-            # Ask user if they want to enable external access
+
+            # Docker hosting option
+            docker_choice = input(f"\n{Colors.OKCYAN}Host using Docker? (y/N): {Colors.ENDC}").lower().strip()
+            if docker_choice in ['y', 'yes']:
+                self.docker_menu()
+                print(f"\n{Colors.OKCYAN}Waiting for containers to start...{Colors.ENDC}")
+                time.sleep(8)
+                # Seamlessly start ngrok and display QR code
+                print(f"\n{Colors.OKCYAN}Starting ngrok and displaying QR code for frontend...{Colors.ENDC}")
+                try:
+                    subprocess.run([sys.executable, str(self.root_dir / "scripts" / "start_ngrok_qr.py")])
+                except Exception as e:
+                    print(f"{Colors.FAIL}❌ Could not run start_ngrok_qr.py: {e}{Colors.ENDC}")
+                print(f"\n{Colors.OKGREEN}✅ Docker hosting and ngrok tunnel setup complete!{Colors.ENDC}")
+                return True
+
+            # Ask user if they want to enable external access (non-Docker)
             print(f"\n{Colors.OKCYAN}Choose deployment type:{Colors.ENDC}")
             print(f"  1. Local network only (friends on same WiFi)")
             print(f"  2. Public internet access (requires router setup)")
             print(f"  3. VPS deployment (upload to server)")
             print(f"  4. No external access (localhost only)")
-            
+
             access_choice = input(f"Enter choice (1/2/3/4): ").strip()
-            
+
             if access_choice == "1":
                 if not self.open_firewall_ports():
                     print(f"{Colors.WARNING}⚠️  Continuing without external access...{Colors.ENDC}")
@@ -717,30 +776,30 @@ pause"""
                 return True  # Exit after showing guide
             else:
                 print(f"  ℹ️  External access disabled. Only local access (localhost) will work.")
-            
+
             # Start backend
             if not self.start_backend():
                 print(f"\n{Colors.FAIL}❌ Failed to start backend. Please check for errors above.{Colors.ENDC}")
                 return False
-                
+
             # Start frontend
             if not self.start_frontend():
                 print(f"\n{Colors.FAIL}❌ Failed to start frontend. Please check for errors above.{Colors.ENDC}")
                 self.shutdown()
                 return False
-            
+
             self.is_running = True
-            
+
             # Open browser
             time.sleep(2)
             self.open_browser()
-            
+
             # Show status
             self.show_status()
-            
+
             # Wait for user input or Ctrl+C
             self.wait_for_user_input()
-                
+
         except Exception as e:
             print(f"\n{Colors.FAIL}❌ Unexpected error: {e}{Colors.ENDC}")
         finally:
