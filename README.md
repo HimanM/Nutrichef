@@ -2,292 +2,515 @@
 
 NutriChef is a comprehensive web application designed to help users manage recipes, understand nutritional information, cater to dietary restrictions and allergies, and discover new culinary ideas. It leverages AI for advanced features like food classification from images, natural language processing of recipes, and personalized recommendations.
 
-<!-- Placeholder for a general app screenshot or logo -->
 <p align="center">
-  <img src="./docs/images/logo.png" alt="NutriChef Overview" width="300"/>
+  <img src="./docs/images/logo.png" alt="NutriChef Logo" width="300"/>
 </p>
 
-<!-- Consider adding a screenshot of the HomePage here -->
-![NutriChef Home Page](./docs/images/homepage_screenshot.png)
+NutriChef combines modern web technologies with AI-powered features to provide an intelligent cooking companion that adapts to your dietary needs and preferences.
 
-## Features
+## 📱 Application Overview
 
-**For Users:**
+| Feature | Desktop Screenshot | Mobile Screenshot |
+|---------|-------------------|------------------|
+| **Home Page** | ![NutriChef Home Page](./docs/images/homepage_screenshot.png) | *[Mobile screenshot placeholder]* |
 
-*   **User Accounts:** Secure registration and login, with email verification.
+## ✨ Core Features
 
-    ![User Login Page](./docs/images/user_login_screenshot.png)
+### 👤 User Features
 
-*   **Recipe Management:**
-    *   **Browse & Search:** Explore a public collection of recipes with search and pagination.
+#### 🔐 Account Management
 
-        ![Recipe Browser Page](./docs/images/recipe_browser_screenshot.png)
+| Feature | Desktop Screenshot | Mobile Screenshot |
+|---------|-------------------|------------------|
+| **Login & Registration** | ![User Login Page](./docs/images/user_login_screenshot.png) | *[Mobile screenshot placeholder]* |
 
-    *   **View Details:** See full recipe details including ingredients, instructions, and images.
+#### 🍳 Recipe Management
+- **Browse & Search** public recipe collection with advanced filters
+- **Detailed Recipe Views** with ingredients, instructions, and images
+- **Multiple Upload Methods:**
+  - Structured form submission
+  - Raw text parsing with AI (NLP Recipe Parser)
+  - Image upload support
+- **Recipe Rating System** with user reviews
+- **Recipe Comments** for community interaction
+- **Recipe Tagging System** for better organization
 
-        ![Recipe Detail Page](./docs/images/recipe_detail_screenshot.png)
+| Feature | Screenshot |
+|---------|------------|
+| **Recipe Browser** | ![Recipe Browser Page](./docs/images/recipe_browser_screenshot.png) |
+| **Recipe Details** | ![Recipe Detail Page](./docs/images/recipe_detail_screenshot.png) |
+| **Recipe Upload** | ![Recipe Upload Form](./docs/images/recipe_upload_screenshot.png) |
 
-    *   **Upload Recipes:**
-        *   Submit recipes through a structured form.
-        *   Upload recipes by pasting raw text (ingredients & instructions).
-        *   Upload recipe images.
+#### 🎯 Personalization & Dietary Management
+- **Personalized Recipe Feed** filtered by dietary restrictions
+- **Allergy & Intolerance Management** with comprehensive database
+- **Nutritional Target Setting** for health goals
+- **Favorites System** for saving preferred recipes
 
-        ![Recipe Upload Form](./docs/images/recipe_upload_screenshot.png)
+| Feature | Screenshot |
+|---------|------------|
+| **Personalized Recipes** | ![Personalized Recipes Page](./docs/images/personalized_recipes_screenshot.png) |
+| **Allergy Settings** | ![User Allergy Settings](./docs/images/allergy_settings_screenshot.png) |
 
-*   **Personalization:**
-    *   **Personalized Recipe Feed:** Get recipe recommendations filtered based on your registered allergies.
+#### 🏠 Kitchen Management
+- **Smart Pantry Management** with ingredient tracking
+- **Meal Planning** with nutritional analysis and PDF export
+- **Shopping List Generation** from recipes and meal plans
+- **Recipe Suggestions** based on available ingredients
 
-        ![Personalized Recipes Page](./docs/images/personalized_recipes_screenshot.png)
+| Feature | Screenshot |
+|---------|------------|
+| **Pantry Management** | ![User Pantry Page](./docs/images/pantry_page_screenshot.png) |
+| **Meal Planner** | ![Meal Planner](./docs/images/meal_planner_screenshot.png) |
 
-    *   **Allergy Management:** Specify your allergies and intolerances to customize your experience.
+#### 🤖 AI-Powered Tools
+- **Ingredient Classifier** using computer vision for food identification
+- **Nutrition Lookup** with comprehensive nutritional database
+- **Ingredient Substitution** recommendations
+- **AI Chatbot** for cooking and nutrition assistance
+- **Recipe Text Parser** using natural language processing
 
-        ![User Allergy Settings](./docs/images/allergy_settings_screenshot.png)
+| Feature | Screenshot |
+|---------|------------|
+| **Ingredient Classifier** | ![Ingredient Classifier Page](./docs/images/classifier_screenshot.png) |
+| **Classification Results** | ![Classification Result Example](./docs/images/classifier_result_screenshot.png) |
+| **Nutrition Lookup** | ![Nutrition Lookup Result](./docs/images/nutrition_lookup_screenshot.png) |
+| **AI Chatbot** | ![AI Chatbot](./docs/images/chatbot_screenshot.png) |
 
-    *   **User Settings:** Manage account preferences and password.
-    *   **User Pantry Management:** Keep track of available ingredients in your personal pantry.
+#### 💬 Community Features
+- **Forum System** with recipe discussions and community posts
+- **Recipe Tagging** with `#RecipeName` syntax
+- **User Comments** on recipes and forum posts
+- **Like System** for community engagement
+- **Contact Form** for user feedback and support
 
-        <!-- Consider adding a screenshot of the Pantry Page here -->
-        ![User Pantry Page](./docs/images/pantry_page_screenshot.png)
+| Feature | Screenshot |
+|---------|------------|
+| **Contact Us** | ![Contact Us Page](./docs/images/contact_us_screenshot.png) |
+| **Forum Discussions** | *[Screenshot placeholder - Forum page]* |
+| **Recipe Suggestions** | *[Screenshot placeholder - Recipe suggestions page]* |
+| **Shopping Basket** | *[Screenshot placeholder - Shopping basket interface]* |
+| **Nutritional Tracking** | *[Screenshot placeholder - Nutritional tracking dashboard]* |
+| **User Favorites** | *[Screenshot placeholder - User favorites page]* |
 
-    *   **AI Chatbot:** Interact with an AI-powered chatbot for quick answers to your food, nutrition, and recipe questions.
-        <!-- Consider adding a screenshot of the Chatbot interface here -->
+### 🛡️ Administrator Features
 
-        ![AI Chatbot](./docs/images/chatbot_screenshot.png)
+#### 📊 Dashboard & Analytics
+- **Comprehensive Admin Dashboard** with system overview
+- **Real-time System Monitoring** with performance metrics
+- **AI Model Performance Tracking** for classification accuracy
+- **User Activity Analytics** and engagement metrics
 
-    *   **Contact Us Form:** Easily send messages and feedback to the platform administrators.
+| Feature | Screenshot |
+|---------|------------|
+| **Admin Dashboard** | ![Admin Dashboard Page](./docs/images/admin_dashboard_screenshot.png) |
 
-        <!-- Consider adding a screenshot of the Contact Us Page here -->
-        ![Contact Us Page](./docs/images/contact_us_screenshot.png)
+| Feature | Desktop Screenshot | Mobile Screenshot |
+|---------|-------------------|------------------|
+| **Admin Dashboard** | ![Admin Dashboard Page](./docs/images/admin_dashboard_screenshot.png) | *[Mobile screenshot placeholder]* |
 
-*   **AI-Powered Tools:**
-    *   **Ingredient Classifier:** Upload an image of an ingredient or food item to get it identified.
+#### 👥 User & Content Management
+- **User Management** with role assignment and account control
+- **Recipe Moderation** with approval and deletion capabilities
+- **Forum Management** with post and comment moderation
+- **Content Analytics** for platform insights
 
-        ![Ingredient Classifier Page](./docs/images/classifier_screenshot.png)
+#### 📧 Communication & Support
+- **Message Management** for user inquiries and support
+- **Email Response System** for customer service
+- **Notification System** for user engagement
 
-        <!-- Consider showing an example of classification result -->
-        ![Classification Result Example](./docs/images/classifier_result_screenshot.png)
+| Feature | Screenshot |
+|---------|------------|
+| **Message Management** | ![Admin Reply Messages Page](./docs/images/admin_messages_screenshot_2.png) |
+| **System Logs Monitor** | *[Screenshot placeholder - Admin logs monitoring interface]* |
+| **User Management** | *[Screenshot placeholder - User management interface]* |
+| **Recipe Management** | *[Screenshot placeholder - Recipe moderation interface]* |
+| **Forum Management** | *[Screenshot placeholder - Forum administration interface]* |
 
-    *   **Nutrition Lookup:** Get nutritional information for food items.
+| Feature | Desktop Screenshot | Mobile Screenshot |
+|---------|-------------------|------------------|
+| **Message Management** | ![Admin Reply Messages Page](./docs/images/admin_messages_screenshot_2.png) | *[Mobile screenshot placeholder]* |
+| **System Logs Monitor** | *[Screenshot placeholder - Admin logs monitoring interface]* | *[Mobile screenshot placeholder]* |
+| **User Management** | *[Screenshot placeholder - User management interface]* | *[Mobile screenshot placeholder]* |
+| **Recipe Management** | *[Screenshot placeholder - Recipe moderation interface]* | *[Mobile screenshot placeholder]* |
+| **Forum Management** | *[Screenshot placeholder - Forum administration interface]* | *[Mobile screenshot placeholder]* |
 
-        ![Nutrition Lookup Result](./docs/images/nutrition_lookup_screenshot.png)
-        
-    *   **Ingredient Substitution:** Find suitable substitutes for ingredients.
-    *   **NLP Recipe Parser:** Input recipe text to have it automatically parsed into structured data (ingredients, steps).
-*   **Meal Planner:** Interface for organizing recipes into a meal plan.
-*   **Shopping Basket:** Interface for managing a shopping list.
+> [!NOTE]
+> Admin features require elevated permissions and are protected by role-based access control.
 
-**For Administrators:**
+---
 
-*   **Admin Dashboard:** Centralized overview and access to management functions.
+> [!WARNING]
+> **Missing Features:** Some features are planned but not yet implemented, including:
+> - Mobile-optimized views for all pages
+> - Push notifications for mobile devices
+> - Advanced analytics dashboards
+> - Real-time chat in forums
+> - Multi-language support
+> - Recipe import from external sources
+> - More AI-powered suggestions
+> These features will be added in future releases. Track progress in the [GitHub Issues](https://github.com/HimanM/nutrichef/issues) page.
 
-    ![Admin Dashboard Page](./docs/images/admin_dashboard_screenshot.png)
+---
 
-*   **User Management:** List, view details, update roles, and delete users.
-*   **Recipe Management:** List and delete recipes from the platform.
-*   **Classification Scores:** View a summary of AI classification model performance.
-*   **View User Messages:** Access and review messages submitted by users via the Contact Us form.
-        <!-- Consider adding a screenshot of the Admin Contact Messages Page here -->
-        ![Admin Reply Messages Page](./docs/images/admin_messages_screenshot_2.png)
+#### 🔧 System Administration
+- **Real-time Log Monitoring** with filtering and search
+- **System Health Checks** with automated alerts
+- **Database Management** tools and utilities
+- **Performance Optimization** monitoring
+
+> [!NOTE]
+> Admin features require elevated permissions and are protected by role-based access control.
 
 
-## Technologies Used
+## 🛠️ Technology Stack
 
-**Backend:**
+### Backend Technologies
 
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg" height="20" alt="Flask logo" />  **Framework:** Flask
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" height="20" alt="Python logo" />  **Programming Language:** Python
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlalchemy/sqlalchemy-original.svg" height="20" alt="SQLAlchemy logo" />  **Database ORM:** SQLAlchemy
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/json/json-original.svg" height="20" alt="JWT logo" />  **Authentication:** Flask-JWT-Extended (JWT-based)
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" height="20" alt="email logo" />  **Email Service:** Flask-Mail
-*   **AI/ML Libraries:**
-    *   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg" height="20" alt="Google Gemini logo" />  Google Gemini (for NLP)
-    *   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tensorflow/tensorflow-original.svg" height="20" alt="TensorFlow logo" />  TensorFlow & TensorFlow Hub (for image classification)
-    *   <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/SpaCy_logo.svg" height="20" alt="Spacy logo" />  Spacy (NLP)
-    *   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pandas/pandas-original.svg" height="20" alt="Pandas logo" />  Pandas (data manipulation)
-    *   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/atom/atom-original.svg" height="20" alt="RapidFuzz logo" />  RapidFuzz (string matching)  FuzzyWuzzy
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" height="20" alt="MySQL logo" />  **Database:** Relational (designed for MySQL/MSSQL, uses `mysql-connector-python`)
+| Category | Technology | Description |
+|----------|------------|-------------|
+| **Framework** | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg" height="20" alt="Flask logo" /> Flask | Python web framework for RESTful API development |
+| **Language** | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" height="20" alt="Python logo" /> Python 3.9+ | Core programming language |
+| **Database** | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" height="20" alt="MySQL logo" /> MySQL | Relational database with SQLAlchemy ORM |
+| **Authentication** | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/json/json-original.svg" height="20" alt="JWT logo" /> JWT | Flask-JWT-Extended for secure authentication |
+| **Email Service** | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" height="20" alt="email logo" /> Flask-Mail | Email verification and notifications |
 
-**Frontend:**
+### AI & Machine Learning
 
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" height="20" alt="React logo" />  **Framework/Library:** React
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" height="20" alt="JavaScript logo" />  **Programming Language:** JavaScript (with JSX)
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" height="20" alt="Vite logo" />  **Build Tool/Development Server:** Vite
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/materialui/materialui-original.svg" height="20" alt="Material UI logo" />  **UI Library:** Material UI (MUI)
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" height="20" alt="Tailwind CSS logo" />  **Styling:** Tailwind CSS
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/reactrouter/reactrouter-original.svg" height="20" alt="React Router logo" />  **Routing:** React Router
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" height="20" alt="React Context API logo" />  **State Management:** React Context API
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/grafana/grafana-original.svg" height="20" alt="Recharts logo placeholder" />  **Charting:** Recharts
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/acrobat/acrobat-original.svg" height="20" alt="jsPDF" />  **PDF Generation:** jsPDF
+| Technology | Purpose | Implementation |
+|------------|---------|----------------|
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg" height="20" alt="Google Gemini logo" /> **Google Gemini** | Natural Language Processing | Recipe text parsing and chatbot responses |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tensorflow/tensorflow-original.svg" height="20" alt="TensorFlow logo" /> **TensorFlow** | Computer Vision | Food and ingredient image classification |
+| **Spacy** | NLP Processing | Text analysis and entity extraction |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pandas/pandas-original.svg" height="20" alt="Pandas logo" /> **Pandas** | Data Processing | Nutritional data manipulation and analysis |
+| **RapidFuzz** | String Matching | Ingredient substitution and fuzzy search |
 
-**Deployment:**
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" height="20" alt="docker logo" />  Docker:
+### Frontend Technologies
 
-**Development Tools:**
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" height="20" alt="ESLint logo" />  VScode
+| Category | Technology | Description |
+|----------|------------|-------------|
+| **Framework** | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" height="20" alt="React logo" /> React 18+ | Modern UI library with hooks and context |
+| **Language** | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" height="20" alt="JavaScript logo" /> JavaScript (JSX) | ES6+ with modern syntax |
+| **Build Tool** | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" height="20" alt="Vite logo" /> Vite | Fast development server and build tool |
+| **Styling** | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" height="20" alt="Tailwind CSS logo" /> Tailwind CSS | Utility-first CSS framework |
+| **UI Components** | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/materialui/materialui-original.svg" height="20" alt="Material UI logo" /> Material UI | React component library |
+| **Routing** | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/reactrouter/reactrouter-original.svg" height="20" alt="React Router logo" /> React Router | Client-side routing |
+| **State Management** | React Context API | Global state management |
+| **Charts** | Recharts | Data visualization and analytics |
+| **PDF Generation** | jsPDF | Export functionality for meal plans |
 
-## AI Models & External Resources
+### DevOps & Deployment
 
-*   **Allergy Analysis**
-*   **Food & Ingredient Classification (Image-based):**
-    *   The core models are integrated within the `backend/ai_models/` directory.
-    *   Notebooks and further details on classification approach can be found here: [Food Classification Notebook (TF)](https://github.com/HimanM/Classification-Models-for-NutriChef.git)
-*   **Natural Language Processing (Recipe Text Parsing)**
-*   **Nutrition Lookup**
-*   **Ingredient Substitution Recommendation**
+| Technology | Purpose |
+|------------|---------|
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" height="20" alt="docker logo" /> **Docker** | Containerization and deployment |
+| **Docker Compose** | Multi-container orchestration |
+| **Nginx** | Reverse proxy and static file serving |
 
-<!-- Placeholder for an architecture diagram -->
-<!-- ![Architecture Diagram](./docs/images/architecture_diagram.png) -->
+### Development Tools
 
-## Folder Structure
+| Tool | Purpose |
+|------|---------|
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" height="20" alt="VSCode logo" /> **VS Code** | Primary development environment |
+| **ESLint** | JavaScript code linting |
+| **Git** | Version control |
+| **Postman** | API testing and documentation |
+
+The application is designed with a microservices architecture in mind, making it easy to scale individual components as needed.
+
+## 🧠 AI Models & Intelligence Features
+
+### Core AI Capabilities
+
+| Feature | Technology | Description |
+|---------|------------|-------------|
+| **🔍 Food Classification** | TensorFlow + Computer Vision | Identifies ingredients and food items from uploaded images |
+| **📝 Recipe Text Parsing** | Google Gemini + NLP | Converts raw recipe text into structured data |
+| **🤖 Intelligent Chatbot** | Google Gemini | Provides cooking advice and nutritional guidance |
+| **🔄 Ingredient Substitution** | Fuzzy Matching + Database | Suggests suitable ingredient alternatives |
+| **🍎 Nutrition Analysis** | External APIs + Database | Comprehensive nutritional information lookup |
+| **🎯 Allergy Detection** | Pattern Matching | Identifies potential allergens in recipes |
+
+### Model Implementation
+
+> [!NOTE]
+> **Food Classification Models:**
+> - Core models are integrated within the `backend/ai_models/` directory
+> - Detailed implementation and training notebooks: [Food Classification Repository](https://github.com/HimanM/Classification-Models-for-NutriChef.git)
+> - Supports multiple food categories with high accuracy rates
+
+### AI-Powered Features
+
+- **Smart Recipe Suggestions** based on pantry contents and dietary preferences
+- **Nutritional Goal Tracking** with intelligent meal planning
+- **Automated Recipe Categorization** using machine learning
+- **Personalized Content Filtering** based on user preferences and restrictions
+- **Real-time Ingredient Recognition** through camera integration
+
+## 📁 Project Architecture
+
+### Directory Structure
 
 ```
-.
-├── SQL/                      # SQL schema definitions (MySQL)
-├── backend/                  # Flask backend application
-│   ├── README.md             # Backend specific documentation
-│   ├── .env.example          # Environment variable template for local backend
-│   ├── app.py                # Main Flask application setup
-│   ├── config.py             # Flask configuration classes
-│   ├── db.py                 # SQLAlchemy setup
-│   ├── requirements.txt      # Python dependencies
-│   ├── ai_models/            # AI/ML models and scripts
-│   ├── dao/                  # Data Access Objects
-│   ├── models/               # SQLAlchemy database models
-│   ├── routes/               # API route definitions (Flask Blueprints)
-│   ├── services/             # Business logic layer
-│   ├── static/               # Static files (e.g., uploaded recipe images)
-│   └── tests/                # Backend tests
-├── deployment/               # Deployment guides and scripts
-│   ├── README.md             # Deployment documentation overview
-│   ├── VPS_DEPLOYMENT_GUIDE.md
-│   ├── VPS_README.md
-│   ├── EXTERNAL_ACCESS_GUIDE.md
-│   ├── PUBLIC_ACCESS_GUIDE.md
-│   └── vps-setup.sh          # VPS setup automation script
-├── docs/                     # Project documentation
-│   ├── documents/
-│   ├── images/
-│   ├── Project_Documentation.md
-│   ├── User_Manual.md
-│   ├── Email_Template_System.md
-│   └── Nutritional_Tracking_Feature.md
-├── frontend/                 # React frontend application
-│   ├── README.md             # Frontend specific documentation
-│   ├── index.html            # Main HTML entry point for SPA
-│   ├── package.json          # NPM dependencies and scripts
-│   ├── vite.config.js        # Vite configuration
-│   └── src/                  # React application source code
-│       ├── App.jsx           # Main React app component, routing
-│       ├── main.jsx          # React app entry point
-│       ├── assets/           # Static assets used in components
-│       ├── components/       # Reusable React components
-│       ├── context/          # React Context API providers
-│       ├── pages/            # Page-level components
-│       └── utils/            # Utility functions
-├── scripts/                  # Launch scripts and utilities
-│   ├── README.md             # Scripts documentation
-│   ├── main.py               # Python demo launcher
-│   ├── LAUNCHER_README.md    # Demo launcher documentation
-│   ├── start_demo.bat        # Windows demo launcher
-│   ├── start_backend.bat     # Windows backend launcher
-│   ├── start_frontend.bat    # Windows frontend launcher
-│   └── run_as_admin.bat      # Windows admin launcher
-├── .env.example              # General example for root .env (used by Docker)
-├── .gitignore                # Git ignore file
-├── README.md                 # This file
-└── docker-compose.yml        # Docker Compose configuration
+NutriChef/
+├── 🗄️ SQL/                           # Database schema and migrations
+│   ├── schema_mysql.sql              # Main database schema
+│   └── migration_scripts/            # Database migration files
+├── 🐍 backend/                       # Flask API server
+│   ├── 🤖 ai_models/                 # Machine learning models
+│   │   ├── classification/           # Food classification models
+│   │   ├── nlp/                     # Natural language processing
+│   │   └── nutrition/               # Nutrition analysis models
+│   ├── 🗃️ dao/                       # Data Access Objects
+│   ├── 📊 models/                    # SQLAlchemy database models
+│   ├── 🛣️ routes/                     # API endpoints (Flask Blueprints)
+│   │   ├── admin_routes.py          # Admin management endpoints
+│   │   ├── recipe_routes.py         # Recipe CRUD operations
+│   │   ├── user_routes.py           # User authentication & profile
+│   │   ├── forum_routes.py          # Community forum features
+│   │   ├── chatbot_routes.py        # AI chatbot integration
+│   │   ├── classification_routes.py  # Image classification API
+│   │   ├── nutrition_routes.py      # Nutrition lookup services
+│   │   ├── pantry_routes.py         # Pantry management
+│   │   ├── meal_planner_routes.py   # Meal planning features
+│   │   └── contact_message_routes.py # User support system
+│   ├── 🔧 services/                  # Business logic layer
+│   │   ├── main/                    # Core services
+│   │   ├── ai/                      # AI service integrations
+│   │   └── external/                # Third-party API services
+│   ├── 🛠️ utils/                     # Utility functions and helpers
+│   ├── 📁 static/                    # Uploaded files and assets
+│   ├── 🧪 tests/                     # Backend test suites
+│   ├── app.py                       # Flask application factory
+│   ├── config.py                    # Configuration management
+│   └── requirements.txt             # Python dependencies
+├── ⚛️ frontend/                      # React client application
+│   ├── 📱 src/
+│   │   ├── 🧩 components/            # Reusable UI components
+│   │   │   ├── admin/               # Admin-specific components
+│   │   │   ├── auth/                # Authentication components
+│   │   │   ├── forum/               # Forum and community features
+│   │   │   ├── chatbot/             # AI chatbot interface
+│   │   │   ├── ui/                  # Generic UI components
+│   │   │   └── layout/              # Layout and navigation
+│   │   ├── 📄 pages/                 # Route-level page components
+│   │   │   ├── admin/               # Admin dashboard pages
+│   │   │   ├── forum/               # Forum pages
+│   │   │   └── recipes/             # Recipe-related pages
+│   │   ├── 🔄 context/               # React Context providers
+│   │   ├── 🎣 hooks/                 # Custom React hooks
+│   │   ├── 🛠️ utils/                 # Frontend utilities
+│   │   └── 🎨 styles/                # CSS and styling
+│   ├── package.json                 # NPM dependencies
+│   └── vite.config.js              # Vite build configuration
+├── 🚀 deployment/                    # Deployment configurations
+│   ├── VPS_DEPLOYMENT_GUIDE.md      # VPS deployment instructions
+│   ├── EXTERNAL_ACCESS_GUIDE.md     # External access setup
+│   ├── PUBLIC_ACCESS_GUIDE.md       # Public deployment guide
+│   └── vps-setup.sh                # Automated VPS setup script
+├── 📚 docs/                          # Project documentation
+│   ├── 🖼️ images/                    # Screenshots and diagrams
+│   ├── 📋 internal/                  # Internal documentation
+│   ├── Project_Documentation.md     # Technical documentation
+│   ├── User_Manual.md              # End-user guide
+│   ├── Forum_Feature_Implementation.md
+│   ├── Meal_Suggestion_Implementation.md
+│   ├── Nutritional_Tracking_Feature.md
+│   ├── Session_Expiration_Management.md
+│   ├── Admin_Logs_Monitor.md
+│   └── MobileModal_Animation_Updates.md
+├── 🔧 scripts/                       # Development and deployment scripts
+│   ├── main.py                      # Cross-platform launcher
+│   ├── start_demo.bat              # Windows demo launcher
+│   └── LAUNCHER_README.md          # Launcher documentation
+├── docker-compose.yml              # Multi-container orchestration
+├── .env.example                    # Environment variables template
+└── README.md                       # This file
 ```
 
-## 🚀 Quick Start
+### Key Architecture Patterns
+
+| Pattern | Implementation | Benefits |
+|---------|----------------|----------|
+| **MVC Architecture** | Models (SQLAlchemy), Views (React), Controllers (Flask Routes) | Clear separation of concerns |
+| **Service Layer** | Business logic abstracted into service classes | Reusable and testable code |
+| **Repository Pattern** | Data Access Objects (DAOs) for database operations | Database abstraction |
+| **Component-Based UI** | React components with props and state management | Reusable and maintainable frontend |
+| **RESTful API Design** | Consistent HTTP methods and resource naming | Standard API conventions |
+
+The architecture follows modern web development best practices with clear separation between frontend, backend, and data layers.
+
+## 🚀 Quick Start Guide
+
+### Option 1: Automated Demo Launcher (Recommended)
 
 The fastest way to get NutriChef running locally:
 
-### Option 1: Automated Demo Launcher (Recommended)
 ```bash
-# Using Python script
+# Cross-platform Python launcher
 python scripts/main.py
 
-# Or using Windows batch file
+# Windows users can also use:
 scripts/start_demo.bat
 ```
 
-### Option 2: Manual Setup
-Follow the detailed setup instructions below for manual configuration.
+The automated launcher handles all dependencies, environment setup, and service orchestration automatically.
 
-For deployment to a VPS or production environment, see the [deployment guides](./deployment/).
+> [!TIP]
+> This is the fastest way to get started with NutriChef. The launcher automatically detects your system configuration and sets up everything needed for development.
 
-## Setup and Running
+### Option 2: Docker Deployment (Production-Ready)
 
-This section guides you through setting up and running the NutriChef application, either locally for development or using Docker for a containerized environment.
+```bash
+# Clone the repository
+git clone https://github.com/HimanM/nutrichef.git
+cd nutrichef
+
+# Configure environment variables
+cp .env.example .env
+# Edit .env with your specific configurations
+
+# Start all services
+docker-compose up --build
+```
+
+### Option 3: Manual Development Setup
+
+For developers who want full control over the setup process:
+
+```bash
+# Backend setup
+cd backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+flask run
+
+# Frontend setup (new terminal)
+cd frontend
+npm install
+npm run dev
+```
+
+> [!IMPORTANT]
+> For production deployment, please refer to our comprehensive [deployment guides](./deployment/) which cover VPS setup, security configurations, and scaling considerations.
+
+## 🔧 Detailed Setup Instructions
 
 ### Prerequisites
 
-*   Python (3.9+ recommended)
-*   Node.js and npm
-*   For Docker deployment, see Docker-specific prerequisites below.
+| Requirement | Version | Purpose |
+|-------------|---------|---------|
+| **Python** | 3.9+ | Backend API server |
+| **Node.js** | 16+ | Frontend development and build |
+| **npm/yarn** | Latest | Package management |
+| **MySQL** | 8.0+ | Database server |
+| **Docker** | 20+ (optional) | Containerized deployment |
+| **Git** | Latest | Version control |
+
+> [!WARNING]
+> Ensure all prerequisites are installed and properly configured before proceeding with the setup.
 
 ### 💻 Local Development Setup
 
-Follow these steps to set up the development environment on your local machine.
+#### Step 1: Backend Setup (Flask API)
 
-#### Backend Setup (Flask)
+```bash
+# Navigate to backend directory
+cd backend
 
-1.  **Navigate to the backend directory:**
-    ```bash
-    cd backend
-    ```
-2.  **Create and activate a virtual environment:**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
-    ```
-3.  **Install Python dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-4.  **Configure Environment Variables (for local backend):**
-    *   Inside the `backend` directory, copy `.env.example` to `.env`: `cp .env.example .env`
-    *   Edit `backend/.env` and fill in your specific configurations:
-        *   `DATABASE_URL`: Your database connection string (e.g., `mysql+mysqlconnector://user:password@host/dbname`)
-        *   `JWT_SECRET_KEY`: A strong secret key for JWT.
-        *   `GEMINI_API_KEY`: Your API key for Google Gemini.
-        *   Email Service (Flask-Mail):
-            *   `MAIL_SERVER`, `MAIL_PORT`, `MAIL_USE_TLS`, `MAIL_USE_SSL`
-            *   `MAIL_USERNAME`, `MAIL_PASSWORD` (use App Password for Gmail if 2FA is enabled)
-            *   `MAIL_DEFAULT_SENDER`
-        *   `FRONTEND_URL`: The base URL of your running frontend (e.g., `http://localhost:5173`)
-    *   **Note:** This `backend/.env` file is for local Flask development. For Docker, you'll use a root `.env` file (see Docker section).
-5.  **Initialize the Database:**
-    (Ensure your database server is running and the database specified in `DATABASE_URL` exists)
-    ```bash
-    flask init-db
-    ```
-6.  **Run the Flask development server:**
-    ```bash
-    flask run
-    ```
-    The backend will typically be available at `http://127.0.0.1:5000/`.
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-#### Frontend Setup (Vite/NPM)
+# Install Python dependencies
+pip install -r requirements.txt
+```
 
-1.  **Navigate to the frontend directory:**
-    ```bash
-    cd frontend
-    ```
-2.  **Install npm dependencies:**
-    ```bash
-    npm install
-    ```
-3.  **Run the Vite development server:**
-    ```bash
-    npm run dev
-    ```
-    The frontend will typically be available at `http://localhost:5173/` (or another port if 5173 is busy, check your terminal output).
+#### Step 2: Environment Configuration
 
-#### Running the Application Locally
+Create and configure your environment variables:
 
-*   Ensure both the backend Flask server (from `backend` directory) and the frontend Vite development server (from `frontend` directory) are running.
-*   Open your web browser and navigate to the frontend URL (e.g., `http://localhost:5173`).
+```bash
+# Copy environment template
+cp backend/.env.example backend/.env
+```
+
+Edit `backend/.env` with your configurations:
+
+```env
+# Database Configuration
+DATABASE_URL=mysql+mysqlconnector://user:password@localhost/nutrichef
+DB_HOST=localhost
+DB_NAME=nutrichef
+DB_USER=your_username
+DB_PASS=your_password
+
+# Security
+JWT_SECRET_KEY=your-super-secret-jwt-key-here
+
+# AI Services
+GEMINI_API_KEY=your-google-gemini-api-key
+
+# Email Configuration (for notifications)
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_DEFAULT_SENDER=your-email@gmail.com
+
+# Frontend URL
+FRONTEND_URL=http://localhost:5173
+```
+
+> [!IMPORTANT]
+> **Required API Keys:**
+> - **Google Gemini API**: Required for AI chatbot and recipe parsing
+> - **Email Service**: Required for user verification and notifications
+
+#### Step 3: Database Initialization
+
+```bash
+# Ensure MySQL is running and database exists
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS nutrichef;"
+
+# Initialize database schema
+flask init-db
+
+# Start the Flask development server
+flask run
+```
+
+The backend API will be available at `http://127.0.0.1:5000/`
+
+#### Step 4: Frontend Setup (React + Vite)
+
+```bash
+# Navigate to frontend directory (new terminal)
+cd frontend
+
+# Install Node.js dependencies
+npm install
+
+# Start the Vite development server
+npm run dev
+```
+
+The frontend will be available at `http://localhost:5173/`
+
+#### Step 5: Verify Installation
+
+1. **Backend Health Check**: Visit `http://127.0.0.1:5000/api/health/ping`
+2. **Frontend Access**: Visit `http://localhost:5173`
+3. **Database Connection**: Check backend logs for successful database connection
+
+> [!TIP]
+> **Development Workflow:**
+> - Backend auto-reloads on Python file changes
+> - Frontend supports hot module replacement (HMR)
+> - Use browser developer tools for debugging
 
 ### 🐳 Running with Docker
 
@@ -331,10 +554,11 @@ The `docker-compose.yml` file defines environment variables to configure the ser
     -   **Frontend URL (for Backend Service, if it needs to generate frontend links):**
         -   `FRONTEND_URL` (e.g., `http://localhost:3000` if accessing frontend directly on host, or could be different in other setups)
 
-**Important Notes on Docker `.env`:**
--   The `docker-compose.yml` file is configured to pass these environment variables from the root `.env` file to the respective services.
--   The `backend/.env` file (used for local Python development) is **not** directly used by the Dockerized backend service. Its settings must be consolidated into the **root `.env` file** for Docker Compose.
--   **Do not commit your actual root `.env` file (containing secrets) to version control.** Ensure `.env` is listed in your `.gitignore` file.
+> [!IMPORTANT]
+> **Important Notes on Docker `.env`:**
+> - The `docker-compose.yml` file is configured to pass these environment variables from the root `.env` file to the respective services.
+> - The `backend/.env` file (used for local Python development) is **not** directly used by the Dockerized backend service. Its settings must be consolidated into the **root `.env` file** for Docker Compose.
+> - **Do not commit your actual root `.env` file (containing secrets) to version control.** Ensure `.env` is listed in your `.gitignore` file.
 
 #### Building and Starting Services
 1.  **Clone the Repository (if you haven't already):**
@@ -411,7 +635,8 @@ docker-compose logs -f backend
     ```bash
     docker-compose down -v
     ```
-    **Caution:** Using `-v` with `down` permanently deletes data stored in Docker volumes.
+> [!CAUTION]
+> Using `-v` with `down` permanently deletes data stored in Docker volumes.
 
 #### Development Workflow with Docker
 -   **Live Reloading**: `docker-compose.yml` is often configured with volume mounts mapping your local code directories into the containers (e.g., `./backend:/app`, `./frontend_tailwind/src:/app/src`).
@@ -433,43 +658,151 @@ docker-compose logs -f backend
 -   **Frontend API Proxy Issues:**
     -   Ensure `nginx.conf` (for frontend service) correctly proxies to `http://backend:5000/api/` and `http://backend:5000/static/`.
     -   Check browser console and `docker-compose logs frontend`.
--   **"No space left on device" errors:** Prune unused Docker resources: `docker system prune -a --volumes` (Caution: removes unused data).
+-   **"No space left on device" errors:** Prune unused Docker resources: `docker system prune -a --volumes`
 
-## 📚 Documentation
+> [!CAUTION]
+> The `docker system prune -a --volumes` command removes unused data and can delete important information.
 
-For more detailed information about the project architecture, features, and how to use the application, please refer to the following documents:
+## 📚 Comprehensive Documentation
 
-### Core Documentation
-*   [**Project Documentation**](./docs/Project_Documentation.md): Comprehensive overview of the project's scope, architecture, technical details, API endpoints, and AI model integrations.
-*   [**User Manual**](./docs/User_Manual.md): Detailed guide for end-users and administrators on how to use NutriChef's features.
-*   [**Email Template System**](./docs/Email_Template_System.md): Documentation for the email notification system.
-*   [**Nutritional Tracking Feature**](./docs/Nutritional_Tracking_Feature.md): Guide to the nutritional tracking capabilities.
+### 📖 Core Documentation
 
-### Deployment & Setup
-*   [**VPS Deployment Guide**](./deployment/VPS_DEPLOYMENT_GUIDE.md): Complete guide for deploying NutriChef on a VPS.
-*   [**VPS Setup Documentation**](./deployment/VPS_README.md): Additional VPS setup information.
-*   [**External Access Guide**](./deployment/EXTERNAL_ACCESS_GUIDE.md): Instructions for making your application accessible externally.
-*   [**Public Access Guide**](./deployment/PUBLIC_ACCESS_GUIDE.md): Guide for setting up public access.
-*   [**VPS Setup Script**](./deployment/vps-setup.sh): Automated VPS setup script.
+| Document | Description | Audience |
+|----------|-------------|----------|
+| [**Project Documentation**](./docs/Project_Documentation.md) | Complete technical overview, architecture, and API reference | Developers, Architects |
+| [**User Manual**](./docs/User_Manual.md) | End-user guide for all application features | End Users, Admins |
+| [**Email Template System**](./docs/Email_Template_System.md) | Email notification system documentation | Developers |
+| [**Nutritional Tracking Feature**](./docs/Nutritional_Tracking_Feature.md) | Nutritional analysis and tracking guide | Users, Developers |
 
-### Scripts & Utilities
-*   [**Local Demo Launcher**](./scripts/LAUNCHER_README.md): Information about the local demo launcher script.
-*   [**Demo Launcher Script**](./scripts/main.py): Python script for starting the application locally.
-*   [**Windows Batch Scripts**](./scripts/): Various batch files for Windows users.
+### 🚀 Deployment Documentation
 
-## Running Tests (Backend)
+| Guide | Purpose | Environment |
+|-------|---------|-------------|
+| [**VPS Deployment Guide**](./deployment/VPS_DEPLOYMENT_GUIDE.md) | Complete VPS deployment instructions | Production |
+| [**External Access Guide**](./deployment/EXTERNAL_ACCESS_GUIDE.md) | External network access configuration | Production |
+| [**Public Access Guide**](./deployment/PUBLIC_ACCESS_GUIDE.md) | Public internet deployment setup | Production |
+| [**VPS Setup Script**](./deployment/vps-setup.sh) | Automated deployment script | Production |
 
-1.  Navigate to the `backend` directory.
-2.  Ensure your test database is configured (if different from development) via environment variables (e.g., in your local `backend/.env` or shell environment).
-3.  Run:
-    ```bash
-    pytest
-    ```
-    (If running tests inside Docker, you would typically execute a command within the backend container: `docker-compose exec backend pytest`)
+### 🔧 Feature-Specific Documentation
 
-## 🔗 Connect With Us
+| Feature | Documentation | Status |
+|---------|---------------|--------|
+| **Forum System** | [Forum Implementation](./docs/Forum_Feature_Implementation.md) | ✅ Complete |
+| **Meal Suggestions** | [Meal Suggestions](./docs/Meal_Suggestion_Implementation.md) | ✅ Complete |
+| **Session Management** | [Session Expiration](./docs/Session_Expiration_Management.md) | ✅ Complete |
+| **Admin Monitoring** | [Admin Logs Monitor](./docs/Admin_Logs_Monitor.md) | ✅ Complete |
+| **Mobile Animations** | [Mobile Modal Updates](./docs/MobileModal_Animation_Updates.md) | ✅ Complete |
 
-Find us on other platforms:
+### 🛠️ Development Tools
 
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" width="20" alt="GitHub logo" />  [GitHub](https://github.com/HimanM)
-*   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-plain.svg" width="20" alt="Facebook logo" />  [Facebook](https://www.facebook.com/himan.manduja.543/)
+| Tool | Documentation | Purpose |
+|------|---------------|---------|
+| [**Demo Launcher**](./docs/LAUNCHER_README.md) | Local development setup | Development |
+| [**Scripts Guide**](./scripts/) | Automation and utility scripts | Development |
+| **API Documentation** | Interactive API docs at `/api/docs` | Development |
+
+> [!TIP]
+> All documentation is kept up-to-date with the latest features and includes code examples, screenshots, and troubleshooting guides.
+
+## 🧪 Testing
+
+### Backend Testing
+
+```bash
+# Navigate to backend directory
+cd backend
+
+# Activate virtual environment
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Run all tests
+pytest
+
+# Run with coverage report
+pytest --cov=. --cov-report=html
+
+# Run specific test categories
+pytest tests/test_routes/  # API endpoint tests
+pytest tests/test_services/  # Business logic tests
+pytest tests/test_models/  # Database model tests
+```
+
+### Frontend Testing
+
+```bash
+# Navigate to frontend directory
+cd frontend
+
+# Run unit tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run end-to-end tests
+npm run test:e2e
+```
+
+### Docker Testing
+
+```bash
+# Run tests in Docker environment
+docker-compose exec backend pytest
+docker-compose exec frontend npm test
+```
+
+Test databases are automatically configured and isolated from development data.
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Here's how you can help:
+
+### 🐛 Bug Reports
+- Use the [GitHub Issues](https://github.com/HimanM/nutrichef/issues) page
+- Include detailed reproduction steps
+- Provide system information and error logs
+
+### 💡 Feature Requests
+- Submit feature requests via GitHub Issues
+- Describe the use case and expected behavior
+- Include mockups or examples if applicable
+
+### 🔧 Development Contributions
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### 📝 Documentation
+- Help improve documentation
+- Add code examples and tutorials
+- Translate documentation to other languages
+
+> [!NOTE]
+> Please read our contributing guidelines and code of conduct before submitting contributions.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🔗 Connect & Support
+
+| Platform | Link | Purpose |
+|----------|------|---------|
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" width="20" alt="GitHub logo" /> **GitHub** | [HimanM](https://github.com/HimanM) | Source code, issues, contributions |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-plain.svg" width="20" alt="Facebook logo" /> **Facebook** | [Developer Profile](https://www.facebook.com/himan.manduja.543/) | Updates and community |
+
+## 🙏 Acknowledgments
+
+- **Google Gemini** for AI-powered features
+- **TensorFlow** community for machine learning models
+- **React** and **Flask** communities for excellent frameworks
+- **Open Source Contributors** who made this project possible
+
+---
+
+<p align="center">
+  <strong>Built with ❤️ for the cooking community</strong><br>
+  <em>Making healthy cooking accessible through technology</em>
+</p>
