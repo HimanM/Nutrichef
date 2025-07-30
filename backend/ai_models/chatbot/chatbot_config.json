@@ -1,0 +1,195 @@
+{
+  "intents": {
+    "greeting_keywords": [
+      "hello", "hi", "hey", "greetings", "good morning", "good afternoon", "yo"
+    ],
+    "website_info_keywords": [
+      "what can you do", "what do you do", "what is this website", "what is this site", 
+      "help", "info", "capabilities"
+    ],
+    "who_are_you_keywords": [
+      "who are you", "what is your name", "who made you", "tell me about yourself"
+    ],
+    "how_to_general_keywords": [
+      "how to", "how do i", "where do i", "where can i", "show me how to",
+      "guide me to", "steps for", "explain how to", "what are the steps to",
+      "i want to", "i need to", "can i"
+    ],
+    "classify_keywords": [
+      "classify", "identify", "what is this", "what's this", "recognize this",
+      "what food is this", "what am i looking at", "what food is in this picture",
+      "tell me what this is a photo of", "can you identify this from the image",
+      "what is in the image", "analyze this image"
+    ],
+    "substitute_keywords": [
+      "substitute", "substitution", "replacement", "instead of", "alternative for", 
+      "replace", "swap for"
+    ],
+    "nutrition_keywords": [
+      "nutrition", "nutritional info", "calories", "how much protein", "is it healthy", 
+      "vitamins", "macros", "dietary fiber", "sugar content", "fat content"
+    ]
+  },
+  "how_to_topics": {
+    "classify_image": {
+      "keywords": [
+        "classify image", "classify an image", "identify food from picture", 
+        "image classification", "scan food"
+      ],
+      "response": "To classify an image of a food item, go to the Ingredient Classifier page.",
+      "link_text": "Go to Ingredient Classifier",
+      "link_url": "/classifier"
+    },
+    "browse_recipes": {
+      "keywords": [
+        "browse recipes", "find recipes", "see recipes", "look for recipes", 
+        "recipe browser", "public recipes"
+      ],
+      "response": "You can browse and search for recipes in the Public Recipe Browser.",
+      "link_text": "Browse Recipes",
+      "link_url": "/recipes"
+    },
+    "upload_recipe": {
+      "keywords": [
+        "upload recipe", "add a recipe", "submit new recipe", "share my recipe"
+      ],
+      "response": "To upload your own recipe, you can use the recipe submission feature available in the recipe browser. Look for the 'Add Recipe' button.",
+      "link_text": "Browse Recipes (to add new ones)",
+      "link_url": "/recipes"
+    },
+    "meal_planner": {
+      "keywords": [
+        "meal planner", "meal plan", "plan my meals", "view meal plan"
+      ],
+      "response": "You can plan your meals using the Meal Planner.",
+      "link_text": "Open Meal Planner",
+      "link_url": "/meal-planner"
+    },
+    "shopping_basket": {
+      "keywords": [
+        "shopping basket", "shopping list", "my basket", "view basket"
+      ],
+      "response": "View and manage your shopping list in the Shopping Basket.",
+      "link_text": "Go to Shopping Basket",
+      "link_url": "/basket"
+    },
+    "user_settings": {
+      "keywords": [
+        "user settings", "my settings", "change my preferences", "account settings"
+      ],
+      "response": "You can manage your account preferences, including allergies, in User Settings. You need to be logged in for this.",
+      "link_text": "Open User Settings",
+      "link_url": "/settings"
+    },
+    "change_password": {
+      "keywords": [
+        "change password", "update password", "reset my password", "new password"
+      ],
+      "response": "To change your password, go to User Settings. You need to be logged in.",
+      "link_text": "Manage Settings (for password change)",
+      "link_url": "/settings"
+    },
+    "personalized_recipes": {
+      "keywords": [
+        "personalized recipes", "recipes for me", "my recommended recipes", 
+        "allergy friendly recipes"
+      ],
+      "response": "To see recipes tailored to your preferences and allergies, check out your Personalized Recipes feed. Make sure your allergies are set in User Settings and you are logged in.",
+      "link_text": "View Personalized Recipes",
+      "link_url": "/personalized-recipes"
+    },
+    "ingredient_substitute": {
+      "keywords": [
+        "ingredient substitute", "find substitute", "substitute an ingredient", 
+        "ingredient replacement"
+      ],
+      "response": "Need a substitute for an ingredient? Use the Ingredient Substitute tool.",
+      "link_text": "Find Ingredient Substitutes",
+      "link_url": "/ingredient-substitute"
+    },
+    "food_lookup": {
+      "keywords": [
+        "food lookup", "nutrition lookup", "check nutrition", "find food info", 
+        "lookup food"
+      ],
+      "response": "To get nutritional information for food items, you can use the Food Lookup page or ask me directly (e.g., 'nutrition for apple').",
+      "link_text": "Go to Food Lookup Page",
+      "link_url": "/food-lookup"
+    },
+    "chatbot_help": {
+      "keywords": [
+        "chatbot", "talk to bot", "use chatbot", "chatbot page"
+      ],
+      "response": "You are currently interacting with me, FoodieBot! You can ask me to classify food, find substitutes, get nutrition info, or ask how to use other features of the site.",
+      "link_text": "About this Chatbot",
+      "link_url": "/"
+    },
+    "pantry": {
+      "keywords": [
+        "pantry", "my pantry", "pantry management", "manage pantry", "view pantry"
+      ],
+      "response": "You can manage your pantry items and track your ingredients in the Pantry page. You need to be logged in for this.",
+      "link_text": "Go to Pantry",
+      "link_url": "/pantry"
+    },
+    "recipe_suggestions": {
+      "keywords": [
+        "recipe suggestions", "suggested recipes", "recipe recommendations", 
+        "what can i cook", "recipes based on pantry"
+      ],
+      "response": "Get recipe suggestions based on your pantry items and preferences in the Recipe Suggestions page. You need to be logged in for this.",
+      "link_text": "View Recipe Suggestions",
+      "link_url": "/suggested-recipes"
+    },
+    "forum": {
+      "keywords": [
+        "forum", "community", "discussions", "food forum", "ask community", 
+        "food discussions"
+      ],
+      "response": "Join food discussions and connect with other food enthusiasts in our Community Forum.",
+      "link_text": "Visit Forum",
+      "link_url": "/forum"
+    },
+    "contact_us": {
+      "keywords": [
+        "contact us", "contact support", "get help", "support", "contact admin"
+      ],
+      "response": "Need help or have questions? You can reach out to us through the Contact Us page.",
+      "link_text": "Contact Us",
+      "link_url": "/contact-us"
+    },
+    "about_us": {
+      "keywords": [
+        "about us", "about this site", "about nutrichef", "who created this", 
+        "about us page", "where is about us", "about page"
+      ],
+      "response": "Learn more about NutriChef and our mission on the About Us page.",
+      "link_text": "About Us",
+      "link_url": "/about"
+    },
+    "privacy_policy": {
+      "keywords": [
+        "privacy policy", "privacy", "data protection", "how is my data used"
+      ],
+      "response": "You can read about how we handle your data in our Privacy Policy.",
+      "link_text": "Privacy Policy",
+      "link_url": "/privacy"
+    },
+    "register": {
+      "keywords": [
+        "register", "sign up", "create account", "join", "registration"
+      ],
+      "response": "You can create a new account to access personalized features like meal planning and recipe recommendations.",
+      "link_text": "Register",
+      "link_url": "/register"
+    },
+    "login": {
+      "keywords": [
+        "login", "sign in", "log in", "access account"
+      ],
+      "response": "Sign in to your account to access personalized features.",
+      "link_text": "Login",
+      "link_url": "/login"
+    }
+  }
+}

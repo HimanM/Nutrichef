@@ -42,10 +42,12 @@ class ChatbotService:
             substitution_service = None
 
         log_info("Initializing FoodChatbot with dependencies...", "ChatbotService")
+        config_path = os.path.join(os.path.dirname(__file__), '../../ai_models/chatbot/chatbot_config.json')
         self.chatbot_instance = FoodChatbot(
             food_classifier_instance=food_classifier,
             food_lookup_service_instance=food_lookup_service,
-            substitution_service_instance=substitution_service
+            substitution_service_instance=substitution_service,
+            config_path=config_path
         )
 
         self.temp_image_folder = os.path.abspath(static_tmp_folder)

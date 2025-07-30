@@ -1,5 +1,6 @@
 import spacy
 import os
+import json
 from backend.ai_models.food_classification.food_classifier import FoodClassifier
 from backend.services.main.food_lookup_service import FoodLookupService
 from backend.services.main.substitution_service import SubstitutionService
@@ -8,7 +9,8 @@ class FoodChatbot:
     def __init__(self, food_classifier_instance: FoodClassifier,
                  food_lookup_service_instance: FoodLookupService,
                  substitution_service_instance: SubstitutionService,
-                 spacy_model_name="en_core_web_sm"):
+                 spacy_model_name="en_core_web_sm",
+                 config_path="backend/ai_models/chatbot/chatbot_config.json"):
         """
         Initializes the FoodChatbot with injected dependencies.
 
@@ -17,12 +19,14 @@ class FoodChatbot:
             food_lookup_service_instance (FoodLookupService): An instance of FoodLookupService.
             substitution_service_instance (SubstitutionService): An instance of SubstitutionService.
             spacy_model_name (str): The name of the spaCy model to load.
+            config_path (str): Path to the chatbot configuration file.
         """
         self.nlp = None
         self.food_classifier = food_classifier_instance
         self.food_lookup_service = food_lookup_service_instance
         self.substitution_service = substitution_service_instance
         self.all_models_loaded = False
+        self.config = self._load_config(config_path)
 
         try:
             self.nlp = spacy.load(spacy_model_name)
@@ -64,6 +68,24 @@ class FoodChatbot:
             else:
                 self.all_models_loaded = False
 
+    def _load_config(self, config_path):
+        """
+        Loads the chatbot configuration from a JSON file.
+        
+        Args:
+            config_path (str): Path to the configuration file.
+            
+        Returns:
+            dict: Configuration dictionary or empty dict if loading fails.
+        """
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                print(f"FoodChatbot: Configuration loaded successfully from {config_path}")
+                return config
+        except Exception as e:
+            print(f"FoodChatbot: WARNING - Could not load configuration from {config_path}: {e}")
+            return {"intents": {}, "how_to_topics": {}}
 
     def is_ready(self):
         """Checks if the chatbot and its core components are loaded."""
@@ -100,37 +122,21 @@ class FoodChatbot:
         intent = "unknown"
         entities = {}
 
-        greeting_keywords = ["hello", "hi", "hey", "greetings", "good morning", "good afternoon", "yo"]
-        website_info_keywords = ["what can you do", "what do you do", "what is this website", "what is this site", "help", "info", "capabilities"]
-        who_are_you_keywords = ["who are you", "what is your name", "who made you", "tell me about yourself"]
-
-        how_to_general_keywords = [
-            "how to", "how do i", "where do i", "where can i", "show me how to",
-            "guide me to", "steps for", "explain how to", "what are the steps to",
-            "i want to", "i need to", "can i"
-        ]
-        how_to_topic_keywords = {
-            "classify_image": ["classify image", "classify an image", "identify food from picture", "image classification", "scan food"],
-            "browse_recipes": ["browse recipes", "find recipes", "see recipes", "look for recipes", "recipe browser"],
-            "upload_recipe": ["upload recipe", "add a recipe", "submit new recipe", "share my recipe"],
-            "meal_planner": ["meal planner", "meal plan", "plan my meals", "view meal plan"],
-            "shopping_basket": ["shopping basket", "shopping list", "my basket", "view basket"],
-            "user_settings": ["user settings", "my settings", "change my preferences", "account settings"],
-            "change_password": ["change password", "update password", "reset my password", "new password"],
-            "personalized_recipes": ["personalized recipes", "recipes for me", "my recommended recipes", "allergy friendly recipes"],
-            "ingredient_substitute": ["ingredient substitute", "find substitute", "substitute an ingredient", "ingredient replacement"],
-            "food_lookup": ["food lookup", "nutrition lookup", "check nutrition", "find food info", "lookup food"],
-            "chatbot_help": ["chatbot", "talk to bot", "use chatbot", "chatbot page"]
-        }
-
-        classify_keywords = [
-            "classify", "identify", "what is this", "what's this", "recognize this",
-            "what food is this", "what am i looking at", "what food is in this picture",
-            "tell me what this is a photo of", "can you identify this from the image",
-            "what is in the image", "analyze this image"
-        ]
-        substitute_keywords = ["substitute", "substitution", "replacement", "instead of", "alternative for", "replace", "swap for"]
-        nutrition_keywords = ["nutrition", "nutritional info", "calories", "how much protein", "is it healthy", "vitamins", "macros", "dietary fiber", "sugar content", "fat content"]
+        # Load keywords from configuration
+        intents_config = self.config.get("intents", {})
+        greeting_keywords = intents_config.get("greeting_keywords", [])
+        website_info_keywords = intents_config.get("website_info_keywords", [])
+        who_are_you_keywords = intents_config.get("who_are_you_keywords", [])
+        how_to_general_keywords = intents_config.get("how_to_general_keywords", [])
+        classify_keywords = intents_config.get("classify_keywords", [])
+        substitute_keywords = intents_config.get("substitute_keywords", [])
+        nutrition_keywords = intents_config.get("nutrition_keywords", [])
+        
+        # Build how_to_topic_keywords from configuration
+        how_to_topics_config = self.config.get("how_to_topics", {})
+        how_to_topic_keywords = {}
+        for topic_key, topic_data in how_to_topics_config.items():
+            how_to_topic_keywords[topic_key] = topic_data.get("keywords", [])
 
         if image_provided:
             if any(kw in doc.text for kw in classify_keywords) or \
@@ -481,73 +487,14 @@ class FoodChatbot:
 
         elif intent == "get_how_to_link":
             topic = entities.get("how_to_topic")
-            response_data = {}
-
-            if topic == "classify_image":
+            how_to_topics_config = self.config.get("how_to_topics", {})
+            
+            if topic and topic in how_to_topics_config:
+                topic_data = how_to_topics_config[topic]
                 response_data = {
-                    "response": "To classify an image of a food item, go to the Ingredient Classifier page.",
-                    "link_text": "Go to Ingredient Classifier",
-                    "link_url": "/classifier"
-                }
-            elif topic == "browse_recipes":
-                response_data = {
-                    "response": "You can browse and search for recipes in the Public Recipe Browser.",
-                    "link_text": "Browse Recipes",
-                    "link_url": "/recipes"
-                }
-            elif topic == "upload_recipe":
-                response_data = {
-                    "response": "To upload your own recipe, you can use the recipe submission feature available in the recipe browser. Look for the 'Add Recipe' button.",
-                    "link_text": "Browse Recipes (to add new ones)",
-                    "link_url": "/recipes"
-                }
-            elif topic == "meal_planner":
-                response_data = {
-                    "response": "You can plan your meals using the Meal Planner.",
-                    "link_text": "Open Meal Planner",
-                    "link_url": "/meal-planner"
-                }
-            elif topic == "shopping_basket":
-                response_data = {
-                    "response": "View and manage your shopping list in the Shopping Basket.",
-                    "link_text": "Go to Shopping Basket",
-                    "link_url": "/basket"
-                }
-            elif topic == "user_settings":
-                response_data = {
-                    "response": "You can manage your account preferences, including allergies, in User Settings. You need to be logged in for this.",
-                    "link_text": "Open User Settings",
-                    "link_url": "/settings"
-                }
-            elif topic == "change_password":
-                response_data = {
-                    "response": "To change your password, go to User Settings. You need to be logged in.",
-                    "link_text": "Manage Settings (for password change)",
-                    "link_url": "/settings"
-                }
-            elif topic == "personalized_recipes":
-                response_data = {
-                    "response": "To see recipes tailored to your preferences and allergies, check out your Personalized Recipes feed. Make sure your allergies are set in User Settings and you are logged in.",
-                    "link_text": "View Personalized Recipes",
-                    "link_url": "/personalized-recipes"
-                }
-            elif topic == "ingredient_substitute":
-                response_data = {
-                    "response": "Need a substitute for an ingredient? Use the Ingredient Substitute tool.",
-                    "link_text": "Find Ingredient Substitutes",
-                    "link_url": "/ingredient-substitute"
-                }
-            elif topic == "food_lookup":
-                response_data = {
-                    "response": "To get nutritional information for food items, you can use the Food Lookup page or ask me directly (e.g., 'nutrition for apple').",
-                    "link_text": "Go to Food Lookup Page",
-                    "link_url": "/food-lookup"
-                }
-            elif topic == "chatbot_help":
-                response_data = {
-                    "response": "You are currently interacting with me, FoodieBot! You can ask me to classify food, find substitutes, get nutrition info, or ask how to use other features of the site.",
-                    "link_text": "About this Chatbot",
-                    "link_url": "/"
+                    "response": topic_data.get("response", "I can help you with that feature."),
+                    "link_text": topic_data.get("link_text", "Go to Page"),
+                    "link_url": topic_data.get("link_url", "/")
                 }
             else:
                 response_data = {
