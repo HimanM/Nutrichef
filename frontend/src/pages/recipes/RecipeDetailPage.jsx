@@ -310,7 +310,7 @@ function RecipeDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex justify-center items-center">
-        <div className="text-center">
+        <div className="flex flex-col items-center justify-center text-center">
           <PageLoaderSpinner />
           <p className="mt-4 text-gray-600">Loading recipe details...</p>
         </div>
@@ -337,7 +337,7 @@ function RecipeDetailPage() {
   if (!recipeData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex justify-center items-center">
-        <div className="text-center">
+        <div className="flex flex-col items-center justify-center text-center">
           <PageLoaderSpinner />
           <p className="mt-4 text-gray-600">No recipe data available...</p>
         </div>
