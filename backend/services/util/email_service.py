@@ -17,8 +17,10 @@ class EmailService:
 
         config = current_app.config
 
-        verification_url = f"{config['FRONTEND_URL']}/verify-email/{token}"
-        frontend_url = config['FRONTEND_URL']
+        # Use DOMAIN_URL if available (for production/cloudflared), otherwise use FRONTEND_URL (for local development)
+        base_url = config.get('DOMAIN_URL') or config['FRONTEND_URL']
+        verification_url = f"{base_url}/verify-email/{token}"
+        frontend_url = base_url
 
         subject = "Verify Your Email for NutriChef"
         sender = config.get('MAIL_DEFAULT_SENDER', 'noreply@example.com')
@@ -78,7 +80,8 @@ The NutriChef Team
 
         config = current_app.config
         sender = config.get('MAIL_DEFAULT_SENDER', 'noreply@nutrichef.com')
-        frontend_url = config['FRONTEND_URL']
+        # Use DOMAIN_URL if available (for production/cloudflared), otherwise use FRONTEND_URL (for local development)
+        frontend_url = config.get('DOMAIN_URL') or config['FRONTEND_URL']
 
         # Render professional HTML template
         try:

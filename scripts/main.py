@@ -51,36 +51,74 @@ class NutriChefDemo:
         else:
             print(f"{Colors.WARNING}Skipping Docker hosting step.{Colors.ENDC}")
 
-    def start_ngrok(self):
-        """Prompt user to start ngrok and enter the public URL"""
-        print(f"\n{Colors.OKCYAN}🚀 Please start ngrok in a separate terminal with:{Colors.ENDC}")
-        print(f"   ngrok http 3000")
-        print(f"{Colors.OKCYAN}Once ngrok is running, copy the public URL (http://xxxx.ngrok.io) and paste it below.{Colors.ENDC}")
-        url = input(f"Enter ngrok public URL: ").strip()
-        if url:
-            print(f"{Colors.OKGREEN}🌐 ngrok public URL: {url}{Colors.ENDC}")
-        else:
-            print(f"{Colors.FAIL}❌ No URL entered. Skipping QR code display.{Colors.ENDC}")
-        return url
+    def start_cloudflared_tunnel(self):
+        """Start cloudflared tunnel and display the public URL with QR code"""
+        print(f"\n{Colors.OKCYAN}🚀 Starting cloudflared tunnel...{Colors.ENDC}")
+        
+        try:
+            # Start the cloudflared tunnel in background
+            tunnel_process = subprocess.Popen(
+                ["cloudflared", "tunnel", "run", "nutrichef-tunnel"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+            
+            print(f"  ✅ Cloudflared tunnel started!")
+            print(f"  🌐 Your app is now accessible at: {Colors.UNDERLINE}https://nutrichef.himanmanduja.fun/{Colors.ENDC}")
+            
+            # Display QR code for the domain
+            self.display_qr("https://nutrichef.himanmanduja.fun/")
+            
+            return tunnel_process
+            
+        except FileNotFoundError:
+            print(f"  ❌ cloudflared not found. Please install cloudflared first.")
+            print(f"  💡 Download from: https://github.com/cloudflare/cloudflared/releases")
+            return None
+        except Exception as e:
+            print(f"  ❌ Failed to start cloudflared tunnel: {e}")
+            return None
 
     def display_qr(self, url):
         """Generate and display QR code for a URL in terminal"""
         print(f"\n{Colors.OKCYAN}📱 Scan this QR code to open the app on your device:{Colors.ENDC}")
         try:
             import qrcode
-            qr = qrcode.QRCode()
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
             qr.add_data(url)
-            qr.make()
+            qr.make(fit=True)
             qr.print_ascii(invert=True)
+            print(f"\n{Colors.OKGREEN}🌐 URL: {url}{Colors.ENDC}")
         except ImportError:
             print(f"{Colors.WARNING}qrcode library not installed. Run 'pip install qrcode[pil]' to enable QR code display.{Colors.ENDC}")
-            print(f"URL: {url}")
+            print(f"🌐 URL: {url}")
+
+    def start_ngrok(self):
+        """Prompt user to start ngrok and enter the public URL (DEPRECATED - Use cloudflared instead)"""
+        print(f"\n{Colors.WARNING}⚠️  NGROK support is deprecated. Please use cloudflared tunnel instead.{Colors.ENDC}")
+        print(f"{Colors.OKCYAN}🚀 Please use cloudflared tunnel with:{Colors.ENDC}")
+        print(f"   cloudflared tunnel run nutrichef-tunnel")
+        print(f"{Colors.OKCYAN}Your app will be available at: https://nutrichef.himanmanduja.fun/{Colors.ENDC}")
+        
+        choice = input(f"Would you like to start cloudflared tunnel automatically? (y/N): ").strip().lower()
+        if choice in ['y', 'yes']:
+            return self.start_cloudflared_tunnel()
+        else:
+            self.display_qr("https://nutrichef.himanmanduja.fun/")
+            return None
     def __init__(self):
         self.root_dir = Path(__file__).parent.parent  # Go up to project root from scripts folder
         self.backend_dir = self.root_dir / "backend"
         self.frontend_dir = self.root_dir / "frontend"
         self.backend_process = None
         self.frontend_process = None
+        self.tunnel_process = None
         self.is_running = False
         self.firewall_rules_added = False
         
@@ -635,27 +673,39 @@ pause"""
             print(f"  ⚠️  Could not open browser automatically: {e}")
             print(f"  📝 Please manually open: http://localhost:5173")
 
-    def show_status(self):
+    def show_status(self, tunnel_process=None):
         """Show the current status of both servers"""
         print(f"\n{Colors.OKGREEN}{Colors.BOLD}🚀 NutriChef Demo is now running!{Colors.ENDC}")
+        
+        access_urls = f"""
+{Colors.OKCYAN}🌐 Access URLs:{Colors.ENDC}
+  Frontend: {Colors.UNDERLINE}http://localhost:5173{Colors.ENDC}
+  Backend:  {Colors.UNDERLINE}http://localhost:5000{Colors.ENDC}"""
+        
+        if tunnel_process:
+            access_urls += f"""
+  
+{Colors.OKGREEN}� Public Access (via cloudflared):{Colors.ENDC}
+  Public URL: {Colors.UNDERLINE}https://nutrichef.himanmanduja.fun/{Colors.ENDC}"""
+        
         print(f"""
 {Colors.OKCYAN}📊 Service Status:{Colors.ENDC}
   🔧 Backend API:  🟢 Running in separate terminal
-  🎨 Frontend:     🟢 Running in separate terminal
-
-{Colors.OKCYAN}🌐 Access URLs:{Colors.ENDC}
-  Frontend: {Colors.UNDERLINE}http://localhost:5173{Colors.ENDC}
-  Backend:  {Colors.UNDERLINE}http://localhost:5000{Colors.ENDC}
+  🎨 Frontend:     🟢 Running in separate terminal{f"""
+  🚇 Cloudflared:  🟢 Tunnel active""" if tunnel_process else ""}
+{access_urls}
 
 {Colors.OKCYAN}📱 Terminal Windows:{Colors.ENDC}
   • Backend terminal: Shows Flask server logs and errors
   • Frontend terminal: Shows Vite development server output
-  • Main terminal: This launcher and status information
+  • Main terminal: This launcher and status information{f"""
+  • Cloudflared tunnel: Running in background""" if tunnel_process else ""}
 
 {Colors.WARNING}💡 Tips:{Colors.ENDC}
   • Check the separate terminal windows for detailed logs
   • The frontend will automatically reload when you make changes
-  • The backend runs in debug mode for development
+  • The backend runs in debug mode for development{f"""
+  • Your app is publicly accessible via cloudflared tunnel""" if tunnel_process else ""}
   • Press {Colors.BOLD}Ctrl+C{Colors.ENDC} in this terminal to stop the launcher
   • Close the terminal windows manually to stop the servers
 
@@ -669,6 +719,19 @@ pause"""
         print(f"  📱 Please close the terminal windows manually to stop the servers:")
         print(f"    • Backend terminal (Flask server)")
         print(f"    • Frontend terminal (Vite server)")
+        
+        # Stop cloudflared tunnel if running
+        if self.tunnel_process:
+            try:
+                print(f"  🚇 Stopping cloudflared tunnel...")
+                self.tunnel_process.terminate()
+                self.tunnel_process.wait(timeout=5)
+                print(f"  ✅ Cloudflared tunnel stopped")
+            except subprocess.TimeoutExpired:
+                print(f"  ⚠️  Force killing cloudflared tunnel...")
+                self.tunnel_process.kill()
+            except Exception as e:
+                print(f"  ⚠️  Error stopping cloudflared tunnel: {e}")
         
         # Close firewall ports
         self.close_firewall_ports()
@@ -745,23 +808,26 @@ pause"""
                 self.docker_menu()
                 print(f"\n{Colors.OKCYAN}Waiting for containers to start...{Colors.ENDC}")
                 time.sleep(8)
-                # Seamlessly start ngrok and display QR code
-                print(f"\n{Colors.OKCYAN}Starting ngrok and displaying QR code for frontend...{Colors.ENDC}")
-                try:
-                    subprocess.run([sys.executable, str(self.root_dir / "scripts" / "start_ngrok_qr.py")])
-                except Exception as e:
-                    print(f"{Colors.FAIL}❌ Could not run start_ngrok_qr.py: {e}{Colors.ENDC}")
-                print(f"\n{Colors.OKGREEN}✅ Docker hosting and ngrok tunnel setup complete!{Colors.ENDC}")
+                # Start cloudflared tunnel and display QR code
+                print(f"\n{Colors.OKCYAN}Starting cloudflared tunnel and displaying QR code...{Colors.ENDC}")
+                tunnel_process = self.start_cloudflared_tunnel()
+                if tunnel_process:
+                    print(f"\n{Colors.OKGREEN}✅ Docker hosting and cloudflared tunnel setup complete!{Colors.ENDC}")
+                else:
+                    print(f"\n{Colors.WARNING}⚠️  Docker is running but cloudflared tunnel failed to start.{Colors.ENDC}")
+                    print(f"  💡 You can manually start the tunnel with: cloudflared tunnel run nutrichef-tunnel")
+                    self.display_qr("https://nutrichef.himanmanduja.fun/")
                 return True
 
             # Ask user if they want to enable external access (non-Docker)
             print(f"\n{Colors.OKCYAN}Choose deployment type:{Colors.ENDC}")
             print(f"  1. Local network only (friends on same WiFi)")
             print(f"  2. Public internet access (requires router setup)")
-            print(f"  3. VPS deployment (upload to server)")
-            print(f"  4. No external access (localhost only)")
+            print(f"  3. Cloudflared tunnel (public access via https://nutrichef.himanmanduja.fun/)")
+            print(f"  4. VPS deployment (upload to server)")
+            print(f"  5. No external access (localhost only)")
 
-            access_choice = input(f"Enter choice (1/2/3/4): ").strip()
+            access_choice = input(f"Enter choice (1/2/3/4/5): ").strip()
 
             if access_choice == "1":
                 if not self.open_firewall_ports():
@@ -772,8 +838,13 @@ pause"""
                 if not self.setup_public_access():
                     print(f"{Colors.WARNING}⚠️  Continuing with local network access only...{Colors.ENDC}")
             elif access_choice == "3":
-                self.show_vps_deployment_guide()
-                return True  # Exit after showing guide
+                print(f"\n{Colors.OKCYAN}🚇 Setting up cloudflared tunnel...{Colors.ENDC}")
+                self.tunnel_process = self.start_cloudflared_tunnel()
+                if not self.tunnel_process:
+                    print(f"{Colors.WARNING}⚠️  Continuing without cloudflared tunnel...{Colors.ENDC}")
+            elif access_choice == "4":
+                if self.show_vps_deployment_guide():
+                    return True  # Exit after showing guide
             else:
                 print(f"  ℹ️  External access disabled. Only local access (localhost) will work.")
 
@@ -795,7 +866,7 @@ pause"""
             self.open_browser()
 
             # Show status
-            self.show_status()
+            self.show_status(self.tunnel_process)
 
             # Wait for user input or Ctrl+C
             self.wait_for_user_input()

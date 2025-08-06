@@ -26,6 +26,7 @@ class Config:
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
 
     FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+    DOMAIN_URL = os.environ.get('DOMAIN_URL')  # For production/cloudflared tunnel domain
 
     GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
     if GEMINI_API_KEY:
