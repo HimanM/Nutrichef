@@ -6,7 +6,7 @@ import { HiOutlineLockClosed, HiOutlineMail, HiOutlineArrowRight, HiOutlineEye, 
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login: authLogin, isAuthenticated, authError, authLoading } = useAuth();
+  const { login: authLogin, isAuthenticated, isAdmin, authError, authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState('');
@@ -16,10 +16,15 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      const from = location.state?.from?.pathname || '/';
-      navigate(from, { replace: true });
+      // If user is admin, redirect to admin dashboard instead of default path
+      if (isAdmin) {
+        navigate('/admin', { replace: true });
+      } else {
+        const from = location.state?.from?.pathname || '/';
+        navigate(from, { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate, location.state]);
+  }, [isAuthenticated, isAdmin, navigate, location.state]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
