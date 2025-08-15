@@ -33,8 +33,20 @@ class FoodIngredientClassifier:
                 raise FileNotFoundError(f"Class names JSON not found at: {self.class_names_path}. User needs to place '{class_names_file}' here.")
 
             import keras
-            self.model = keras.models.load_model(self.model_path)
-            log_success(f"Model loaded from {self.model_path}", "FoodIngredientClassifier")
+            
+            # Try loading with compile=False to avoid potential issues
+            try:
+                self.model = keras.models.load_model(self.model_path, compile=False)
+                log_success(f"Model loaded from {self.model_path}", "FoodIngredientClassifier")
+            except Exception as model_load_error:
+                # Try with custom objects if the first attempt fails
+                log_warning(f"Initial model load failed, trying with compile=False: {model_load_error}", "FoodIngredientClassifier")
+                try:
+                    import tensorflow as tf
+                    self.model = tf.keras.models.load_model(self.model_path, compile=False)
+                    log_success(f"Model loaded with TensorFlow fallback from {self.model_path}", "FoodIngredientClassifier")
+                except Exception as tf_load_error:
+                    raise Exception(f"Failed to load model with both Keras and TensorFlow: {tf_load_error}")
             
             with open(self.class_names_path, 'r') as f:
                 class_names = json.load(f)

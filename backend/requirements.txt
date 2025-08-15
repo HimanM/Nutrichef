@@ -11,9 +11,9 @@ rapidfuzz
 Flask-Mail
 spacy==3.7.2
 en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz
-tensorflow>=2.15.0
-keras>=3.0.0
+tensorflow==2.19.0
+keras==3.9.2
 keras-nightly
 Pillow
-tensorflow-hub>=0.13.0
+tensorflow-hub==0.16.1
 psutil>=5.9.0

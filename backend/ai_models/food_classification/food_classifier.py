@@ -3,7 +3,7 @@ import numpy as np
 import json
 import os
 from tensorflow.keras.preprocessing import image as keras_image
-from backend.utils.logging_utils import log_success, log_error
+from backend.utils.logging_utils import log_success, log_error, log_warning
 
 class FoodClassifier:
     def __init__(self, model_base_path=None, model_file_name="food_model.keras", indices_json_name="class_names.json", image_size=(224, 224)):
@@ -36,8 +36,19 @@ class FoodClassifier:
             self.idx_to_class = {i: name for i, name in enumerate(class_names_list)}
             log_success(f"Loaded {len(self.idx_to_class)} class names from JSON: {indices_path}", "FoodClassifier")
 
-            self.model = tf.keras.models.load_model(model_path)
-            log_success(f"Loaded model from .keras file: {model_path}", "FoodClassifier")
+            # Try loading with compile=False first to avoid compatibility issues
+            try:
+                self.model = tf.keras.models.load_model(model_path, compile=False)
+                log_success(f"Loaded model from .keras file: {model_path}", "FoodClassifier")
+            except Exception as model_load_error:
+                log_warning(f"Initial model load failed, trying alternative method: {model_load_error}", "FoodClassifier")
+                # Try with different loading method
+                try:
+                    import keras
+                    self.model = keras.models.load_model(model_path, compile=False)
+                    log_success(f"Loaded model with Keras fallback from .keras file: {model_path}", "FoodClassifier")
+                except Exception as keras_load_error:
+                    raise Exception(f"Failed to load model with both TensorFlow and Keras: {keras_load_error}")
 
             self.model_loaded = True
 
