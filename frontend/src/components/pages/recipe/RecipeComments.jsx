@@ -14,7 +14,7 @@ const RecipeComments = ({ recipeId, className = '' }) => {
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editComment, setEditComment] = useState('');
     const auth = useAuth();
-    const { isAuthenticated, currentUser } = auth;
+    const { isAuthenticated } = auth;
     const { showModal } = useModal();
     const commentsContainerRef = useRef(null);
 

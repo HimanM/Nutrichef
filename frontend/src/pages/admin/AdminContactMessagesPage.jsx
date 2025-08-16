@@ -107,7 +107,7 @@ const AdminContactMessagesPage = () => {
         throw new Error(responseData.msg || responseData.error || `Failed to send reply: ${response.status}`);
       }
 
-      const responseData = await response.json();
+      // const responseData = await response.json();
       setReplyLoading(false);
       handleCloseModal(); // Close reply modal
       

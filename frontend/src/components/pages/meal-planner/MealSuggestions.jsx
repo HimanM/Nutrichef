@@ -68,9 +68,6 @@ const MealSuggestions = ({
     }
   };
 
-  const toggleCardExpansion = (recipeId) => {
-    setExpandedCard(expandedCard === recipeId ? null : recipeId);
-  };
 
   if (!isVisible) return null;
 

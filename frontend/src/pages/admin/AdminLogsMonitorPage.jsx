@@ -90,7 +90,6 @@ const AdminLogsMonitorPage = () => {
 
     const logContainerRef = useRef(null);
     const eventSourceRef = useRef(null);
-    const chartRef = useRef(null);
     const performanceDataRef = useRef({
         labels: [],
         cpu: [],

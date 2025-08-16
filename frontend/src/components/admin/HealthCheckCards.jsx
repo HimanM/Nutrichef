@@ -76,17 +76,9 @@ const HealthCheckCards = () => {
             }, authContextValue);
 
             const data = await response.json();
-            const statusText = response.ok ? 'Success' : 'Error';
             const statusColor = response.ok ? 'success' : 'error';
             
-            // Format the response data for display
-            const formattedData = {
-                status: response.status,
-                statusText: response.statusText,
-                ok: response.ok,
-                timestamp: new Date().toISOString(),
-                responseData: data
-            };
+
 
             await showModal('alert', `${name} Test Result`, 
                 <div className="space-y-4">

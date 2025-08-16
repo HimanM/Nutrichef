@@ -16,7 +16,6 @@ function FoodLookupPage() {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const auth = useAuth();
-  const appName = "NutriChef";
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) {

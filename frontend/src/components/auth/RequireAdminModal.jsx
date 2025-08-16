@@ -8,11 +8,6 @@ const RequireAdminModal = ({
   message = "You do not have the necessary permissions to access this page or perform this action. Administrator privileges are required."
 }) => {
 
-  const handlePrimaryAction = () => {
-    if (onClose) {
-      onClose();
-    }
-  };
 
   return (
     <InteractiveModal

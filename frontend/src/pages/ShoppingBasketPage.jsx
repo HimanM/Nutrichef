@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState} from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useModal } from '../context/ModalContext.jsx';
 import { consolidateBasketItems } from '../utils/basketUtils.js';

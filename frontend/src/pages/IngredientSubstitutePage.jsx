@@ -21,7 +21,6 @@ const IngredientSubstitutePage = () => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const auth = useAuth();
-  const appName = "NutriChef";
 
   const fetchNutritionForSubstitute = async (substituteName, index) => {
     try {

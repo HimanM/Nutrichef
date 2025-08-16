@@ -21,12 +21,11 @@ const UserSettingsPage = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const auth = useAuth();
-    const { currentUser: authContextUser, token, showExpiryMessageAndLogout, loading: authLoading } = auth;
+    const { currentUser: authContextUser, token, loading: authLoading } = auth;
     const [userId, setUserId] = useState(null);
     const [userName, setUserName] = useState('User');
     const [userEmail, setUserEmail] = useState('');
     const { showModal } = useModal();
-    const navigate = useNavigate();
 
     useEffect(() => {
         let effectiveUserId = null; let userIdSource = 'default'; let resolvedUserName = 'User'; let resolvedUserEmail = '';

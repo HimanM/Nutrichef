@@ -7,7 +7,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
  * when session expires. This provides a single point of session expiration handling.
  */
 export const useAuthGuard = () => {
-  const { isAuthenticated, sessionExpiredMessage, setSessionExpiredMessage, showExpiryMessageAndLogout } = useAuth();
+  const { isAuthenticated, sessionExpiredMessage, showExpiryMessageAndLogout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const hasTriggeredExpiry = useRef(false);

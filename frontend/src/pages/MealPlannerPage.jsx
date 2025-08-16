@@ -14,7 +14,7 @@ import MealPlannerActionBar from '../components/pages/meal-planner/MealPlannerAc
 import MealPlannerMobileView from '../components/pages/meal-planner/MealPlannerMobileView.jsx';
 import MealPlannerDesktopView from '../components/pages/meal-planner/MealPlannerDesktopView.jsx';
 import jsPDF from 'jspdf';
-import { format, addDays, startOfToday as getStartOfToday, isToday, isTomorrow, isBefore, parseISO } from 'date-fns';
+import { format, addDays, startOfToday as getStartOfToday, isBefore, parseISO } from 'date-fns';
 import { MdClose, MdAdd } from 'react-icons/md';
 
 const MEAL_PLAN_PALETTE_KEY = 'mealPlanPaletteRecipes';

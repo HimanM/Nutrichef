@@ -137,10 +137,7 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
   const dropdownClass =
     'absolute right-0 mt-2 w-80 max-w-xs bg-white/80 backdrop-blur-xl rounded-xl shadow-2xl border border-gray-100 z-50 animate-fade-in sm:w-96 sm:right-0';
 
-  // Mobile modal styling
-  const mobileModalClass =
-    'fixed top-0 left-0 right-0 w-full bg-white z-50 shadow-lg border-b border-gray-200 animate-fade-in rounded-b-2xl';
-
+  
   return (
     <div className="relative" ref={dropdownRef}>
       <button

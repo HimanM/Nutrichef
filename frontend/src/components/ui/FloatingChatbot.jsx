@@ -19,7 +19,7 @@ const FloatingChatbot = () => {
   const chatWindowRef = useRef(null);
   const inputRef = useRef(null);
   const auth = useAuth();
-  const { isAuthenticated, currentUser, token, loading: authLoading } = auth;
+
 
   const fetchInstance = useCallback(async (url, options) => {
     return authenticatedFetch(url, options, auth);

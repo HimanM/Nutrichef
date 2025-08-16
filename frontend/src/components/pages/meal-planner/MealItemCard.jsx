@@ -9,7 +9,6 @@ const MealItemCard = ({
   isInPalette = false,
   onDragStart,
   onDragEnd,
-  onAssignToDay,
   isDragging = false,
   isCompact = false
 }) => {
