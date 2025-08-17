@@ -4,6 +4,8 @@ import { useModal } from '../../context/ModalContext';
 import { authenticatedFetch } from '../../utils/apiUtil';
 import InteractiveModal from '../../components/ui/InteractiveModal';
 import ResponsiveTable from '../../components/admin/ResponsiveTable';
+import AdminBreadcrumb from '../../components/admin/AdminBreadcrumb';
+import AdminFilters from '../../components/admin/AdminFilters';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { MdCheckCircle, MdError, MdOutlineRemoveRedEye, MdReply } from 'react-icons/md';
 import { HiX, HiEye, HiChat } from 'react-icons/hi';
@@ -22,6 +24,10 @@ const AdminContactMessagesPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10); // Or make this configurable
 
+  // Sorting state
+  const [sortColumn, setSortColumn] = useState('CreatedAt');
+  const [sortDirection, setSortDirection] = useState('desc');
+
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false); // For view/reply modal
   const [replyText, setReplyText] = useState('');
@@ -29,7 +35,15 @@ const AdminContactMessagesPage = () => {
   const [replyError, setReplyError] = useState('');
 
   const [notificationModalOpen, setNotificationModalOpen] = useState(false);
-  const [notificationModalContent, setNotificationModalContent] = useState({ title: '', message: '', iconType: 'info' });
+  const [notificationModalContent] = useState({ title: '', message: '', iconType: 'info' });
+
+  // Filter states
+  const [nameFilter, setNameFilter] = useState('');
+  const [emailFilter, setEmailFilter] = useState('');
+  const [messageFilter, setMessageFilter] = useState('');
+  const [repliedFilter, setRepliedFilter] = useState('all');
+  const [dateFromFilter, setDateFromFilter] = useState('');
+  const [dateToFilter, setDateToFilter] = useState('');
 
   // --- Fetch Messages ---
   const fetchMessages = useCallback(async (page) => {
@@ -37,7 +51,7 @@ const AdminContactMessagesPage = () => {
     setError('');
     try {
       const response = await authenticatedFetch(
-        `/api/contact/admin/messages?page=${page}&per_page=${itemsPerPage}`,
+        `/api/contact/admin/messages?page=${page}&per_page=${itemsPerPage}&sort_by=${sortColumn}&sort_order=${sortDirection}`,
         { method: 'GET' },
         authContextValue
       );
@@ -55,13 +69,24 @@ const AdminContactMessagesPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [authContextValue, itemsPerPage]);
+  }, [authContextValue, itemsPerPage, sortColumn, sortDirection]);
 
   useEffect(() => {
     if (authContextValue.token) {
       fetchMessages(currentPage);
     }
   }, [fetchMessages, currentPage, authContextValue.token]);
+
+  // --- Sorting Handler ---
+  const handleSort = (columnKey) => {
+    if (sortColumn === columnKey) {
+      setSortDirection(prevDirection => prevDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(columnKey);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1); // Reset to first page when sorting changes
+  };
 
   // --- Modal Handlers ---
   const handleOpenModal = (message) => {
@@ -107,7 +132,7 @@ const AdminContactMessagesPage = () => {
         throw new Error(responseData.msg || responseData.error || `Failed to send reply: ${response.status}`);
       }
 
-      const responseData = await response.json();
+      // const responseData = await response.json();
       setReplyLoading(false);
       handleCloseModal(); // Close reply modal
       
@@ -141,19 +166,152 @@ const AdminContactMessagesPage = () => {
     return message.substring(0, maxLength) + '...';
   };
 
+  // Filter handling
+  const handleFilterChange = (filterKey, value) => {
+    switch (filterKey) {
+      case 'name':
+        setNameFilter(value);
+        break;
+      case 'email':
+        setEmailFilter(value);
+        break;
+      case 'message':
+        setMessageFilter(value);
+        break;
+      case 'replied':
+        setRepliedFilter(value);
+        break;
+      case 'dateFrom':
+        setDateFromFilter(value);
+        break;
+      case 'dateTo':
+        setDateToFilter(value);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const clearFilters = () => {
+    setNameFilter('');
+    setEmailFilter('');
+    setMessageFilter('');
+    setRepliedFilter('all');
+    setDateFromFilter('');
+    setDateToFilter('');
+  };
+
+  // Count active filters
+  const activeFiltersCount = [
+    nameFilter,
+    emailFilter,
+    messageFilter,
+    repliedFilter !== 'all' ? repliedFilter : '',
+    dateFromFilter,
+    dateToFilter
+  ].filter(Boolean).length;
+
+  // Define filter configuration
+  const filterConfig = [
+    {
+      key: 'name',
+      label: 'Name',
+      type: 'search',
+      value: nameFilter,
+      placeholder: 'Search by name...'
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      type: 'search',
+      value: emailFilter,
+      placeholder: 'Search by email...'
+    },
+    {
+      key: 'message',
+      label: 'Message',
+      type: 'search',
+      value: messageFilter,
+      placeholder: 'Search in message...'
+    },
+    {
+      key: 'replied',
+      label: 'Status',
+      type: 'select',
+      value: repliedFilter,
+      options: [
+        { value: 'all', label: 'All Messages' },
+        { value: 'true', label: 'Replied' },
+        { value: 'false', label: 'Pending' }
+      ]
+    },
+    {
+      key: 'dateFrom',
+      label: 'From Date',
+      type: 'date',
+      value: dateFromFilter,
+      placeholder: 'Start date'
+    },
+    {
+      key: 'dateTo',
+      label: 'To Date',
+      type: 'date',
+      value: dateToFilter,
+      placeholder: 'End date'
+    }
+  ];
+
+  // Filter messages based on current filters
+  const filteredMessages = messages.filter(message => {
+    // Name filter
+    if (nameFilter && !message.Name?.toLowerCase().includes(nameFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Email filter
+    if (emailFilter && !message.Email?.toLowerCase().includes(emailFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Message content filter
+    if (messageFilter && !message.Message?.toLowerCase().includes(messageFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Replied status filter
+    if (repliedFilter === 'true' && !message.Replied) return false;
+    if (repliedFilter === 'false' && message.Replied) return false;
+
+    // Date range filters
+    if (dateFromFilter || dateToFilter) {
+      const messageDate = new Date(message.CreatedAt);
+      if (dateFromFilter) {
+        const fromDate = new Date(dateFromFilter);
+        if (messageDate < fromDate) return false;
+      }
+      if (dateToFilter) {
+        const toDate = new Date(dateToFilter);
+        toDate.setHours(23, 59, 59, 999); // End of day
+        if (messageDate > toDate) return false;
+      }
+    }
+
+    return true;
+  });
+
   const columns = [
     { 
       key: 'CreatedAt', 
       label: 'Date', 
-      sortable: false,
+      sortable: true,
       render: (msg) => new Date(msg.CreatedAt).toLocaleDateString()
     },
-    { key: 'Name', label: 'Name', sortable: false },
-    { key: 'Email', label: 'Email', sortable: false },
+    { key: 'Name', label: 'Name', sortable: true },
+    { key: 'Email', label: 'Email', sortable: true },
     { 
       key: 'Message', 
       label: 'Message', 
-      sortable: false,
+      sortable: true,
       render: (msg) => (
         <span className="max-w-xs truncate block" title={msg.Message}>
           {getMessageSnippet(msg.Message)}
@@ -163,7 +321,7 @@ const AdminContactMessagesPage = () => {
     { 
       key: 'Replied', 
       label: 'Replied', 
-      sortable: false,
+      sortable: true,
       render: (msg) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           msg.Replied 
@@ -207,10 +365,28 @@ const AdminContactMessagesPage = () => {
   return (
     <div className="section-padding">
       <div className="container-modern">
-        <div className="text-center mb-10 animate-fade-in">
+        {/* Breadcrumb */}
+        <AdminBreadcrumb 
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Contact Messages', href: '/admin/contact-messages', current: true }
+          ]}
+          className="mb-6"
+        />
+
+        <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Contact Messages</h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">View and respond to messages submitted via the contact form.</p>
         </div>
+
+        {/* Filters */}
+        <AdminFilters 
+          filters={filterConfig}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+          activeFiltersCount={activeFiltersCount}
+          className="mb-6"
+        />
         
         {loading && messages.length === 0 ? (
           <div className="flex justify-center items-center h-64">
@@ -234,9 +410,12 @@ const AdminContactMessagesPage = () => {
               </div>
             )}
             <ResponsiveTable
-              data={messages}
+              data={filteredMessages}
               columns={columns}
               loading={loading}
+              onSort={handleSort}
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
               actions={actions}
               pagination={pagination}
               tableTitle="Messages"
@@ -249,7 +428,12 @@ const AdminContactMessagesPage = () => {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           title={selectedMessage?.Replied ? "View Message" : "Reply to Message"}
-          size="lg"
+          onConfirm={selectedMessage?.Replied ? undefined : handleSendReply}
+          confirmText={selectedMessage?.Replied ? undefined : (replyLoading ? "Sending..." : "Send Reply")}
+          showCancelButton={false}
+          primaryActionText={selectedMessage?.Replied ? "Close" : undefined}
+          isLoading={replyLoading}
+          showCloseButton={true}
         >
           {selectedMessage && (
             <div className="space-y-4">
@@ -302,29 +486,6 @@ const AdminContactMessagesPage = () => {
                   )}
                 </div>
               )}
-
-              <div className="flex justify-end space-x-3 pt-4">
-                
-                {!selectedMessage.Replied && (
-                  <button
-                    onClick={handleSendReply}
-                    disabled={replyLoading}
-                    className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 flex items-center"
-                  >
-                    {replyLoading ? (
-                      <>
-                        <AiOutlineLoading className="animate-spin mr-2" />
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <MdReply className="mr-2" />
-                        Send Reply
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
             </div>
           )}
         </InteractiveModal>

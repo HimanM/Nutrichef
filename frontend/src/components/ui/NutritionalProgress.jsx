@@ -5,7 +5,6 @@ const NutritionalProgress = ({
   dayMeals = [], 
   userNutritionalTargets = {}, 
   isExpanded = false, 
-  onToggleExpand,
   onOpenSettings 
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(!isExpanded);

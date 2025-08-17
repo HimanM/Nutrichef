@@ -19,11 +19,10 @@ const IngredientClassifierPage = () => {
     const [showLoginModal, setShowLoginModal] = useState(false);
 
     const auth = useAuth();
-    const { isAuthenticated, currentUser } = auth;
-    const { canPerformAuthAction, attemptAuthAction, isSessionExpired } = useConditionalAuth();
+    const { currentUser } = auth;
+    const { attemptAuthAction, isSessionExpired } = useConditionalAuth();
     const location = useLocation();
     const fileInputRef = useRef(null);
-    const appName = "NutriChef";
 
     // Camera functionality
     const {

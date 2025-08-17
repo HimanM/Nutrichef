@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { useConditionalAuth } from '../../components/auth/AuthGuard.jsx';
+// import { useConditionalAuth } from '../../components/auth/AuthGuard.jsx';
 import RecipeCard from '../../components/pages/recipe/RecipeCard.jsx';
 import { authenticatedFetch } from '../../utils/apiUtil.js';
 import { HiOutlineRefresh } from 'react-icons/hi';
@@ -12,7 +12,7 @@ function RecipeSuggestionsPage() {
     const [error, setError] = useState('');
     const auth = useAuth();
     const { isAuthenticated, loading: authLoading, token } = auth;
-    const { canPerformAuthAction, isSessionExpired } = useConditionalAuth();
+    // const { isSessionExpired } = useConditionalAuth();
 
     const [currentPage, setCurrentPage] = useState(1);
     const [recipesPerPage, setRecipesPerPage] = useState(10);
@@ -48,13 +48,13 @@ function RecipeSuggestionsPage() {
     }, [isAuthenticated, token, auth, apiResponse.recipes.length]);
 
     useEffect(() => {
-      if (isAuthenticated && token) {
-        fetchSuggestions(matchThreshold, currentPage, recipesPerPage);
-      } else if (!authLoading && !isAuthenticated) {
-        setApiResponse({ recipes: [], message: '' });
-        setTotalRecipes(0);
-        setError("Please log in to get recipe suggestions.");
-      }
+        if (isAuthenticated && token) {
+            fetchSuggestions(matchThreshold, currentPage, recipesPerPage);
+        } else if (!authLoading && !isAuthenticated) {
+            setApiResponse({ recipes: [], message: '' });
+            setTotalRecipes(0);
+            setError("Please log in to get recipe suggestions.");
+        }
     }, [fetchSuggestions, matchThreshold, isAuthenticated, token, authLoading, currentPage, recipesPerPage]);
 
 
@@ -160,9 +160,9 @@ function RecipeSuggestionsPage() {
                                 ))}
                             </div>
                         )}
-                        
+
                         {isLoading && apiResponse.recipes.length > 0 && (
-                             <div className="flex justify-center items-center py-8"><HiOutlineRefresh className="animate-spin h-8 w-8 text-blue-400" /></div>
+                            <div className="flex justify-center items-center py-8"><HiOutlineRefresh className="animate-spin h-8 w-8 text-blue-400" /></div>
                         )}
 
                         {!isLoading && apiResponse.recipes.length === 0 && (
@@ -173,8 +173,8 @@ function RecipeSuggestionsPage() {
                                     </svg>
                                 </div>
                                 <h3 className="text-xl font-semibold text-gray-800 mb-3">
-                                    {(totalRecipes > 0 && apiResponse.recipes.length === 0) 
-                                        ? "No recipes on this page" 
+                                    {(totalRecipes > 0 && apiResponse.recipes.length === 0)
+                                        ? "No recipes on this page"
                                         : "No recipe matches found"
                                     }
                                 </h3>
@@ -191,19 +191,19 @@ function RecipeSuggestionsPage() {
                                             <ul className="space-y-1 text-left">
                                                 <li className="flex items-center gap-2">
                                                     <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                                     </svg>
                                                     Lower the match threshold (try 0.3 or 0.4)
                                                 </li>
                                                 <li className="flex items-center gap-2">
                                                     <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                                     </svg>
                                                     Add more ingredients to your pantry
                                                 </li>
                                                 <li className="flex items-center gap-2">
                                                     <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                                     </svg>
                                                     Check common ingredients like flour, salt, or oil
                                                 </li>
@@ -254,9 +254,9 @@ function RecipeSuggestionsPage() {
                                     <span className="text-sm text-gray-600">per page</span>
                                 </div>
                                 <div className="flex items-center space-x-3">
-                                    <button 
-                                        onClick={handlePreviousPage} 
-                                        disabled={currentPage === 1} 
+                                    <button
+                                        onClick={handlePreviousPage}
+                                        disabled={currentPage === 1}
                                         className="btn-outline px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
                                     >
                                         Previous
@@ -264,9 +264,9 @@ function RecipeSuggestionsPage() {
                                     <span className="px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-200">
                                         Page {currentPage} of {Math.ceil(totalRecipes / recipesPerPage)}
                                     </span>
-                                    <button 
-                                        onClick={handleNextPage} 
-                                        disabled={currentPage * recipesPerPage >= totalRecipes} 
+                                    <button
+                                        onClick={handleNextPage}
+                                        disabled={currentPage * recipesPerPage >= totalRecipes}
                                         className="btn-outline px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
                                     >
                                         Next

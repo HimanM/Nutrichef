@@ -20,7 +20,7 @@ function RecipeDetailPage() {
   const [error, setError] = useState(null);
   const auth = useAuth();
   const { isAuthenticated, currentUser } = auth;
-  const { canPerformAuthAction, attemptAuthAction, isSessionExpired } = useConditionalAuth();
+  const { attemptAuthAction, isSessionExpired } = useConditionalAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const location = useLocation();
   const [isRatingSubmitting, setIsRatingSubmitting] = useState(false);
@@ -78,7 +78,7 @@ function RecipeDetailPage() {
         let errorData;
         try {
           errorData = await response.json();
-        } catch (parseError) {
+        } catch {
           errorData = { error: `Failed to fetch recipe details: ${response.statusText || response.status}` };
         }
         throw new Error(errorData.error || `Failed to fetch recipe details: ${response.statusText || response.status}`);
@@ -125,7 +125,7 @@ function RecipeDetailPage() {
         let errorData;
         try {
           errorData = await response.json();
-        } catch (parseError) {
+        } catch {
           errorData = { error: `Failed to fetch allergies: ${response.statusText || response.status}` };
         }
         throw new Error(errorData.error || `Failed to fetch allergies: ${response.statusText || response.status}`);
@@ -157,7 +157,7 @@ function RecipeDetailPage() {
         let errorData;
         try {
           errorData = await response.json();
-        } catch (parseError) {
+        } catch {
           errorData = { error: `Failed to fetch substitutes: ${response.statusText || response.status}` };
         }
         throw new Error(errorData.error || `Failed to fetch substitutes: ${response.statusText || response.status}`);
@@ -183,7 +183,7 @@ function RecipeDetailPage() {
       newRecipeData.ingredients[ingredientIndex].IngredientName = newSubstituteName;
       newRecipeData.ingredients[ingredientIndex].selectedSubstitute = newSubstituteName;
     }
-    const originalNameRegex = new RegExp(`\\b${originalIngredientNameForReplacement.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'gi');
+    const originalNameRegex = new RegExp(`\\b${originalIngredientNameForReplacement.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'gi');
     if (typeof newRecipeData.Instructions === 'string') {
       newRecipeData.Instructions = newRecipeData.Instructions.replace(originalNameRegex, newSubstituteName);
     } else if (Array.isArray(newRecipeData.Instructions)) {
@@ -203,7 +203,7 @@ function RecipeDetailPage() {
     const newRecipeData = JSON.parse(JSON.stringify(recipeData));
     newRecipeData.ingredients[ingredientIndex].IngredientName = originalName;
     newRecipeData.ingredients[ingredientIndex].selectedSubstitute = null;
-    const currentSubstituteNameRegex = new RegExp(`\\b${currentSubstituteName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'gi');
+    const currentSubstituteNameRegex = new RegExp(`\\b${currentSubstituteName.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'gi');
     if (typeof newRecipeData.Instructions === 'string') {
         newRecipeData.Instructions = newRecipeData.Instructions.replace(currentSubstituteNameRegex, originalName);
     } else if (Array.isArray(newRecipeData.Instructions)) {
@@ -235,7 +235,7 @@ function RecipeDetailPage() {
         localStorage.setItem(SHOPPING_BASKET_KEY, JSON.stringify(consolidatedBasket));
         setBasketMessage(`Ingredients added to your shopping basket!`);
         setTimeout(() => setBasketMessage(''), 3000);
-      } catch (error) {
+      } catch {
         setBasketMessage('Failed to add items to basket.'); setTimeout(() => setBasketMessage(''), 3000);
       }
     }, () => {

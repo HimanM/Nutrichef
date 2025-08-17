@@ -11,11 +11,41 @@ class ContactMessageDAO:
         db.session.add(new_message)
         return new_message
 
-    def get_all_messages(self, page: int = 1, per_page: int = 10):
+    def get_all_messages(self, page: int = 1, per_page: int = 10, sort_by: str = 'CreatedAt', sort_order: str = 'desc'):
         """
-        Retrieves all messages, paginated, ordered by CreatedAt descending.
+        Retrieves all messages, paginated, with customizable sorting.
+        
+        Args:
+            page: Page number (1-indexed)
+            per_page: Items per page
+            sort_by: Column to sort by (CreatedAt, Name, Email, Message, Replied, MessageID)
+            sort_order: Sort direction ('asc' or 'desc')
         """
-        query = ContactMessage.query.order_by(ContactMessage.CreatedAt.desc())
+        # Map frontend column names to model attributes
+        sort_mapping = {
+            'CreatedAt': ContactMessage.CreatedAt,
+            'Name': ContactMessage.Name,
+            'Email': ContactMessage.Email,
+            'Message': ContactMessage.Message,
+            'Replied': ContactMessage.Replied,
+            'MessageID': ContactMessage.MessageID
+        }
+        
+        # Validate sort_by parameter
+        if sort_by not in sort_mapping:
+            sort_by = 'CreatedAt'
+        
+        # Validate sort_order parameter
+        if sort_order.lower() not in ['asc', 'desc']:
+            sort_order = 'desc'
+        
+        # Build the query with sorting
+        sort_column = sort_mapping[sort_by]
+        if sort_order.lower() == 'asc':
+            query = ContactMessage.query.order_by(sort_column.asc())
+        else:
+            query = ContactMessage.query.order_by(sort_column.desc())
+        
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
         return pagination # Returns a Pagination object
 

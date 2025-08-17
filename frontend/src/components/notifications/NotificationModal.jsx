@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 const NotificationModal = ({ isOpen, onClose }) => {
   const { token, isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [_unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     if (isAuthenticated && isOpen) fetchNotifications();
@@ -27,7 +27,9 @@ const NotificationModal = ({ isOpen, onClose }) => {
       const data = await res.json();
       setNotifications(data);
       setUnreadCount(data.filter(n => !n.IsRead).length);
-    } catch (e) {}
+    } catch {
+      // Fail silently
+    }
   };
 
   const handleNotificationClick = async (notif) => {

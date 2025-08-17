@@ -145,6 +145,7 @@ export const BlueSpinner = ({ size = 'h-8 w-8', color = 'text-blue-400' }) => (
 /**
  * Loading component with text
  */
+// eslint-disable-next-line no-unused-vars
 export const LoadingWithText = ({ text = 'Loading...', SpinnerComponent = PageLoaderSpinner }) => (
   <div className="flex items-center justify-center py-8">
     <SpinnerComponent />
@@ -155,6 +156,7 @@ export const LoadingWithText = ({ text = 'Loading...', SpinnerComponent = PageLo
 /**
  * Centered loading component for full-page loading
  */
+// eslint-disable-next-line no-unused-vars
 export const CenteredLoader = ({ text = 'Loading...', SpinnerComponent = PageLoaderSpinner }) => (
   <div className="flex justify-center items-center min-h-[calc(100vh-200px)]">
     <SpinnerComponent />

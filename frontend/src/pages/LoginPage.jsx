@@ -48,7 +48,7 @@ export default function LoginPage() {
         let errorData;
         try {
           errorData = await response.json();
-        } catch (parseError) {
+        } catch {
           errorData = { error: `Login failed. Status: ${response.status}` };
         }
         

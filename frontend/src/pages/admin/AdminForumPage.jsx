@@ -3,6 +3,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
 import { authenticatedFetch } from '../../utils/apiUtil';
 import ResponsiveTable from '../../components/admin/ResponsiveTable';
+import AdminBreadcrumb from '../../components/admin/AdminBreadcrumb';
+import AdminFilters from '../../components/admin/AdminFilters';
 import ResponsiveModal from '../../components/ui/ResponsiveModal';
 import { HiTrash, HiEye, HiChat, HiHeart } from 'react-icons/hi';
 import { PageLoaderSpinner } from '../../components/common/LoadingComponents';
@@ -49,7 +51,7 @@ const PostDetailContent = ({ post }) => {
             </span>
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">{post.UserName || 'Unknown User'}</h3>
+            <h5 className="font-semibold text-gray-900">{post.UserName || 'Unknown User'}</h5>
             <p className="text-sm text-gray-500">User ID: {post.UserId}</p>
             <p className="text-sm text-gray-500">{formatDate(post.CreatedAt)}</p>
           </div>
@@ -62,7 +64,7 @@ const PostDetailContent = ({ post }) => {
       </div>
 
       {/* Title */}
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">{post.Title}</h1>
+      <h4 className="text-2xl font-bold text-gray-900 mb-4">{post.Title}</h4>
 
       {/* Stats */}
       <div className="flex items-center gap-6 text-sm text-gray-500 mb-6">
@@ -128,6 +130,70 @@ const PostDetailContent = ({ post }) => {
   );
 };
 
+// Comment Detail Content Component for ResponsiveModal
+const CommentDetailContent = ({ comment }) => {
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <div>
+      {/* Comment Header */}
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
+            <span className="text-emerald-700 font-medium text-lg">
+              {comment.UserName?.charAt(0)?.toUpperCase() || 'U'}
+            </span>
+          </div>
+          <div>
+            <h5 className="font-semibold text-gray-900">{comment.UserName || 'Unknown User'}</h5>
+            <p className="text-sm text-gray-500">User ID: {comment.UserId}</p>
+            <p className="text-sm text-gray-500">{formatDate(comment.CreatedAt)}</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            Comment #{comment.Id}
+          </span>
+        </div>
+      </div>
+
+      {/* Post Context */}
+      <div className="bg-gray-50 rounded-lg p-4 mb-6">
+        <h4 className="text-sm font-medium text-gray-900 mb-2">Commenting on:</h4>
+        <div className="text-sm text-gray-700">
+          <span className="font-medium">{comment.PostTitle}</span>
+          <span className="text-gray-500 ml-2">(Post ID: {comment.PostId})</span>
+        </div>
+      </div>
+
+      {/* Comment Content */}
+      <div className="mb-6">
+        <h4 className="text-sm font-medium text-gray-900 mb-3">Comment:</h4>
+        <div className="prose prose-gray max-w-none">
+          <div className="text-gray-700 leading-relaxed whitespace-pre-wrap bg-white border border-gray-200 rounded-lg p-4">
+            {comment.Comment}
+          </div>
+        </div>
+      </div>
+
+      {/* Timestamps */}
+      <div className="border-t border-gray-200 pt-4 text-sm text-gray-500">
+        <div className="flex justify-between">
+          <span>Created: {formatDate(comment.CreatedAt)}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AdminForumPage = () => {
   const authContextValue = useAuth();
   const { showModal, setLoading: setModalLoading } = useModal();
@@ -154,6 +220,23 @@ const AdminForumPage = () => {
 
   // Selected post for viewing
   const [selectedPost, setSelectedPost] = useState(null);
+  
+  // Selected comment for viewing
+  const [selectedComment, setSelectedComment] = useState(null);
+
+  // Filter states for posts
+  const [postTitleFilter, setPostTitleFilter] = useState('');
+  const [postAuthorFilter, setPostAuthorFilter] = useState('');
+  const [postContentFilter, setPostContentFilter] = useState('');
+  const [postDateFromFilter, setPostDateFromFilter] = useState('');
+  const [postDateToFilter, setPostDateToFilter] = useState('');
+
+  // Filter states for comments
+  const [commentTextFilter, setCommentTextFilter] = useState('');
+  const [commentAuthorFilter, setCommentAuthorFilter] = useState('');
+  const [commentPostFilter, setCommentPostFilter] = useState('');
+  const [commentDateFromFilter, setCommentDateFromFilter] = useState('');
+  const [commentDateToFilter, setCommentDateToFilter] = useState('');
 
   const fetchPosts = useCallback(async (currentPage, currentRowsPerPage, currentSortColumn, currentSortDirection) => {
     setLoading(true);
@@ -255,6 +338,230 @@ const AdminForumPage = () => {
     setCommentsPage(0);
   };
 
+  // Filter handling for posts
+  const handlePostFilterChange = (filterKey, value) => {
+    switch (filterKey) {
+      case 'title':
+        setPostTitleFilter(value);
+        break;
+      case 'author':
+        setPostAuthorFilter(value);
+        break;
+      case 'content':
+        setPostContentFilter(value);
+        break;
+      case 'dateFrom':
+        setPostDateFromFilter(value);
+        break;
+      case 'dateTo':
+        setPostDateToFilter(value);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const clearPostFilters = () => {
+    setPostTitleFilter('');
+    setPostAuthorFilter('');
+    setPostContentFilter('');
+    setPostDateFromFilter('');
+    setPostDateToFilter('');
+  };
+
+  // Filter handling for comments
+  const handleCommentFilterChange = (filterKey, value) => {
+    switch (filterKey) {
+      case 'comment':
+        setCommentTextFilter(value);
+        break;
+      case 'author':
+        setCommentAuthorFilter(value);
+        break;
+      case 'post':
+        setCommentPostFilter(value);
+        break;
+      case 'dateFrom':
+        setCommentDateFromFilter(value);
+        break;
+      case 'dateTo':
+        setCommentDateToFilter(value);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const clearCommentFilters = () => {
+    setCommentTextFilter('');
+    setCommentAuthorFilter('');
+    setCommentPostFilter('');
+    setCommentDateFromFilter('');
+    setCommentDateToFilter('');
+  };
+
+  // Count active filters
+  const activePostFiltersCount = [
+    postTitleFilter,
+    postAuthorFilter,
+    postContentFilter,
+    postDateFromFilter,
+    postDateToFilter
+  ].filter(Boolean).length;
+
+  const activeCommentFiltersCount = [
+    commentTextFilter,
+    commentAuthorFilter,
+    commentPostFilter,
+    commentDateFromFilter,
+    commentDateToFilter
+  ].filter(Boolean).length;
+
+  // Define filter configurations
+  const postFilterConfig = [
+    {
+      key: 'title',
+      label: 'Title',
+      type: 'search',
+      value: postTitleFilter,
+      placeholder: 'Search by title...'
+    },
+    {
+      key: 'author',
+      label: 'Author',
+      type: 'search',
+      value: postAuthorFilter,
+      placeholder: 'Search by author...'
+    },
+    {
+      key: 'content',
+      label: 'Content',
+      type: 'search',
+      value: postContentFilter,
+      placeholder: 'Search in content...'
+    },
+    {
+      key: 'dateFrom',
+      label: 'From Date',
+      type: 'date',
+      value: postDateFromFilter,
+      placeholder: 'Start date'
+    },
+    {
+      key: 'dateTo',
+      label: 'To Date',
+      type: 'date',
+      value: postDateToFilter,
+      placeholder: 'End date'
+    }
+  ];
+
+  const commentFilterConfig = [
+    {
+      key: 'comment',
+      label: 'Comment',
+      type: 'search',
+      value: commentTextFilter,
+      placeholder: 'Search in comments...'
+    },
+    {
+      key: 'author',
+      label: 'Author',
+      type: 'search',
+      value: commentAuthorFilter,
+      placeholder: 'Search by author...'
+    },
+    {
+      key: 'post',
+      label: 'Post',
+      type: 'search',
+      value: commentPostFilter,
+      placeholder: 'Search by post title...'
+    },
+    {
+      key: 'dateFrom',
+      label: 'From Date',
+      type: 'date',
+      value: commentDateFromFilter,
+      placeholder: 'Start date'
+    },
+    {
+      key: 'dateTo',
+      label: 'To Date',
+      type: 'date',
+      value: commentDateToFilter,
+      placeholder: 'End date'
+    }
+  ];
+
+  // Filter posts based on current filters
+  const filteredPosts = posts.filter(post => {
+    // Title filter
+    if (postTitleFilter && !post.Title?.toLowerCase().includes(postTitleFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Author filter
+    if (postAuthorFilter && !post.UserName?.toLowerCase().includes(postAuthorFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Content filter
+    if (postContentFilter && !post.Content?.toLowerCase().includes(postContentFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Date range filters
+    if (postDateFromFilter || postDateToFilter) {
+      const postDate = new Date(post.CreatedAt);
+      if (postDateFromFilter) {
+        const fromDate = new Date(postDateFromFilter);
+        if (postDate < fromDate) return false;
+      }
+      if (postDateToFilter) {
+        const toDate = new Date(postDateToFilter);
+        toDate.setHours(23, 59, 59, 999); // End of day
+        if (postDate > toDate) return false;
+      }
+    }
+
+    return true;
+  });
+
+  // Filter comments based on current filters
+  const filteredComments = comments.filter(comment => {
+    // Comment text filter
+    if (commentTextFilter && !comment.Comment?.toLowerCase().includes(commentTextFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Author filter
+    if (commentAuthorFilter && !comment.UserName?.toLowerCase().includes(commentAuthorFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Post title filter
+    if (commentPostFilter && !comment.PostTitle?.toLowerCase().includes(commentPostFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Date range filters
+    if (commentDateFromFilter || commentDateToFilter) {
+      const commentDate = new Date(comment.CreatedAt);
+      if (commentDateFromFilter) {
+        const fromDate = new Date(commentDateFromFilter);
+        if (commentDate < fromDate) return false;
+      }
+      if (commentDateToFilter) {
+        const toDate = new Date(commentDateToFilter);
+        toDate.setHours(23, 59, 59, 999); // End of day
+        if (commentDate > toDate) return false;
+      }
+    }
+
+    return true;
+  });
+
   const handleDeletePost = async (postId) => {
     setActionError(null);
 
@@ -338,15 +645,23 @@ const AdminForumPage = () => {
 
   // Posts table columns
   const postsColumns = [
-    { key: 'Id', label: 'Post ID', sortable: true },
+    { 
+      key: 'Id', 
+      label: 'ID', 
+      sortable: true,
+      minWidth: '60px',
+      maxWidth: '80px'
+    },
     {
       key: 'Title',
       label: 'Title',
       sortable: true,
+      minWidth: '180px',
+      maxWidth: '280px',
       render: (post) => (
-        <div className="max-w-xs">
+        <div className="max-w-full">
           <div className="font-medium text-gray-900 truncate">{post.Title}</div>
-          <div className="text-sm text-gray-500 truncate">{truncateText(post.Content, 60)}</div>
+          <div className="text-sm text-gray-500 truncate">{truncateText(post.Content, 50)}</div>
         </div>
       )
     },
@@ -354,9 +669,11 @@ const AdminForumPage = () => {
       key: 'UserName',
       label: 'Author',
       sortable: true,
+      minWidth: '100px',
+      maxWidth: '140px',
       render: (post) => (
         <div>
-          <div className="font-medium text-gray-900">{post.UserName}</div>
+          <div className="font-medium text-gray-900 truncate">{post.UserName}</div>
           <div className="text-sm text-gray-500">ID: {post.UserId}</div>
         </div>
       )
@@ -365,6 +682,8 @@ const AdminForumPage = () => {
       key: 'CreatedAt',
       label: 'Created',
       sortable: true,
+      minWidth: '120px',
+      maxWidth: '150px',
       render: (post) => (
         <div className="text-sm text-gray-900">
           {formatDate(post.CreatedAt)}
@@ -375,6 +694,8 @@ const AdminForumPage = () => {
       key: 'LikesCount',
       label: 'Likes',
       sortable: true,
+      minWidth: '70px',
+      maxWidth: '85px',
       render: (post) => (
         <div className="flex items-center gap-1 text-sm">
           <HiHeart className="w-4 h-4 text-red-500" />
@@ -386,6 +707,8 @@ const AdminForumPage = () => {
       key: 'ViewsCount',
       label: 'Views',
       sortable: true,
+      minWidth: '70px',
+      maxWidth: '85px',
       render: (post) => (
         <div className="flex items-center gap-1 text-sm">
           <HiEye className="w-4 h-4 text-blue-500" />
@@ -397,6 +720,8 @@ const AdminForumPage = () => {
       key: 'CommentsCount',
       label: 'Comments',
       sortable: true,
+      minWidth: '80px',
+      maxWidth: '100px',
       render: (post) => (
         <div className="flex items-center gap-1 text-sm">
           <HiChat className="w-4 h-4 text-green-500" />
@@ -408,16 +733,42 @@ const AdminForumPage = () => {
 
   // Comments table columns
   const commentsColumns = [
-    { key: 'Id', label: 'Comment ID', sortable: true },
+    { 
+      key: 'Id', 
+      label: 'Comment ID', 
+      sortable: true,
+      minWidth: '80px',
+      maxWidth: '120px'
+    },
     {
       key: 'Comment',
       label: 'Comment',
       sortable: false,
+      minWidth: '200px',
+      maxWidth: '400px',
       render: (comment) => (
-        <div className="max-w-xs">
-          <div className="text-sm text-gray-900 whitespace-pre-wrap">
+        <div className="max-w-full">
+          <div 
+            className="text-sm text-gray-900 cursor-pointer hover:text-emerald-600 transition-colors overflow-hidden"
+            style={{
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              wordBreak: 'break-word'
+            }}
+            onClick={() => setSelectedComment(comment)}
+            title="Click to view full comment"
+          >
             {truncateText(comment.Comment, 100)}
           </div>
+          {comment.Comment.length > 100 && (
+            <button
+              onClick={() => setSelectedComment(comment)}
+              className="text-xs text-emerald-600 hover:text-emerald-700 mt-1"
+            >
+              View full comment
+            </button>
+          )}
         </div>
       )
     },
@@ -425,8 +776,10 @@ const AdminForumPage = () => {
       key: 'PostTitle',
       label: 'Post',
       sortable: true,
+      minWidth: '150px',
+      maxWidth: '250px',
       render: (comment) => (
-        <div className="max-w-xs">
+        <div className="max-w-full">
           <div className="font-medium text-gray-900 truncate">
             {truncateText(comment.PostTitle, 40)}
           </div>
@@ -438,9 +791,11 @@ const AdminForumPage = () => {
       key: 'UserName',
       label: 'Author',
       sortable: true,
+      minWidth: '120px',
+      maxWidth: '180px',
       render: (comment) => (
         <div>
-          <div className="font-medium text-gray-900">{comment.UserName}</div>
+          <div className="font-medium text-gray-900 truncate">{comment.UserName}</div>
           <div className="text-sm text-gray-500">ID: {comment.UserId}</div>
         </div>
       )
@@ -449,6 +804,8 @@ const AdminForumPage = () => {
       key: 'CreatedAt',
       label: 'Created',
       sortable: true,
+      minWidth: '140px',
+      maxWidth: '180px',
       render: (comment) => (
         <div className="text-sm text-gray-900">
           {formatDate(comment.CreatedAt)}
@@ -475,6 +832,12 @@ const AdminForumPage = () => {
 
   // Actions for comments
   const commentsActions = [
+    {
+      label: 'View',
+      icon: HiEye,
+      onClick: (comment) => setSelectedComment(comment),
+      className: 'bg-blue-50 text-blue-700 hover:bg-blue-100 focus:ring-blue-500'
+    },
     {
       label: 'Delete',
       icon: HiTrash,
@@ -519,8 +882,17 @@ const AdminForumPage = () => {
   return (
     <div className="section-padding">
       <div className="container-modern">
+        {/* Breadcrumb */}
+        <AdminBreadcrumb 
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Forum Management', href: '/admin/forum', current: true }
+          ]}
+          className="mb-6"
+        />
+
         {/* Header */}
-        <div className="text-center mb-10 animate-fade-in">
+        <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Forum Management</h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
             Manage forum posts and comments, monitor community activity
@@ -577,11 +949,20 @@ const AdminForumPage = () => {
         {/* Posts Table */}
         {activeTab === 'posts' && (
           <>
+            {/* Post Filters */}
+            <AdminFilters 
+              filters={postFilterConfig}
+              onFilterChange={handlePostFilterChange}
+              onClearFilters={clearPostFilters}
+              activeFiltersCount={activePostFiltersCount}
+              className="mb-6"
+            />
+            
             {posts.length === 0 && !loading && !error ? (
               <p className="text-center text-gray-400 mt-6 text-lg">No forum posts found.</p>
             ) : (
               <ResponsiveTable
-                data={posts}
+                data={filteredPosts}
                 columns={postsColumns}
                 loading={loading}
                 onSort={handlePostsSort}
@@ -598,11 +979,20 @@ const AdminForumPage = () => {
         {/* Comments Table */}
         {activeTab === 'comments' && (
           <>
+            {/* Comment Filters */}
+            <AdminFilters 
+              filters={commentFilterConfig}
+              onFilterChange={handleCommentFilterChange}
+              onClearFilters={clearCommentFilters}
+              activeFiltersCount={activeCommentFiltersCount}
+              className="mb-6"
+            />
+            
             {comments.length === 0 && !loading && !error ? (
               <p className="text-center text-gray-400 mt-6 text-lg">No forum comments found.</p>
             ) : (
               <ResponsiveTable
-                data={comments}
+                data={filteredComments}
                 columns={commentsColumns}
                 loading={loading}
                 onSort={handleCommentsSort}
@@ -624,6 +1014,16 @@ const AdminForumPage = () => {
           maxWidth="max-w-4xl"
         >
           {selectedPost && <PostDetailContent post={selectedPost} />}
+        </ResponsiveModal>
+
+        {/* Comment Detail Modal */}
+        <ResponsiveModal
+          isOpen={!!selectedComment}
+          onClose={() => setSelectedComment(null)}
+          title="Forum Comment Details"
+          maxWidth="max-w-3xl"
+        >
+          {selectedComment && <CommentDetailContent comment={selectedComment} />}
         </ResponsiveModal>
       </div>
     </div>

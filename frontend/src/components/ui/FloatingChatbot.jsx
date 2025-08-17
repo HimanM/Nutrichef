@@ -19,7 +19,7 @@ const FloatingChatbot = () => {
   const chatWindowRef = useRef(null);
   const inputRef = useRef(null);
   const auth = useAuth();
-  const { isAuthenticated, currentUser, token, loading: authLoading } = auth;
+
 
   const fetchInstance = useCallback(async (url, options) => {
     return authenticatedFetch(url, options, auth);
@@ -99,7 +99,7 @@ const FloatingChatbot = () => {
       setImagePreviewUrl(null);
       setError('');
     }
-  }, [open, isMobile, scrollToBottom]);
+  }, [open, isMobile, scrollToBottom, initialGreeting, messages.length]);
 
   useEffect(() => {
     // Use multiple strategies to ensure scroll works
@@ -169,9 +169,10 @@ const FloatingChatbot = () => {
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      if (inputRef.current) {
-        inputRef.current.removeEventListener('focusin', handleFocusIn);
-        inputRef.current.removeEventListener('focusout', handleFocusOut);
+      const currentInput = inputRef.current;
+      if (currentInput) {
+        currentInput.removeEventListener('focusin', handleFocusIn);
+        currentInput.removeEventListener('focusout', handleFocusOut);
       }
     };
   }, [isMobile, open, scrollToBottom]);
@@ -188,7 +189,7 @@ const FloatingChatbot = () => {
     let html = text
       .replace(linkRegex, '<a href="$2" class="text-emerald-600 hover:text-emerald-700 underline font-medium">$1</a>')
       .replace(boldRegex, '<strong class="font-semibold">$1</strong>')
-      .replace(/\_(.*?)\_/g, '<em class="italic">$1</em>')
+      .replace(/_(.*?)_/g, '<em class="italic">$1</em>')
       .replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, '<em class="italic">$1</em>');
 
     if (listRegex.test(html)) {

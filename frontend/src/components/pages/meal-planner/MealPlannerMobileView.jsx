@@ -28,9 +28,9 @@ function MealPlannerMobileView({
   const renderDayCard = (date) => {
     const dayKey = format(date, 'yyyy-MM-dd');
     const dayItems = plannedMeals[dayKey] || [];
-    let dayLabel = format(date, 'MMM d (EEE)');
-    if (isToday(date)) dayLabel = `Today (${format(date, 'MMM d')})`;
-    else if (isTomorrow(date)) dayLabel = `Tomorrow (${format(date, 'MMM d')})`;
+    let _dayLabel = format(date, 'MMM d (EEE)');
+    if (isToday(date)) _dayLabel = `Today (${format(date, 'MMM d')})`;
+    else if (isTomorrow(date)) _dayLabel = `Tomorrow (${format(date, 'MMM d')})`;
 
     const hasSelectedRecipe = selectedRecipe || recipeSelectedForPlanning;
     const isExpanded = expandedDays.get(dayKey) || false;

@@ -4,7 +4,6 @@ import { MdDescription, MdSecurity, MdOutlineGavel, MdOutlineContactSupport, MdO
 
 const PrivacyPolicyPage = () => {
   const appName = "NutriChef";
-  const lastUpdatedDate = "October 26, 2023";
 
   const pStyle = "text-gray-700 leading-relaxed mb-4";
   const subHStyle = "text-xl font-semibold text-gray-100 mb-2 mt-4";

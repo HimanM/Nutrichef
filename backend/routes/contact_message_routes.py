@@ -29,8 +29,15 @@ def get_all_contact_messages():
     try:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
+        sort_by = request.args.get('sort_by', 'CreatedAt', type=str)
+        sort_order = request.args.get('sort_order', 'desc', type=str)
 
-        messages, pagination_details, error, status_code = contact_message_service.get_contact_messages(page, per_page)
+        messages, pagination_details, error, status_code = contact_message_service.get_contact_messages(
+            page=page, 
+            per_page=per_page, 
+            sort_by=sort_by, 
+            sort_order=sort_order
+        )
 
         if error:
             return jsonify({"msg": error}), status_code

@@ -15,7 +15,7 @@ function PantryPage() {
     const [error, setError] = useState('');
     const auth = useAuth();
     const { isAuthenticated, loading: authLoading, token } = auth;
-    const { canPerformAuthAction, isSessionExpired } = useConditionalAuth();
+    const { isSessionExpired } = useConditionalAuth();
 
     const [newIngredients, setNewIngredients] = useState([{ name: '', quantity: '', unit: '' }]);
     const [isIngredientFormOpen, setIsIngredientFormOpen] = useState(false);

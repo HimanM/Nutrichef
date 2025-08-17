@@ -9,16 +9,15 @@ const MealItemCard = ({
   isInPalette = false,
   onDragStart,
   onDragEnd,
-  onAssignToDay,
   isDragging = false,
   isCompact = false
 }) => {
-  if (!recipe) return null;
-
   const titleRef = useRef(null);
   const [shouldMarquee, setShouldMarquee] = useState(false);
 
   useEffect(() => {
+    if (!recipe) return;
+    
     const checkOverflow = () => {
       if (titleRef.current && titleRef.current.scrollWidth > titleRef.current.clientWidth) {
         setShouldMarquee(true);
@@ -29,7 +28,9 @@ const MealItemCard = ({
     checkOverflow();
     window.addEventListener('resize', checkOverflow);
     return () => window.removeEventListener('resize', checkOverflow);
-  }, [recipe.Title]);
+  }, [recipe]);
+
+  if (!recipe) return null;
 
   const handleDragStart = (e) => {
     if (onDragStart) {
@@ -39,7 +40,7 @@ const MealItemCard = ({
     e.dataTransfer.effectAllowed = 'copy';
   };
 
-  const handleDragEnd = (e) => {
+  const handleDragEnd = () => {
     if (onDragEnd) {
       onDragEnd();
     }

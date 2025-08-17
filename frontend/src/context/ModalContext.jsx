@@ -1,9 +1,15 @@
 import React, { createContext, useState, useContext, useCallback, useRef } from 'react';
 import InteractiveModal from '../components/ui/InteractiveModal';
 
-const ModalContext = createContext();
+const ModalContext = createContext(null);
 
-export const useModal = () => useContext(ModalContext);
+export const useModal = () => {
+  const context = useContext(ModalContext);
+  if (!context) {
+    throw new Error('useModal must be used within a ModalProvider');
+  }
+  return context;
+};
 
 export const ModalProvider = ({ children }) => {
   const [modalState, setModalState] = useState({

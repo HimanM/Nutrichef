@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState} from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useModal } from '../context/ModalContext.jsx';
 import { consolidateBasketItems } from '../utils/basketUtils.js';
@@ -36,7 +36,7 @@ function ShoppingBasketPage() {
       } else {
         setBasketItems([]);
       }
-    } catch (err) {
+    } catch {
       setError("Could not load your shopping basket. Data might be corrupted.");
       setBasketItems([]);
     } finally {
@@ -54,7 +54,7 @@ function ShoppingBasketPage() {
         setBasketItems(updatedBasketItems);
         if (updatedBasketItems.length > 0) localStorage.setItem(SHOPPING_BASKET_KEY, JSON.stringify(updatedBasketItems));
         else localStorage.removeItem(SHOPPING_BASKET_KEY);
-      } catch (e) { setError("Failed to update basket."); }
+      } catch { setError("Failed to update basket."); }
     }
   };
 
@@ -64,7 +64,7 @@ function ShoppingBasketPage() {
       try {
         setBasketItems([]); localStorage.removeItem(SHOPPING_BASKET_KEY);
         showModal('alert', 'Success', 'Shopping basket cleared.', {iconType: 'success'});
-      } catch (e) { setError("Failed to clear basket."); }
+      } catch { setError("Failed to clear basket."); }
     }
   };
 
@@ -79,7 +79,7 @@ function ShoppingBasketPage() {
     const fractionMatch = newQuantityStr.match(fractionPattern);
     
     if (fractionMatch) {
-      const numerator = parseInt(fractionMatch[1], 10);
+      // const numerator = parseInt(fractionMatch[1], 10);
       const denominator = parseInt(fractionMatch[2], 10);
       
       if (denominator === 0) {
@@ -94,7 +94,7 @@ function ShoppingBasketPage() {
         );
         setBasketItems(updatedBasketItems);
         localStorage.setItem(SHOPPING_BASKET_KEY, JSON.stringify(updatedBasketItems));
-      } catch (e) { 
+      } catch { 
         setError("Failed to update quantity."); 
       }
       return;
@@ -115,7 +115,7 @@ function ShoppingBasketPage() {
       );
       setBasketItems(updatedBasketItems);
       localStorage.setItem(SHOPPING_BASKET_KEY, JSON.stringify(updatedBasketItems));
-    } catch (e) { 
+    } catch { 
       setError("Failed to update quantity."); 
     }
   };
@@ -165,7 +165,7 @@ function ShoppingBasketPage() {
     doc.save('shopping-list.pdf');
   };
 
-  const commonButtonClassNameBase = "px-4 py-2 text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50";
+  // const commonButtonClassNameBase = "px-4 py-2 text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50";
 
   if (loading) return <div className="flex justify-center items-center min-h-[calc(100vh-200px)]"><ImSpinner2 className="animate-spin h-10 w-10 text-indigo-400" /></div>;
   if (error && basketItems.length === 0) return (

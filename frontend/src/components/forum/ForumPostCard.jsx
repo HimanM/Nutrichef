@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
 import { authenticatedFetch } from '../../utils/apiUtil';
 
-const ForumPostCard = ({ post, onPostDeleted, onRefresh }) => {
+const ForumPostCard = ({ post, onPostDeleted }) => {
   const auth = useAuth();
   const { isAuthenticated, currentUser } = auth;
   const { showAlert, showModal } = useModal();

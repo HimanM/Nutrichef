@@ -15,6 +15,14 @@ const ResponsiveTableMobileView = ({
     selectedCard,
     handleCardClick
 }) => {
+    // Helper function to truncate text
+    const truncateText = (text, maxLength = 50) => {
+        if (!text) return '';
+        if (typeof text !== 'string') return text;
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    };
+
     const renderMobileCard = (item, index) => (
         <div key={index} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
             <div 
@@ -22,29 +30,39 @@ const ResponsiveTableMobileView = ({
                 onClick={() => handleCardClick(item)}
             >
                 <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">
+                    <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-gray-900 truncate">
                             {columns[0].render ? columns[0].render(item) : item[columns[0].key]}
                         </h3>
-                        <div className="text-sm text-gray-500 mt-1">
-                            {columns[1] && (columns[1].render ? columns[1].render(item) : item[columns[1].key])}
+                        <div className="text-sm text-gray-500 mt-1 truncate">
+                            {columns[1] && (columns[1].render ? columns[1].render(item) : truncateText(item[columns[1].key], 30))}
                         </div>
                     </div>
                     {selectedCard === item ? (
-                        <HiChevronUp className="w-5 h-5 text-gray-400" />
+                        <HiChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0 ml-2" />
                     ) : (
-                        <HiChevronDown className="w-5 h-5 text-gray-400" />
+                        <HiChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0 ml-2" />
                     )}
                 </div>
                 
                 {/* Always show key info */}
                 <div className="grid grid-cols-1 gap-2 mb-3">
                     {columns.slice(2, 4).map((column) => (
-                        <div key={column.key} className="flex justify-between">
-                            <span className="text-sm text-gray-500">{column.label}:</span>
-                            <span className="text-sm font-medium text-gray-900">
-                                {column.render ? column.render(item) : item[column.key]}
-                            </span>
+                        <div key={column.key} className="flex justify-between items-start">
+                            <span className="text-sm text-gray-500 flex-shrink-0 mr-2">{column.label}:</span>
+                            <div className="text-sm font-medium text-gray-900 text-right min-w-0 flex-1">
+                                {column.key === 'Message' ? (
+                                    <span className="block truncate" title={item[column.key]}>
+                                        {truncateText(item[column.key], 40)}
+                                    </span>
+                                ) : column.render ? (
+                                    column.render(item)
+                                ) : (
+                                    <span className="block truncate" title={item[column.key]}>
+                                        {truncateText(String(item[column.key] || ''), 30)}
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -55,11 +73,15 @@ const ResponsiveTableMobileView = ({
                 <div className="border-t pt-3 mt-3">
                     <div className="grid grid-cols-1 gap-2 mb-4">
                         {columns.slice(4).map((column) => (
-                            <div key={column.key} className="flex justify-between">
-                                <span className="text-sm text-gray-500">{column.label}:</span>
-                                <span className="text-sm font-medium text-gray-900">
-                                    {column.render ? column.render(item) : item[column.key]}
-                                </span>
+                            <div key={column.key} className="flex justify-between items-start">
+                                <span className="text-sm text-gray-500 flex-shrink-0 mr-2">{column.label}:</span>
+                                <div className="text-sm font-medium text-gray-900 text-right min-w-0 flex-1">
+                                    {column.render ? column.render(item) : (
+                                        <span className="block break-words">
+                                            {String(item[column.key] || '')}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { HiOutlineBell, HiOutlineTrash, HiCheck, HiX } from 'react-icons/hi';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { HiOutlineBell, HiOutlineTrash, HiCheck } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import ResponsiveModal from '../ui/ResponsiveModal';
@@ -16,21 +16,7 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
   const responsiveModal = useResponsiveModal(false);
   const { showModal } = useModal();
 
-  useEffect(() => {
-    if (isAuthenticated) fetchNotifications();
-    const interval = setInterval(() => {
-      if (isAuthenticated) fetchNotifications();
-    }, 60000);
-    return () => clearInterval(interval);
-  }, [isAuthenticated, token]);
-
-  useEffect(() => {
-    const handleResize = () => setOpen(window.innerWidth >= 640);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!isAuthenticated || !token) return;
     try {
       const res = await fetch(apiUrl, {
@@ -43,10 +29,24 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
       const data = await res.json();
       setNotifications(data);
       setUnreadCount(data.filter(n => !n.IsRead).length);
-    } catch (e) {
+    } catch {
       // fail silently
     }
-  };
+  }, [isAuthenticated, token, apiUrl]);
+
+  useEffect(() => {
+    if (isAuthenticated) fetchNotifications();
+    const interval = setInterval(() => {
+      if (isAuthenticated) fetchNotifications();
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, fetchNotifications]);
+
+  useEffect(() => {
+    const handleResize = () => setOpen(window.innerWidth >= 640);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleNotificationClick = async (notif) => {
     if (!notif.IsRead && token) {
@@ -89,7 +89,7 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
       if (!res.ok) throw new Error('Failed to clear notifications');
       setNotifications([]);
       setUnreadCount(0);
-    } catch (e) {
+    } catch {
       alert('Failed to clear notifications.');
     }
   };
@@ -129,7 +129,7 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
       document.removeEventListener('touchstart', handleClick);
       window.removeEventListener('openNotifications', handleOpenNotifications);
     };
-  }, [open, responsiveModal.openModal]);
+  }, [open, responsiveModal]);
 
   if (!isAuthenticated) return null;
 
@@ -137,10 +137,7 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
   const dropdownClass =
     'absolute right-0 mt-2 w-80 max-w-xs bg-white/80 backdrop-blur-xl rounded-xl shadow-2xl border border-gray-100 z-50 animate-fade-in sm:w-96 sm:right-0';
 
-  // Mobile modal styling
-  const mobileModalClass =
-    'fixed top-0 left-0 right-0 w-full bg-white z-50 shadow-lg border-b border-gray-200 animate-fade-in rounded-b-2xl';
-
+  
   return (
     <div className="relative" ref={dropdownRef}>
       <button

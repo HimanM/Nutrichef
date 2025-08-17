@@ -11,10 +11,10 @@ const MobileModal = ({
   dragToClose = true,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [dragY, setDragY] = useState(0);
+  const [_dragY, setDragY] = useState(0);
   const [startY, setStartY] = useState(0);
   const [isClosing, setIsClosing] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [_isAnimating, setIsAnimating] = useState(false);
   const modalRef = useRef(null);
   const dragHandleRef = useRef(null);
 

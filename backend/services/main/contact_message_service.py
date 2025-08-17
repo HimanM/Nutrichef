@@ -36,13 +36,25 @@ class ContactMessageService:
             db.session.rollback()
             return None, f"An unexpected error occurred: {str(e)}", 500
 
-    def get_contact_messages(self, page: int = 1, per_page: int = 10):
+    def get_contact_messages(self, page: int = 1, per_page: int = 10, sort_by: str = 'CreatedAt', sort_order: str = 'desc'):
         """
-        Retrieves paginated contact messages.
+        Retrieves paginated contact messages with sorting.
+        
+        Args:
+            page: Page number (1-indexed)
+            per_page: Items per page
+            sort_by: Column to sort by (CreatedAt, Name, Email, Message, Replied, MessageID)
+            sort_order: Sort direction ('asc' or 'desc')
+            
         Returns a tuple: (list_of_message_dicts, pagination_details, error_message | None, status_code)
         """
         try:
-            pagination_obj = self.contact_message_dao.get_all_messages(page=page, per_page=per_page)
+            pagination_obj = self.contact_message_dao.get_all_messages(
+                page=page, 
+                per_page=per_page, 
+                sort_by=sort_by, 
+                sort_order=sort_order
+            )
             messages_dict = [msg.to_dict() for msg in pagination_obj.items]
             pagination_details = {
                 'page': pagination_obj.page,
