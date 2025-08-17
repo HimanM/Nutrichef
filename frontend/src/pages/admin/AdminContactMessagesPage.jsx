@@ -33,7 +33,7 @@ const AdminContactMessagesPage = () => {
   const [replyError, setReplyError] = useState('');
 
   const [notificationModalOpen, setNotificationModalOpen] = useState(false);
-  const [notificationModalContent, setNotificationModalContent] = useState({ title: '', message: '', iconType: 'info' });
+  const [notificationModalContent] = useState({ title: '', message: '', iconType: 'info' });
 
   // --- Fetch Messages ---
   const fetchMessages = useCallback(async (page) => {
@@ -267,7 +267,12 @@ const AdminContactMessagesPage = () => {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           title={selectedMessage?.Replied ? "View Message" : "Reply to Message"}
-          size="lg"
+          onConfirm={selectedMessage?.Replied ? undefined : handleSendReply}
+          confirmText={selectedMessage?.Replied ? undefined : (replyLoading ? "Sending..." : "Send Reply")}
+          showCancelButton={false}
+          primaryActionText={selectedMessage?.Replied ? "Close" : undefined}
+          isLoading={replyLoading}
+          showCloseButton={true}
         >
           {selectedMessage && (
             <div className="space-y-4">
@@ -320,29 +325,6 @@ const AdminContactMessagesPage = () => {
                   )}
                 </div>
               )}
-
-              <div className="flex justify-end space-x-3 pt-4">
-                
-                {!selectedMessage.Replied && (
-                  <button
-                    onClick={handleSendReply}
-                    disabled={replyLoading}
-                    className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 flex items-center"
-                  >
-                    {replyLoading ? (
-                      <>
-                        <AiOutlineLoading className="animate-spin mr-2" />
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <MdReply className="mr-2" />
-                        Send Reply
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
             </div>
           )}
         </InteractiveModal>

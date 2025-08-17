@@ -150,7 +150,7 @@ const MealSuggestions = ({
             <div
               key={recipe.RecipeID}
               className={`bg-white border border-gray-200 rounded-lg overflow-hidden ${
-                isMobile ? "shadow-sm" : "hover:shadow-md"
+                isMobile ? "shadow-sm" : "hover:shadow-md min-h-[280px]"
               } transition-shadow`}
             >
               {isMobile ? (
@@ -184,9 +184,13 @@ const MealSuggestions = ({
                       </h4>
                       
                       {recipe.nutrition_fit && (
-                        <p className="text-xs text-emerald-600 mb-2 bg-emerald-50 px-2 py-1 rounded">
+                        <div 
+                          className="text-xs text-emerald-600 mb-2 bg-emerald-50 px-2 py-1 rounded leading-relaxed break-words"
+                          title={recipe.nutrition_fit}
+                          style={{ wordBreak: 'break-word' }}
+                        >
                           {recipe.nutrition_fit}
-                        </p>
+                        </div>
                       )}
 
                       <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
@@ -227,24 +231,28 @@ const MealSuggestions = ({
                   </div>
 
                   <div className="p-4 flex-1 flex flex-col">
-                    {/* Title with fixed height */}
-                    <div className="h-12 mb-2">
+                    {/* Title with flexible height */}
+                    <div className="mb-2">
                       <h4 className="font-medium text-gray-800 line-clamp-2 leading-tight">
                         {recipe.Title}
                       </h4>
                     </div>
                     
-                    {/* Nutrition fit info with fixed height */}
-                    <div className="h-6 mb-2">
+                    {/* Nutrition fit info with improved height */}
+                    <div className="mb-3">
                       {recipe.nutrition_fit && (
-                        <p className="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded line-clamp-1">
+                        <div 
+                          className="text-xs text-emerald-600 bg-emerald-50 px-2 py-1.5 rounded leading-relaxed break-words hyphens-auto"
+                          title={recipe.nutrition_fit}
+                          style={{ wordBreak: 'break-word' }}
+                        >
                           {recipe.nutrition_fit}
-                        </p>
+                        </div>
                       )}
                     </div>
 
                     {/* Recipe details */}
-                    <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                    <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
                       <span>{recipe.CookingTime ? `${recipe.CookingTime} min` : 'Quick recipe'}</span>
                       <span>{recipe.Servings || 1} servings</span>
                     </div>
