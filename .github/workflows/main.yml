@@ -58,14 +58,9 @@ jobs:
             printf '%s\n' "MAIL_USERNAME = \"${{ secrets.MAIL_USERNAME }}\"" >> "$ENV_FILE"
             printf '%s\n' "MAIL_PASSWORD = \"${{ secrets.MAIL_PASSWORD }}\"" >> "$ENV_FILE"
             printf '%s\n' "MAIL_DEFAULT_SENDER = \"${{ secrets.MAIL_DEFAULT_SENDER }}\"" >> "$ENV_FILE"
-            printf '%s\n' "" >> "$ENV_FILE"
-            printf '%s\n' "# GEMINI NLP" >> "$ENV_FILE"
             printf '%s\n' "GEMINI_API_KEY=\"${{ secrets.GEMINI_API_KEY }}\"" >> "$ENV_FILE"
             printf '%s\n' "PROJECT_NUMBER = \"${{ secrets.PROJECT_NUMBER }}\"" >> "$ENV_FILE"
-            printf '%s\n' "" >> "$ENV_FILE"
             printf '%s\n' "FRONTEND_URL='${{ secrets.FRONTEND_URL }}'" >> "$ENV_FILE"
-            printf '%s\n' "" >> "$ENV_FILE"
-            printf '%s\n' "# Domain URL for production/cloudflared tunnel" >> "$ENV_FILE"
             printf '%s\n' "DOMAIN_URL='${{ secrets.DOMAIN_URL }}'" >> "$ENV_FILE"
 
             # Try docker compose v2 first (docker compose), fall back to docker-compose
