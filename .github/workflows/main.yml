@@ -9,7 +9,7 @@ jobs:
     name: SSH Deploy
     runs-on: ubuntu-latest
     environment:
-      name: production   
+      name: Nutrichef VPS 
       url: https://nutrichef.himanmanduja.fun 
     steps:
       - name: Checkout
