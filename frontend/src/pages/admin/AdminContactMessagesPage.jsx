@@ -5,6 +5,7 @@ import { authenticatedFetch } from '../../utils/apiUtil';
 import InteractiveModal from '../../components/ui/InteractiveModal';
 import ResponsiveTable from '../../components/admin/ResponsiveTable';
 import AdminBreadcrumb from '../../components/admin/AdminBreadcrumb';
+import AdminFilters from '../../components/admin/AdminFilters';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { MdCheckCircle, MdError, MdOutlineRemoveRedEye, MdReply } from 'react-icons/md';
 import { HiX, HiEye, HiChat } from 'react-icons/hi';
@@ -35,6 +36,14 @@ const AdminContactMessagesPage = () => {
 
   const [notificationModalOpen, setNotificationModalOpen] = useState(false);
   const [notificationModalContent] = useState({ title: '', message: '', iconType: 'info' });
+
+  // Filter states
+  const [nameFilter, setNameFilter] = useState('');
+  const [emailFilter, setEmailFilter] = useState('');
+  const [messageFilter, setMessageFilter] = useState('');
+  const [repliedFilter, setRepliedFilter] = useState('all');
+  const [dateFromFilter, setDateFromFilter] = useState('');
+  const [dateToFilter, setDateToFilter] = useState('');
 
   // --- Fetch Messages ---
   const fetchMessages = useCallback(async (page) => {
@@ -157,6 +166,139 @@ const AdminContactMessagesPage = () => {
     return message.substring(0, maxLength) + '...';
   };
 
+  // Filter handling
+  const handleFilterChange = (filterKey, value) => {
+    switch (filterKey) {
+      case 'name':
+        setNameFilter(value);
+        break;
+      case 'email':
+        setEmailFilter(value);
+        break;
+      case 'message':
+        setMessageFilter(value);
+        break;
+      case 'replied':
+        setRepliedFilter(value);
+        break;
+      case 'dateFrom':
+        setDateFromFilter(value);
+        break;
+      case 'dateTo':
+        setDateToFilter(value);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const clearFilters = () => {
+    setNameFilter('');
+    setEmailFilter('');
+    setMessageFilter('');
+    setRepliedFilter('all');
+    setDateFromFilter('');
+    setDateToFilter('');
+  };
+
+  // Count active filters
+  const activeFiltersCount = [
+    nameFilter,
+    emailFilter,
+    messageFilter,
+    repliedFilter !== 'all' ? repliedFilter : '',
+    dateFromFilter,
+    dateToFilter
+  ].filter(Boolean).length;
+
+  // Define filter configuration
+  const filterConfig = [
+    {
+      key: 'name',
+      label: 'Name',
+      type: 'search',
+      value: nameFilter,
+      placeholder: 'Search by name...'
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      type: 'search',
+      value: emailFilter,
+      placeholder: 'Search by email...'
+    },
+    {
+      key: 'message',
+      label: 'Message',
+      type: 'search',
+      value: messageFilter,
+      placeholder: 'Search in message...'
+    },
+    {
+      key: 'replied',
+      label: 'Status',
+      type: 'select',
+      value: repliedFilter,
+      options: [
+        { value: 'all', label: 'All Messages' },
+        { value: 'true', label: 'Replied' },
+        { value: 'false', label: 'Pending' }
+      ]
+    },
+    {
+      key: 'dateFrom',
+      label: 'From Date',
+      type: 'date',
+      value: dateFromFilter,
+      placeholder: 'Start date'
+    },
+    {
+      key: 'dateTo',
+      label: 'To Date',
+      type: 'date',
+      value: dateToFilter,
+      placeholder: 'End date'
+    }
+  ];
+
+  // Filter messages based on current filters
+  const filteredMessages = messages.filter(message => {
+    // Name filter
+    if (nameFilter && !message.Name?.toLowerCase().includes(nameFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Email filter
+    if (emailFilter && !message.Email?.toLowerCase().includes(emailFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Message content filter
+    if (messageFilter && !message.Message?.toLowerCase().includes(messageFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Replied status filter
+    if (repliedFilter === 'true' && !message.Replied) return false;
+    if (repliedFilter === 'false' && message.Replied) return false;
+
+    // Date range filters
+    if (dateFromFilter || dateToFilter) {
+      const messageDate = new Date(message.CreatedAt);
+      if (dateFromFilter) {
+        const fromDate = new Date(dateFromFilter);
+        if (messageDate < fromDate) return false;
+      }
+      if (dateToFilter) {
+        const toDate = new Date(dateToFilter);
+        toDate.setHours(23, 59, 59, 999); // End of day
+        if (messageDate > toDate) return false;
+      }
+    }
+
+    return true;
+  });
+
   const columns = [
     { 
       key: 'CreatedAt', 
@@ -236,6 +378,15 @@ const AdminContactMessagesPage = () => {
           <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Contact Messages</h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">View and respond to messages submitted via the contact form.</p>
         </div>
+
+        {/* Filters */}
+        <AdminFilters 
+          filters={filterConfig}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+          activeFiltersCount={activeFiltersCount}
+          className="mb-6"
+        />
         
         {loading && messages.length === 0 ? (
           <div className="flex justify-center items-center h-64">
@@ -259,7 +410,7 @@ const AdminContactMessagesPage = () => {
               </div>
             )}
             <ResponsiveTable
-              data={messages}
+              data={filteredMessages}
               columns={columns}
               loading={loading}
               onSort={handleSort}
