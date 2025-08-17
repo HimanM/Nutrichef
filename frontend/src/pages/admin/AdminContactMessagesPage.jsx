@@ -22,6 +22,10 @@ const AdminContactMessagesPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10); // Or make this configurable
 
+  // Sorting state
+  const [sortColumn, setSortColumn] = useState('CreatedAt');
+  const [sortDirection, setSortDirection] = useState('desc');
+
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false); // For view/reply modal
   const [replyText, setReplyText] = useState('');
@@ -37,7 +41,7 @@ const AdminContactMessagesPage = () => {
     setError('');
     try {
       const response = await authenticatedFetch(
-        `/api/contact/admin/messages?page=${page}&per_page=${itemsPerPage}`,
+        `/api/contact/admin/messages?page=${page}&per_page=${itemsPerPage}&sort_by=${sortColumn}&sort_order=${sortDirection}`,
         { method: 'GET' },
         authContextValue
       );
@@ -55,13 +59,24 @@ const AdminContactMessagesPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [authContextValue, itemsPerPage]);
+  }, [authContextValue, itemsPerPage, sortColumn, sortDirection]);
 
   useEffect(() => {
     if (authContextValue.token) {
       fetchMessages(currentPage);
     }
   }, [fetchMessages, currentPage, authContextValue.token]);
+
+  // --- Sorting Handler ---
+  const handleSort = (columnKey) => {
+    if (sortColumn === columnKey) {
+      setSortDirection(prevDirection => prevDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(columnKey);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1); // Reset to first page when sorting changes
+  };
 
   // --- Modal Handlers ---
   const handleOpenModal = (message) => {
@@ -145,15 +160,15 @@ const AdminContactMessagesPage = () => {
     { 
       key: 'CreatedAt', 
       label: 'Date', 
-      sortable: false,
+      sortable: true,
       render: (msg) => new Date(msg.CreatedAt).toLocaleDateString()
     },
-    { key: 'Name', label: 'Name', sortable: false },
-    { key: 'Email', label: 'Email', sortable: false },
+    { key: 'Name', label: 'Name', sortable: true },
+    { key: 'Email', label: 'Email', sortable: true },
     { 
       key: 'Message', 
       label: 'Message', 
-      sortable: false,
+      sortable: true,
       render: (msg) => (
         <span className="max-w-xs truncate block" title={msg.Message}>
           {getMessageSnippet(msg.Message)}
@@ -163,7 +178,7 @@ const AdminContactMessagesPage = () => {
     { 
       key: 'Replied', 
       label: 'Replied', 
-      sortable: false,
+      sortable: true,
       render: (msg) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           msg.Replied 
@@ -237,6 +252,9 @@ const AdminContactMessagesPage = () => {
               data={messages}
               columns={columns}
               loading={loading}
+              onSort={handleSort}
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
               actions={actions}
               pagination={pagination}
               tableTitle="Messages"
