@@ -44,28 +44,48 @@ jobs:
             fi
             cd "$DEPLOY_PATH"
 
-            # Build the command we want the server (or tmux session) to run.
-            UPDATE_CMD="cd \"$DEPLOY_PATH\" && git fetch --all --prune && git reset --hard origin/main"
+            # Update repository to latest main
+            cd "$DEPLOY_PATH"
+            git fetch --all --prune
+            git reset --hard origin/main
 
-            # Compose commands
-            UPDATE_CMD="$UPDATE_CMD && (\
-              if command -v docker > /dev/null 2>&1; then \
-                echo 'Using docker (compose v2)'; docker compose pull || true; docker compose up -d --build; \
-              elif command -v docker-compose > /dev/null 2>&1; then \
-                echo 'Using docker-compose (v1)'; docker-compose pull || true; docker-compose up -d --build; \
-              else \
-                echo 'Neither docker nor docker-compose found'; exit 2; \
-              fi)"
+            # Create or overwrite backend/.env from repository secrets supplied to Actions.
+            # The here-doc uses a quoted delimiter so the remote shell does not perform additional expansion.
+            ENV_FILE="$DEPLOY_PATH/backend/.env"
+            mkdir -p "$(dirname "$ENV_FILE")"
+            cat > "$ENV_FILE" <<'ENV_EOF'
+MAIL_SERVER="${{ secrets.MAIL_SERVER }}"
+MAIL_USERNAME="${{ secrets.MAIL_USERNAME }}"
+MAIL_PASSWORD="${{ secrets.MAIL_PASSWORD }}"
+MAIL_DEFAULT_SENDER="${{ secrets.MAIL_DEFAULT_SENDER }}"
 
-            # If the tmux session exists, send the update command into it; otherwise run directly.
-            if tmux has-session -t "$TMUX_SESSION" 2>/dev/null; then
-              echo "Found tmux session '$TMUX_SESSION' — sending update command into it."
-              # send the command and press Enter
-              tmux send-keys -t "$TMUX_SESSION" "$UPDATE_CMD" C-m
+# GEMINI NLP
+GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
+PROJECT_NUMBER="${{ secrets.PROJECT_NUMBER }}"
+
+FRONTEND_URL="${{ secrets.FRONTEND_URL }}"
+
+# Domain URL for production/cloudflared tunnel
+DOMAIN_URL="${{ secrets.DOMAIN_URL }}"
+ENV_EOF
+
+            # Try docker compose v2 first (docker compose), fall back to docker-compose
+            if command -v docker > /dev/null 2>&1; then
+              DOCKER_CMD="docker compose pull || true && docker compose up -d --build"
+            elif command -v docker-compose > /dev/null 2>&1; then
+              DOCKER_CMD="docker-compose pull || true && docker-compose up -d --build"
             else
-              echo "No tmux session named '$TMUX_SESSION' found — running update directly."
-              # Run the update command directly on the server
-              eval "$UPDATE_CMD"
+              echo "Neither 'docker' nor 'docker-compose' found on the server."
+              exit 1
+            fi
+
+            # If the tmux session exists, send the docker restart command into it; otherwise run directly.
+            if tmux has-session -t "$TMUX_SESSION" 2>/dev/null; then
+              echo "Found tmux session '$TMUX_SESSION' — sending docker restart command into it."
+              tmux send-keys -t "$TMUX_SESSION" "cd \"$DEPLOY_PATH\" && $DOCKER_CMD" C-m
+            else
+              echo "No tmux session named '$TMUX_SESSION' found — running docker restart directly."
+              eval "cd \"$DEPLOY_PATH\" && $DOCKER_CMD"
             fi
 
             echo "Deployment finished."
