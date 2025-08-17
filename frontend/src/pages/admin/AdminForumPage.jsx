@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
 import { authenticatedFetch } from '../../utils/apiUtil';
 import ResponsiveTable from '../../components/admin/ResponsiveTable';
+import AdminBreadcrumb from '../../components/admin/AdminBreadcrumb';
 import ResponsiveModal from '../../components/ui/ResponsiveModal';
 import { HiTrash, HiEye, HiChat, HiHeart } from 'react-icons/hi';
 import { PageLoaderSpinner } from '../../components/common/LoadingComponents';
@@ -519,8 +520,17 @@ const AdminForumPage = () => {
   return (
     <div className="section-padding">
       <div className="container-modern">
+        {/* Breadcrumb */}
+        <AdminBreadcrumb 
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Forum Management', href: '/admin/forum', current: true }
+          ]}
+          className="mb-6"
+        />
+
         {/* Header */}
-        <div className="text-center mb-10 animate-fade-in">
+        <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Forum Management</h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
             Manage forum posts and comments, monitor community activity

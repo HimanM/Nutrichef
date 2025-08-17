@@ -5,6 +5,8 @@ import RecipeDetailPopup from '../../components/admin/RecipeDetailPopup.jsx';
 import { authenticatedFetch } from '../../utils/apiUtil.js';
 import { PageLoaderSpinner } from '../../components/common/LoadingComponents.jsx';
 import ResponsiveTable from '../../components/admin/ResponsiveTable.jsx';
+import AdminBreadcrumb from '../../components/admin/AdminBreadcrumb.jsx';
+import AdminFilters from '../../components/admin/AdminFilters.jsx';
 import { HiTrash, HiEye, HiChat } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { AdminErrorDisplay, AdminFullPageError } from '../../components/common/ErrorDisplay.jsx';
@@ -22,7 +24,11 @@ function RecipeManagementPage() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [sortColumn, setSortColumn] = useState('RecipeID');
   const [sortDirection, setSortDirection] = useState('asc');
-  const [publicFilter] = useState('all');
+  
+  // Filter states
+  const [titleFilter, setTitleFilter] = useState('');
+  const [authorFilter, setAuthorFilter] = useState('');
+  const [visibilityFilter, setVisibilityFilter] = useState('all'); // all, public, private
 
   const fetchRecipes = useCallback(async (currentPage, currentRowsPerPage, currentSortColumn, currentSortDirection) => {
     setLoading(true); setError(null); 
@@ -94,11 +100,81 @@ function RecipeManagementPage() {
     }
   };
 
-  // Filter recipes based on publicFilter
+  // Filter handling
+  const handleFilterChange = (filterKey, value) => {
+    switch (filterKey) {
+      case 'title':
+        setTitleFilter(value);
+        break;
+      case 'author':
+        setAuthorFilter(value);
+        break;
+      case 'visibility':
+        setVisibilityFilter(value);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const clearFilters = () => {
+    setTitleFilter('');
+    setAuthorFilter('');
+    setVisibilityFilter('all');
+  };
+
+  // Count active filters
+  const activeFiltersCount = [
+    titleFilter,
+    authorFilter,
+    visibilityFilter !== 'all' ? visibilityFilter : ''
+  ].filter(Boolean).length;
+
+  // Define filter configuration
+  const filterConfig = [
+    {
+      key: 'title',
+      label: 'Recipe Title',
+      type: 'search',
+      value: titleFilter,
+      placeholder: 'Search by recipe title...'
+    },
+    {
+      key: 'author',
+      label: 'Author',
+      type: 'search',
+      value: authorFilter,
+      placeholder: 'Search by author name...'
+    },
+    {
+      key: 'visibility',
+      label: 'Visibility',
+      type: 'select',
+      value: visibilityFilter,
+      options: [
+        { value: 'all', label: 'All Recipes' },
+        { value: 'public', label: 'Public Only' },
+        { value: 'private', label: 'Private Only' }
+      ]
+    }
+  ];
+
+  // Filter recipes based on current filters
   const filteredRecipes = recipes.filter(recipe => {
-    if (publicFilter === 'all') return true;
-    if (publicFilter === 'public') return recipe.is_public === true;
-    if (publicFilter === 'private') return recipe.is_public === false;
+    // Title filter
+    if (titleFilter && !recipe.Title?.toLowerCase().includes(titleFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Author filter
+    if (authorFilter && !recipe.AuthorName?.toLowerCase().includes(authorFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Visibility filter
+    if (visibilityFilter === 'public' && !recipe.is_public) return false;
+    if (visibilityFilter === 'private' && recipe.is_public) return false;
+
     return true;
   });
 
@@ -173,7 +249,16 @@ function RecipeManagementPage() {
   return (
     <div className="section-padding">
       <div className="container-modern">
-        <div className="text-center mb-10 animate-fade-in">
+        {/* Breadcrumb */}
+        <AdminBreadcrumb 
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Recipe Management', href: '/admin/recipes', current: true }
+          ]}
+          className="mb-6"
+        />
+
+        <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Recipe Management</h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-4">View and manage user-submitted recipes.</p>
           
@@ -188,6 +273,15 @@ function RecipeManagementPage() {
             </Link>
           </div>
         </div>
+
+        {/* Filters */}
+        <AdminFilters 
+          filters={filterConfig}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+          activeFiltersCount={activeFiltersCount}
+          className="mb-6"
+        />
         
         {actionError && (
           <div className="mb-4">

@@ -3,6 +3,8 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { useModal } from '../../context/ModalContext.jsx';
 import { authenticatedFetch } from '../../utils/apiUtil.js';
 import ResponsiveTable from '../../components/admin/ResponsiveTable.jsx';
+import AdminBreadcrumb from '../../components/admin/AdminBreadcrumb.jsx';
+import AdminFilters from '../../components/admin/AdminFilters.jsx';
 import { HiTrash } from 'react-icons/hi';
 import { AdminErrorDisplay, AdminFullPageError } from '../../components/common/ErrorDisplay.jsx';
 
@@ -22,6 +24,11 @@ function UserManagementPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [sortColumn, setSortColumn] = useState('UserID');
   const [sortDirection, setSortDirection] = useState('asc');
+
+  // Filter states
+  const [usernameFilter, setUsernameFilter] = useState('');
+  const [emailFilter, setEmailFilter] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
 
   const fetchUsers = useCallback(async (currentPage, currentRowsPerPage) => {
     setLoading(true); setError(null);
@@ -65,6 +72,84 @@ function UserManagementPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  // Filter handling
+  const handleFilterChange = (filterKey, value) => {
+    switch (filterKey) {
+      case 'username':
+        setUsernameFilter(value);
+        break;
+      case 'email':
+        setEmailFilter(value);
+        break;
+      case 'role':
+        setRoleFilter(value);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const clearFilters = () => {
+    setUsernameFilter('');
+    setEmailFilter('');
+    setRoleFilter('all');
+  };
+
+  // Count active filters
+  const activeFiltersCount = [
+    usernameFilter,
+    emailFilter,
+    roleFilter !== 'all' ? roleFilter : ''
+  ].filter(Boolean).length;
+
+  // Define filter configuration
+  const filterConfig = [
+    {
+      key: 'username',
+      label: 'Name',
+      type: 'search',
+      value: usernameFilter,
+      placeholder: 'Search by name...'
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      type: 'search',
+      value: emailFilter,
+      placeholder: 'Search by email...'
+    },
+    {
+      key: 'role',
+      label: 'Role',
+      type: 'select',
+      value: roleFilter,
+      options: [
+        { value: 'all', label: 'All Roles' },
+        { value: 'admin', label: 'Admin' },
+        { value: 'user', label: 'User' }
+      ]
+    }
+  ];
+
+  // Filter users based on current filters
+  const filteredUsers = users.filter(user => {
+    // Username filter (actually filtering by Name property)
+    if (usernameFilter && !user.Name?.toLowerCase().includes(usernameFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Email filter
+    if (emailFilter && !user.Email?.toLowerCase().includes(emailFilter.toLowerCase())) {
+      return false;
+    }
+
+    // Role filter
+    if (roleFilter === 'admin' && user.Role !== 'admin') return false;
+    if (roleFilter === 'user' && user.Role !== 'user') return false;
+
+    return true;
+  });
 
   const handleRoleChange = async (userId, newRole) => {
     setActionError(null);
@@ -165,10 +250,28 @@ function UserManagementPage() {
   return (
     <div className="section-padding">
       <div className="container-modern">
-        <div className="text-center mb-10 animate-fade-in">
+        {/* Breadcrumb */}
+        <AdminBreadcrumb 
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'User Management', href: '/admin/users', current: true }
+          ]}
+          className="mb-6"
+        />
+
+        <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">User Management</h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">View, edit, and manage user accounts and roles.</p>
         </div>
+
+        {/* Filters */}
+        <AdminFilters 
+          filters={filterConfig}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+          activeFiltersCount={activeFiltersCount}
+          className="mb-6"
+        />
         
         {actionError && (
           <div className="mb-4">
@@ -193,7 +296,7 @@ function UserManagementPage() {
           <p className="text-center text-gray-400 mt-6 text-lg">No users found.</p>
         ) : (
           <ResponsiveTable
-            data={users}
+            data={filteredUsers}
             columns={columns}
             loading={loading}
             onSort={handleSort}

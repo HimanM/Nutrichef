@@ -4,6 +4,7 @@ import { useModal } from '../../context/ModalContext';
 import { authenticatedFetch } from '../../utils/apiUtil';
 import InteractiveModal from '../../components/ui/InteractiveModal';
 import ResponsiveTable from '../../components/admin/ResponsiveTable';
+import AdminBreadcrumb from '../../components/admin/AdminBreadcrumb';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { MdCheckCircle, MdError, MdOutlineRemoveRedEye, MdReply } from 'react-icons/md';
 import { HiX, HiEye, HiChat } from 'react-icons/hi';
@@ -222,7 +223,16 @@ const AdminContactMessagesPage = () => {
   return (
     <div className="section-padding">
       <div className="container-modern">
-        <div className="text-center mb-10 animate-fade-in">
+        {/* Breadcrumb */}
+        <AdminBreadcrumb 
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Contact Messages', href: '/admin/contact-messages', current: true }
+          ]}
+          className="mb-6"
+        />
+
+        <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Contact Messages</h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">View and respond to messages submitted via the contact form.</p>
         </div>

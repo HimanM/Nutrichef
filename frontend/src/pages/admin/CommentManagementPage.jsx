@@ -4,7 +4,9 @@ import { useModal } from '../../context/ModalContext.jsx';
 import { authenticatedFetch } from '../../utils/apiUtil.js';
 import { PageLoaderSpinner } from '../../components/common/LoadingComponents.jsx';
 import ResponsiveTable from '../../components/admin/ResponsiveTable.jsx';
-import { HiTrash, HiEye, HiClock, HiSearch, HiX, HiFilter } from 'react-icons/hi';
+import AdminFilters from '../../components/admin/AdminFilters.jsx';
+import AdminBreadcrumb from '../../components/admin/AdminBreadcrumb.jsx';
+import { HiTrash, HiEye, HiClock } from 'react-icons/hi';
 import { AdminErrorDisplay } from '../../components/common/ErrorDisplay.jsx';
 
 function CommentManagementPage() {
@@ -19,7 +21,6 @@ function CommentManagementPage() {
   const [totalCount, setTotalCount] = useState(0);
 
   // Filter states
-  const [showFilters, setShowFilters] = useState(false);
   const [usernameFilter, setUsernameFilter] = useState('');
   const [editedFilter, setEditedFilter] = useState('all'); // all, edited, original
   const [recipeFilter, setRecipeFilter] = useState('');
@@ -96,6 +97,87 @@ function CommentManagementPage() {
     setPage(0);
   };
 
+  // Filter handling
+  const handleFilterChange = (filterKey, value) => {
+    switch (filterKey) {
+      case 'username':
+        setUsernameFilter(value);
+        break;
+      case 'recipe':
+        setRecipeFilter(value);
+        break;
+      case 'editStatus':
+        setEditedFilter(value);
+        break;
+      case 'dateFrom':
+        setDateFromFilter(value);
+        break;
+      case 'dateTo':
+        setDateToFilter(value);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const clearFilters = () => {
+    setUsernameFilter('');
+    setEditedFilter('all');
+    setRecipeFilter('');
+    setDateFromFilter('');
+    setDateToFilter('');
+  };
+
+  // Count active filters
+  const activeFiltersCount = [
+    usernameFilter,
+    editedFilter !== 'all' ? editedFilter : '',
+    recipeFilter,
+    dateFromFilter,
+    dateToFilter
+  ].filter(Boolean).length;
+
+  // Define filter configuration
+  const filterConfig = [
+    {
+      key: 'username',
+      label: 'Username',
+      type: 'search',
+      value: usernameFilter,
+      placeholder: 'Search by username...'
+    },
+    {
+      key: 'recipe',
+      label: 'Recipe',
+      type: 'search',
+      value: recipeFilter,
+      placeholder: 'Search by recipe title...'
+    },
+    {
+      key: 'editStatus',
+      label: 'Edit Status',
+      type: 'select',
+      value: editedFilter,
+      options: [
+        { value: 'all', label: 'All Comments' },
+        { value: 'original', label: 'Original Only' },
+        { value: 'edited', label: 'Edited Only' }
+      ]
+    },
+    {
+      key: 'dateFrom',
+      label: 'From Date',
+      type: 'date',
+      value: dateFromFilter
+    },
+    {
+      key: 'dateTo',
+      label: 'To Date',
+      type: 'date',
+      value: dateToFilter
+    }
+  ];
+
   // Filter comments based on current filters
   const filteredComments = comments.filter(comment => {
     // Username filter
@@ -142,14 +224,6 @@ function CommentManagementPage() {
     if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
     return 0;
   });
-
-  const clearFilters = () => {
-    setUsernameFilter('');
-    setEditedFilter('all');
-    setRecipeFilter('');
-    setDateFromFilter('');
-    setDateToFilter('');
-  };
 
   const handleSort = (columnKey) => {
     if (sortColumn === columnKey) {
@@ -259,120 +333,32 @@ function CommentManagementPage() {
   return (
     <div className="section-padding">
       <div className="container-modern">
+        {/* Breadcrumb */}
+        <AdminBreadcrumb 
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Recipes', href: '/admin/recipes' },
+            { label: 'Comments', href: '/admin/comments', current: true }
+          ]}
+          className="mb-6"
+        />
+
         {/* Header */}
-        <div className="text-center mb-10 animate-fade-in">
+        <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Comment Management</h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
             View and manage user comments on recipes
           </p>
         </div>
 
-        {/* Filter Controls */}
-        <div className="bg-white/60 rounded-xl p-6 border border-emerald-100 shadow-sm mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-emerald-700 flex items-center gap-2">
-              <HiFilter className="w-5 h-5" />
-              Filters
-            </h3>
-            <div className="flex items-center gap-2">
-              {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter) && (
-                <button
-                  onClick={clearFilters}
-                  className="flex items-center gap-1 px-3 py-1 text-sm text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                >
-                  <HiX className="w-4 h-4" />
-                  Clear All
-                </button>
-              )}
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-1 px-3 py-1 text-sm text-emerald-600 hover:text-emerald-800 bg-emerald-100 hover:bg-emerald-200 rounded-lg transition-colors"
-              >
-                {showFilters ? 'Hide Filters' : 'Show Filters'}
-              </button>
-            </div>
-          </div>
-
-          {showFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Username Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Username
-                </label>
-                <div className="relative">
-                  <HiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    value={usernameFilter}
-                    onChange={(e) => setUsernameFilter(e.target.value)}
-                    placeholder="Search by username..."
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              {/* Recipe Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Recipe
-                </label>
-                <div className="relative">
-                  <HiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    value={recipeFilter}
-                    onChange={(e) => setRecipeFilter(e.target.value)}
-                    placeholder="Search by recipe title..."
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              {/* Edited Status Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Edit Status
-                </label>
-                <select
-                  value={editedFilter}
-                  onChange={(e) => setEditedFilter(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                >
-                  <option value="all">All Comments</option>
-                  <option value="original">Original Only</option>
-                  <option value="edited">Edited Only</option>
-                </select>
-              </div>
-
-              {/* Date From Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  From Date
-                </label>
-                <input
-                  type="date"
-                  value={dateFromFilter}
-                  onChange={(e) => setDateFromFilter(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
-              </div>
-
-              {/* Date To Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  To Date
-                </label>
-                <input
-                  type="date"
-                  value={dateToFilter}
-                  onChange={(e) => setDateToFilter(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Filters */}
+        <AdminFilters
+          filters={filterConfig}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+          activeFiltersCount={activeFiltersCount}
+          className="mb-6"
+        />
 
         {actionError && (
           <div className="mb-4">
@@ -393,51 +379,31 @@ function CommentManagementPage() {
           </div>
         )}
 
-        {/* Results Summary */}
-        {!loading && comments.length > 0 && (
-          <div className="mb-4 flex items-center justify-between text-sm text-gray-600">
-            <div>
-              Showing {filteredComments.length} of {comments.length} comments
-              {filteredComments.length !== comments.length && (
-                <span className="text-emerald-600 font-medium"> (filtered)</span>
-              )}
-            </div>
-            {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter) && (
-              <div className="text-emerald-600">
-                {filteredComments.length === 0 ? 'No matches found' : 'Filters applied'}
-              </div>
-            )}
-          </div>
-        )}
-
         {filteredComments.length === 0 && !loading && !error ? (
-          <div className="text-center py-12 bg-white/60 rounded-xl border border-emerald-100 shadow-sm">
+          <div className="text-center py-12 bg-white rounded-xl border border-gray-200 shadow-sm">
             <div className="mx-auto h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <HiEye className="h-6 w-6 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter)
-                ? 'No matching comments found'
-                : 'No comments found'
-              }
+              {activeFiltersCount > 0 ? 'No matching comments found' : 'No comments found'}
             </h3>
-            <p className="text-gray-500">
-              {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter)
+            <p className="text-gray-500 mb-4">
+              {activeFiltersCount > 0
                 ? 'Try adjusting your filters to see more results.'
                 : 'No recipe comments are currently available in the system.'
               }
             </p>
-            {(usernameFilter || editedFilter !== 'all' || recipeFilter || dateFromFilter || dateToFilter) && (
+            {activeFiltersCount > 0 && (
               <button
                 onClick={clearFilters}
-                className="mt-4 px-4 py-2 text-sm text-emerald-600 hover:text-emerald-800 bg-emerald-100 hover:bg-emerald-200 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors"
               >
                 Clear All Filters
               </button>
             )}
           </div>
         ) : (
-          <div className="bg-white/60 rounded-xl shadow-lg border border-emerald-100 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             <ResponsiveTable
               data={filteredComments}
               columns={columns}
