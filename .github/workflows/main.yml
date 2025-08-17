@@ -1,0 +1,71 @@
+name: Deploy to VPS on push
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: SSH Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run remote deploy commands over SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          # You can supply either an SSH private key (VPS_SSH_KEY) or a password (VPS_SSH_PASSWORD).
+          # If you don't have an SSH key, set the repository secret VPS_SSH_PASSWORD to your account password.
+          key: ${{ secrets.VPS_SSH_KEY }}
+          password: ${{ secrets.VPS_SSH_PASSWORD }}
+          port: ${{ secrets.VPS_SSH_PORT }}
+          # strict = false will skip host-key checking; safer to add the host key to a secret and set strict = true
+          strict: false
+          script: |
+            set -e
+
+            # Path on the VPS where the repo lives. Provide this as a repository secret named VPS_DEPLOY_PATH
+            # Example secret value: /home/ubuntu/nutrichef
+            DEPLOY_PATH="${{ secrets.VPS_DEPLOY_PATH }}"
+
+            # tmux session name to target. Provide as VPS_TMUX_SESSION secret if different. Defaults to 'nutrichef'.
+            TMUX_SESSION="${{ secrets.VPS_TMUX_SESSION }}"
+            if [ -z "$TMUX_SESSION" ]; then
+              TMUX_SESSION="nutrichef"
+            fi
+
+            # Switch to repo directory
+            if [ ! -d "$DEPLOY_PATH" ]; then
+              echo "Deploy path $DEPLOY_PATH does not exist. Exiting."
+              exit 1
+            fi
+            cd "$DEPLOY_PATH"
+
+            # Build the command we want the server (or tmux session) to run.
+            UPDATE_CMD="cd \"$DEPLOY_PATH\" && git fetch --all --prune && git reset --hard origin/main"
+
+            # Compose commands
+            UPDATE_CMD="$UPDATE_CMD && (\
+              if command -v docker > /dev/null 2>&1; then \
+                echo 'Using docker (compose v2)'; docker compose pull || true; docker compose up -d --build; \
+              elif command -v docker-compose > /dev/null 2>&1; then \
+                echo 'Using docker-compose (v1)'; docker-compose pull || true; docker-compose up -d --build; \
+              else \
+                echo 'Neither docker nor docker-compose found'; exit 2; \
+              fi)"
+
+            # If the tmux session exists, send the update command into it; otherwise run directly.
+            if tmux has-session -t "$TMUX_SESSION" 2>/dev/null; then
+              echo "Found tmux session '$TMUX_SESSION' — sending update command into it."
+              # send the command and press Enter
+              tmux send-keys -t "$TMUX_SESSION" "$UPDATE_CMD" C-m
+            else
+              echo "No tmux session named '$TMUX_SESSION' found — running update directly."
+              # Run the update command directly on the server
+              eval "$UPDATE_CMD"
+            fi
+
+            echo "Deployment finished."
