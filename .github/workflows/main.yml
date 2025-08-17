@@ -53,33 +53,20 @@ jobs:
             # The here-doc uses a quoted delimiter so the remote shell does not perform additional expansion.
             ENV_FILE="$DEPLOY_PATH/backend/.env"
             mkdir -p "$(dirname "$ENV_FILE")"
-            # Use printf to write the file to avoid here-doc delimiter indentation issues in YAML.
-            printf '%s
-'    "MAIL_SERVER = \"${{ secrets.MAIL_SERVER }}\"" > "$ENV_FILE"
-            printf '%s
-'    "MAIL_USERNAME = \"${{ secrets.MAIL_USERNAME }}\"" >> "$ENV_FILE"
-            printf '%s
-'    "MAIL_PASSWORD = \"${{ secrets.MAIL_PASSWORD }}\"" >> "$ENV_FILE"
-            printf '%s
-'    "MAIL_DEFAULT_SENDER = \"${{ secrets.MAIL_DEFAULT_SENDER }}\"" >> "$ENV_FILE"
-            printf '%s
-'    "" >> "$ENV_FILE"
-            printf '%s
-'    "# GEMINI NLP" >> "$ENV_FILE"
-            printf '%s
-'    "GEMINI_API_KEY=\"${{ secrets.GEMINI_API_KEY }}\"" >> "$ENV_FILE"
-            printf '%s
-'    "PROJECT_NUMBER = \"${{ secrets.PROJECT_NUMBER }}\"" >> "$ENV_FILE"
-            printf '%s
-'    "" >> "$ENV_FILE"
-            printf '%s
-'    "FRONTEND_URL='${{ secrets.FRONTEND_URL }}'" >> "$ENV_FILE"
-            printf '%s
-'    "" >> "$ENV_FILE"
-            printf '%s
-'    "# Domain URL for production/cloudflared tunnel" >> "$ENV_FILE"
-            printf '%s
-'    "DOMAIN_URL='${{ secrets.DOMAIN_URL }}'" >> "$ENV_FILE"
+            # Use single-line printf calls to write the file (safer inside YAML block).
+            printf '%s\n' "MAIL_SERVER = \"${{ secrets.MAIL_SERVER }}\"" > "$ENV_FILE"
+            printf '%s\n' "MAIL_USERNAME = \"${{ secrets.MAIL_USERNAME }}\"" >> "$ENV_FILE"
+            printf '%s\n' "MAIL_PASSWORD = \"${{ secrets.MAIL_PASSWORD }}\"" >> "$ENV_FILE"
+            printf '%s\n' "MAIL_DEFAULT_SENDER = \"${{ secrets.MAIL_DEFAULT_SENDER }}\"" >> "$ENV_FILE"
+            printf '%s\n' "" >> "$ENV_FILE"
+            printf '%s\n' "# GEMINI NLP" >> "$ENV_FILE"
+            printf '%s\n' "GEMINI_API_KEY=\"${{ secrets.GEMINI_API_KEY }}\"" >> "$ENV_FILE"
+            printf '%s\n' "PROJECT_NUMBER = \"${{ secrets.PROJECT_NUMBER }}\"" >> "$ENV_FILE"
+            printf '%s\n' "" >> "$ENV_FILE"
+            printf '%s\n' "FRONTEND_URL='${{ secrets.FRONTEND_URL }}'" >> "$ENV_FILE"
+            printf '%s\n' "" >> "$ENV_FILE"
+            printf '%s\n' "# Domain URL for production/cloudflared tunnel" >> "$ENV_FILE"
+            printf '%s\n' "DOMAIN_URL='${{ secrets.DOMAIN_URL }}'" >> "$ENV_FILE"
 
             # Try docker compose v2 first (docker compose), fall back to docker-compose
             if command -v docker > /dev/null 2>&1; then
