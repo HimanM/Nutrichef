@@ -129,6 +129,70 @@ const PostDetailContent = ({ post }) => {
   );
 };
 
+// Comment Detail Content Component for ResponsiveModal
+const CommentDetailContent = ({ comment }) => {
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <div>
+      {/* Comment Header */}
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
+            <span className="text-emerald-700 font-medium text-lg">
+              {comment.UserName?.charAt(0)?.toUpperCase() || 'U'}
+            </span>
+          </div>
+          <div>
+            <h5 className="font-semibold text-gray-900">{comment.UserName || 'Unknown User'}</h5>
+            <p className="text-sm text-gray-500">User ID: {comment.UserId}</p>
+            <p className="text-sm text-gray-500">{formatDate(comment.CreatedAt)}</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            Comment #{comment.Id}
+          </span>
+        </div>
+      </div>
+
+      {/* Post Context */}
+      <div className="bg-gray-50 rounded-lg p-4 mb-6">
+        <h4 className="text-sm font-medium text-gray-900 mb-2">Commenting on:</h4>
+        <div className="text-sm text-gray-700">
+          <span className="font-medium">{comment.PostTitle}</span>
+          <span className="text-gray-500 ml-2">(Post ID: {comment.PostId})</span>
+        </div>
+      </div>
+
+      {/* Comment Content */}
+      <div className="mb-6">
+        <h4 className="text-sm font-medium text-gray-900 mb-3">Comment:</h4>
+        <div className="prose prose-gray max-w-none">
+          <div className="text-gray-700 leading-relaxed whitespace-pre-wrap bg-white border border-gray-200 rounded-lg p-4">
+            {comment.Comment}
+          </div>
+        </div>
+      </div>
+
+      {/* Timestamps */}
+      <div className="border-t border-gray-200 pt-4 text-sm text-gray-500">
+        <div className="flex justify-between">
+          <span>Created: {formatDate(comment.CreatedAt)}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AdminForumPage = () => {
   const authContextValue = useAuth();
   const { showModal, setLoading: setModalLoading } = useModal();
@@ -155,6 +219,9 @@ const AdminForumPage = () => {
 
   // Selected post for viewing
   const [selectedPost, setSelectedPost] = useState(null);
+  
+  // Selected comment for viewing
+  const [selectedComment, setSelectedComment] = useState(null);
 
   const fetchPosts = useCallback(async (currentPage, currentRowsPerPage, currentSortColumn, currentSortDirection) => {
     setLoading(true);
@@ -339,15 +406,23 @@ const AdminForumPage = () => {
 
   // Posts table columns
   const postsColumns = [
-    { key: 'Id', label: 'Post ID', sortable: true },
+    { 
+      key: 'Id', 
+      label: 'ID', 
+      sortable: true,
+      minWidth: '60px',
+      maxWidth: '80px'
+    },
     {
       key: 'Title',
       label: 'Title',
       sortable: true,
+      minWidth: '180px',
+      maxWidth: '280px',
       render: (post) => (
-        <div className="max-w-xs">
+        <div className="max-w-full">
           <div className="font-medium text-gray-900 truncate">{post.Title}</div>
-          <div className="text-sm text-gray-500 truncate">{truncateText(post.Content, 60)}</div>
+          <div className="text-sm text-gray-500 truncate">{truncateText(post.Content, 50)}</div>
         </div>
       )
     },
@@ -355,9 +430,11 @@ const AdminForumPage = () => {
       key: 'UserName',
       label: 'Author',
       sortable: true,
+      minWidth: '100px',
+      maxWidth: '140px',
       render: (post) => (
         <div>
-          <div className="font-medium text-gray-900">{post.UserName}</div>
+          <div className="font-medium text-gray-900 truncate">{post.UserName}</div>
           <div className="text-sm text-gray-500">ID: {post.UserId}</div>
         </div>
       )
@@ -366,6 +443,8 @@ const AdminForumPage = () => {
       key: 'CreatedAt',
       label: 'Created',
       sortable: true,
+      minWidth: '120px',
+      maxWidth: '150px',
       render: (post) => (
         <div className="text-sm text-gray-900">
           {formatDate(post.CreatedAt)}
@@ -376,6 +455,8 @@ const AdminForumPage = () => {
       key: 'LikesCount',
       label: 'Likes',
       sortable: true,
+      minWidth: '70px',
+      maxWidth: '85px',
       render: (post) => (
         <div className="flex items-center gap-1 text-sm">
           <HiHeart className="w-4 h-4 text-red-500" />
@@ -387,6 +468,8 @@ const AdminForumPage = () => {
       key: 'ViewsCount',
       label: 'Views',
       sortable: true,
+      minWidth: '70px',
+      maxWidth: '85px',
       render: (post) => (
         <div className="flex items-center gap-1 text-sm">
           <HiEye className="w-4 h-4 text-blue-500" />
@@ -398,6 +481,8 @@ const AdminForumPage = () => {
       key: 'CommentsCount',
       label: 'Comments',
       sortable: true,
+      minWidth: '80px',
+      maxWidth: '100px',
       render: (post) => (
         <div className="flex items-center gap-1 text-sm">
           <HiChat className="w-4 h-4 text-green-500" />
@@ -409,16 +494,42 @@ const AdminForumPage = () => {
 
   // Comments table columns
   const commentsColumns = [
-    { key: 'Id', label: 'Comment ID', sortable: true },
+    { 
+      key: 'Id', 
+      label: 'Comment ID', 
+      sortable: true,
+      minWidth: '80px',
+      maxWidth: '120px'
+    },
     {
       key: 'Comment',
       label: 'Comment',
       sortable: false,
+      minWidth: '200px',
+      maxWidth: '400px',
       render: (comment) => (
-        <div className="max-w-xs">
-          <div className="text-sm text-gray-900 whitespace-pre-wrap">
+        <div className="max-w-full">
+          <div 
+            className="text-sm text-gray-900 cursor-pointer hover:text-emerald-600 transition-colors overflow-hidden"
+            style={{
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              wordBreak: 'break-word'
+            }}
+            onClick={() => setSelectedComment(comment)}
+            title="Click to view full comment"
+          >
             {truncateText(comment.Comment, 100)}
           </div>
+          {comment.Comment.length > 100 && (
+            <button
+              onClick={() => setSelectedComment(comment)}
+              className="text-xs text-emerald-600 hover:text-emerald-700 mt-1"
+            >
+              View full comment
+            </button>
+          )}
         </div>
       )
     },
@@ -426,8 +537,10 @@ const AdminForumPage = () => {
       key: 'PostTitle',
       label: 'Post',
       sortable: true,
+      minWidth: '150px',
+      maxWidth: '250px',
       render: (comment) => (
-        <div className="max-w-xs">
+        <div className="max-w-full">
           <div className="font-medium text-gray-900 truncate">
             {truncateText(comment.PostTitle, 40)}
           </div>
@@ -439,9 +552,11 @@ const AdminForumPage = () => {
       key: 'UserName',
       label: 'Author',
       sortable: true,
+      minWidth: '120px',
+      maxWidth: '180px',
       render: (comment) => (
         <div>
-          <div className="font-medium text-gray-900">{comment.UserName}</div>
+          <div className="font-medium text-gray-900 truncate">{comment.UserName}</div>
           <div className="text-sm text-gray-500">ID: {comment.UserId}</div>
         </div>
       )
@@ -450,6 +565,8 @@ const AdminForumPage = () => {
       key: 'CreatedAt',
       label: 'Created',
       sortable: true,
+      minWidth: '140px',
+      maxWidth: '180px',
       render: (comment) => (
         <div className="text-sm text-gray-900">
           {formatDate(comment.CreatedAt)}
@@ -476,6 +593,12 @@ const AdminForumPage = () => {
 
   // Actions for comments
   const commentsActions = [
+    {
+      label: 'View',
+      icon: HiEye,
+      onClick: (comment) => setSelectedComment(comment),
+      className: 'bg-blue-50 text-blue-700 hover:bg-blue-100 focus:ring-blue-500'
+    },
     {
       label: 'Delete',
       icon: HiTrash,
@@ -634,6 +757,16 @@ const AdminForumPage = () => {
           maxWidth="max-w-4xl"
         >
           {selectedPost && <PostDetailContent post={selectedPost} />}
+        </ResponsiveModal>
+
+        {/* Comment Detail Modal */}
+        <ResponsiveModal
+          isOpen={!!selectedComment}
+          onClose={() => setSelectedComment(null)}
+          title="Forum Comment Details"
+          maxWidth="max-w-3xl"
+        >
+          {selectedComment && <CommentDetailContent comment={selectedComment} />}
         </ResponsiveModal>
       </div>
     </div>

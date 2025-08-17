@@ -24,12 +24,6 @@ const CommentDetailPopup = ({ comment, onClose }) => {
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString() + ' ' +
-      new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
   // Mobile Modal Component
   const MobileModal = () => {
     const [startY, setStartY] = useState(0);

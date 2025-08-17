@@ -6,8 +6,80 @@ import { PageLoaderSpinner } from '../../components/common/LoadingComponents.jsx
 import ResponsiveTable from '../../components/admin/ResponsiveTable.jsx';
 import AdminFilters from '../../components/admin/AdminFilters.jsx';
 import AdminBreadcrumb from '../../components/admin/AdminBreadcrumb.jsx';
+import ResponsiveModal from '../../components/ui/ResponsiveModal.jsx';
 import { HiTrash, HiEye, HiClock } from 'react-icons/hi';
 import { AdminErrorDisplay } from '../../components/common/ErrorDisplay.jsx';
+
+// Comment Detail Content Component for ResponsiveModal
+const CommentDetailContent = ({ comment }) => {
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <div>
+      {/* Comment Header */}
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
+            <span className="text-emerald-700 font-medium text-lg">
+              {comment.Username?.charAt(0)?.toUpperCase() || 'U'}
+            </span>
+          </div>
+          <div>
+            <h5 className="font-semibold text-gray-900">{comment.Username || 'Unknown User'}</h5>
+            <p className="text-sm text-gray-500">Comment ID: {comment.CommentID}</p>
+            <p className="text-sm text-gray-500">{formatDate(comment.CreatedAt)}</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            Comment #{comment.CommentID}
+          </span>
+          {comment.IsEdited && (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 mt-1">
+              Edited
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Recipe Context */}
+      <div className="bg-gray-50 rounded-lg p-4 mb-6">
+        <h4 className="text-sm font-medium text-gray-900 mb-2">Comment on Recipe:</h4>
+        <div className="text-sm text-gray-700">
+          <span className="font-medium text-emerald-600">{comment.RecipeTitle}</span>
+        </div>
+      </div>
+
+      {/* Comment Content */}
+      <div className="mb-6">
+        <h4 className="text-sm font-medium text-gray-900 mb-3">Comment:</h4>
+        <div className="prose prose-gray max-w-none">
+          <div className="text-gray-700 leading-relaxed whitespace-pre-wrap bg-white border border-gray-200 rounded-lg p-4">
+            {comment.Comment}
+          </div>
+        </div>
+      </div>
+
+      {/* Timestamps */}
+      <div className="border-t border-gray-200 pt-4 text-sm text-gray-500">
+        <div className="flex justify-between">
+          <span>Created: {formatDate(comment.CreatedAt)}</span>
+          {comment.IsEdited && comment.UpdatedAt && comment.UpdatedAt !== comment.CreatedAt && (
+            <span>Last updated: {formatDate(comment.UpdatedAt)}</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function CommentManagementPage() {
   const authContextValue = useAuth();
@@ -30,6 +102,9 @@ function CommentManagementPage() {
   // Sorting state
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
+
+  // Selected comment for viewing
+  const [selectedComment, setSelectedComment] = useState(null);
 
   const fetchComments = useCallback(async (currentPage, currentRowsPerPage) => {
     setLoading(true);
@@ -248,17 +323,25 @@ function CommentManagementPage() {
   };
 
   const columns = [
-    { key: 'CommentID', label: 'ID', sortable: true },
+    { 
+      key: 'CommentID', 
+      label: 'ID', 
+      sortable: true,
+      minWidth: '80px',
+      maxWidth: '100px'
+    },
     {
       key: 'Username',
       label: 'User',
       sortable: true,
+      minWidth: '150px',
+      maxWidth: '200px',
       render: (comment) => (
         <span className="flex items-center gap-2">
           <span className="inline-block w-8 h-8 bg-emerald-500 rounded-full text-white text-sm font-semibold leading-8 text-center">
             {comment.Username ? comment.Username[0].toUpperCase() : 'U'}
           </span>
-          <span className="font-medium">{comment.Username}</span>
+          <span className="font-medium truncate">{comment.Username}</span>
         </span>
       )
     },
@@ -266,9 +349,11 @@ function CommentManagementPage() {
       key: 'RecipeTitle',
       label: 'Recipe',
       sortable: true,
+      minWidth: '150px',
+      maxWidth: '250px',
       render: (comment) => (
-        <span className="inline-block max-w-xs">
-          <span className="font-medium text-emerald-600" title={comment.RecipeTitle}>
+        <span className="inline-block max-w-full">
+          <span className="font-medium text-emerald-600 truncate block" title={comment.RecipeTitle}>
             {truncateText(comment.RecipeTitle, 40)}
           </span>
         </span>
@@ -278,21 +363,43 @@ function CommentManagementPage() {
       key: 'Comment',
       label: 'Comment',
       sortable: false,
+      minWidth: '200px',
+      maxWidth: '400px',
       render: (comment) => (
-        <span className="inline-block max-w-md">
-          <span className="text-gray-700 block" title={comment.Comment}>
+        <div className="max-w-full">
+          <div 
+            className="text-gray-700 cursor-pointer hover:text-emerald-600 transition-colors overflow-hidden"
+            style={{
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              wordBreak: 'break-word'
+            }}
+            onClick={() => setSelectedComment(comment)}
+            title="Click to view full comment"
+          >
             {truncateText(comment.Comment, 80)}
-          </span>
+          </div>
           {comment.IsEdited && (
             <span className="text-xs text-gray-500 italic">(edited)</span>
           )}
-        </span>
+          {comment.Comment.length > 80 && (
+            <button
+              onClick={() => setSelectedComment(comment)}
+              className="text-xs text-emerald-600 hover:text-emerald-700 mt-1 block"
+            >
+              View full comment
+            </button>
+          )}
+        </div>
       )
     },
     {
       key: 'CreatedAt',
       label: 'Posted',
       sortable: true,
+      minWidth: '180px',
+      maxWidth: '220px',
       render: (comment) => (
         <span className="inline-block text-sm">
           <span className="flex items-center gap-1 text-gray-600">
@@ -310,6 +417,12 @@ function CommentManagementPage() {
   ];
 
   const actions = [
+    {
+      label: 'View',
+      icon: HiEye,
+      onClick: (comment) => setSelectedComment(comment),
+      className: 'bg-blue-50 text-blue-700 hover:bg-blue-100 focus:ring-blue-500'
+    },
     {
       label: 'Delete',
       icon: HiTrash,
@@ -417,6 +530,16 @@ function CommentManagementPage() {
             />
           </div>
         )}
+        
+        {/* Comment Detail Modal */}
+        <ResponsiveModal
+          isOpen={!!selectedComment}
+          onClose={() => setSelectedComment(null)}
+          title="Comment Details"
+          maxWidth="max-w-3xl"
+        >
+          {selectedComment && <CommentDetailContent comment={selectedComment} />}
+        </ResponsiveModal>
       </div>
     </div>
   );
