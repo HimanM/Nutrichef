@@ -8,6 +8,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <title>NutriChef</title>
+    <style>
+      /* Fix for unwanted text cursor appearing on non-text elements */
+      *, *::before, *::after {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      
+      /* Allow text selection on text elements */
+      input, textarea, [contenteditable="true"], p, div.prose, .text-content {
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+      }
+      
+      /* Ensure proper cursor behavior */
+      button, [role="button"], a, .cursor-pointer {
+        cursor: pointer !important;
+      }
+      
+      input, textarea, [contenteditable="true"] {
+        cursor: text !important;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
