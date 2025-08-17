@@ -50,7 +50,7 @@ const PostDetailContent = ({ post }) => {
             </span>
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">{post.UserName || 'Unknown User'}</h3>
+            <h5 className="font-semibold text-gray-900">{post.UserName || 'Unknown User'}</h5>
             <p className="text-sm text-gray-500">User ID: {post.UserId}</p>
             <p className="text-sm text-gray-500">{formatDate(post.CreatedAt)}</p>
           </div>
@@ -63,7 +63,7 @@ const PostDetailContent = ({ post }) => {
       </div>
 
       {/* Title */}
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">{post.Title}</h1>
+      <h4 className="text-2xl font-bold text-gray-900 mb-4">{post.Title}</h4>
 
       {/* Stats */}
       <div className="flex items-center gap-6 text-sm text-gray-500 mb-6">
