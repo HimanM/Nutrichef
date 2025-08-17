@@ -54,20 +54,21 @@ jobs:
             ENV_FILE="$DEPLOY_PATH/backend/.env"
             mkdir -p "$(dirname "$ENV_FILE")"
             cat > "$ENV_FILE" <<'ENV_EOF'
-MAIL_SERVER="${{ secrets.MAIL_SERVER }}"
-MAIL_USERNAME="${{ secrets.MAIL_USERNAME }}"
-MAIL_PASSWORD="${{ secrets.MAIL_PASSWORD }}"
-MAIL_DEFAULT_SENDER="${{ secrets.MAIL_DEFAULT_SENDER }}"
+              MAIL_SERVER = "${{ secrets.MAIL_SERVER }}"
+              MAIL_USERNAME = "${{ secrets.MAIL_USERNAME }}"
+              MAIL_PASSWORD = "${{ secrets.MAIL_PASSWORD }}"
+              MAIL_DEFAULT_SENDER = "${{ secrets.MAIL_DEFAULT_SENDER }}"
 
-# GEMINI NLP
-GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
-PROJECT_NUMBER="${{ secrets.PROJECT_NUMBER }}"
 
-FRONTEND_URL="${{ secrets.FRONTEND_URL }}"
+              # GEMINI NLP
+              GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
+              PROJECT_NUMBER = "${{ secrets.PROJECT_NUMBER }}"
 
-# Domain URL for production/cloudflared tunnel
-DOMAIN_URL="${{ secrets.DOMAIN_URL }}"
-ENV_EOF
+              FRONTEND_URL='${{ secrets.FRONTEND_URL }}'
+
+              # Domain URL for production/cloudflared tunnel
+              DOMAIN_URL='${{ secrets.DOMAIN_URL }}'
+              ENV_EOF
 
             # Try docker compose v2 first (docker compose), fall back to docker-compose
             if command -v docker > /dev/null 2>&1; then
