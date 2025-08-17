@@ -117,13 +117,17 @@ class GeminiNlpParser:
             # Create a detailed prompt for nutrition analysis
             nutrition_prompt = f"""
             Analyze the following recipe and provide nutritional information per serving.
+            Ingredients with quantity and Units are given in a JSON format.
+
+                Recipe Title: {recipe_info['title']}
+                Servings: {recipe_info['servings']}
+                Ingredients:
+                {json.dumps(recipe_info['ingredients'], indent=2)}
             
-            Recipe Title: {recipe_info['title']}
-            Servings: {recipe_info['servings']}
-            Ingredients:
-            {json.dumps(recipe_info['ingredients'], indent=2)}
-            
+            After analyzing above information about the recipe deeply, considering all the ingredients and quantities,
             Please provide nutritional information in the following JSON format (Add other nutrients if you can but these are the most important):
+
+
             {{
                 "success": true,
                 "nutrition": {{
@@ -140,14 +144,18 @@ class GeminiNlpParser:
                 "notes": "Nutritional values are estimates based on typical ingredient values"
             }}
             
-            If you cannot provide accurate nutritional information, return:
+            Try to provide above information If you really cannot provide accurate nutritional information, return:
+
+
             {{
                 "success": false,
-                "error": "Unable to calculate nutritional information for this recipe"
+                "error": "Unable to calculate nutritional information for this recipe: <reason>"
             }}
             
             Focus on providing realistic estimates based on the ingredients listed. Include only the nutrients you can reasonably estimate.
+            replace the <reason> with the proper reason within 20 words (ex: nutritional values differ with brands)
             """
+
 
             client = genai.Client(api_key=self.api_key)
             model_name = "gemini-1.5-flash-8b"
