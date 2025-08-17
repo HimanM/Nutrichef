@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useModal } from '../context/ModalContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
@@ -28,12 +28,12 @@ const UserSettingsPage = () => {
     const { showModal } = useModal();
 
     useEffect(() => {
-        let effectiveUserId = null; let userIdSource = 'default'; let resolvedUserName = 'User'; let resolvedUserEmail = '';
+        let effectiveUserId = null; let resolvedUserName = 'User'; let resolvedUserEmail = '';
         const storedUser = localStorage.getItem('currentUser');
         if (storedUser) {
             try {
                 const u = JSON.parse(storedUser);
-                effectiveUserId = String(u.UserID || u.id); userIdSource = 'localStorage';
+                effectiveUserId = String(u.UserID || u.id);
                 resolvedUserName = u.Name || u.Email?.split('@')[0] || `User ID: ${effectiveUserId}`;
                 resolvedUserEmail = u.Email || '';
             } catch (e) { 
@@ -42,7 +42,7 @@ const UserSettingsPage = () => {
             }
         }
         if (!effectiveUserId && authContextUser) {
-            effectiveUserId = String(authContextUser.UserID || authContextUser.id); userIdSource = 'AuthContext';
+            effectiveUserId = String(authContextUser.UserID || authContextUser.id);
             resolvedUserName = authContextUser.Name || authContextUser.Email?.split('@')[0] || `User ID: ${effectiveUserId}`;
             resolvedUserEmail = authContextUser.Email || '';
         }

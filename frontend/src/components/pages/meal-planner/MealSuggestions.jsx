@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { MdLightbulb, MdAdd, MdClose, MdRefresh, MdExpandMore, MdExpandLess } from 'react-icons/md';
 import { HiOutlineSparkles, HiOutlineX } from 'react-icons/hi';
 import { authenticatedFetch } from '../../../utils/apiUtil.js';
@@ -19,10 +19,10 @@ const MealSuggestions = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [remainingTargets, setRemainingTargets] = useState({});
-  const [expandedCard, setExpandedCard] = useState(null);
+  const [_expandedCard, _setExpandedCard] = useState(null);
   const auth = useAuth();
 
-  const fetchSuggestions = async () => {
+  const fetchSuggestions = useCallback(async () => {
     if (!selectedDate || !auth.token) return;
     
     setIsLoading(true);
@@ -54,13 +54,13 @@ const MealSuggestions = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedDate, auth, existingMeals]);
 
   useEffect(() => {
     if (isVisible && selectedDate) {
       fetchSuggestions();
     }
-  }, [isVisible, selectedDate, existingMeals]);
+  }, [isVisible, selectedDate, existingMeals, fetchSuggestions]);
 
   const handleAddSuggestion = (recipe) => {
     if (onAddSuggestion) {

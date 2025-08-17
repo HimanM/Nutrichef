@@ -11,7 +11,7 @@ function PersonalizedRecipesPage() {
     const [error, setError] = useState(null);
     const auth = useAuth();
     const { isAuthenticated, loading: authLoading, currentUser, token } = auth;
-    const { canPerformAuthAction, isSessionExpired } = useConditionalAuth();
+    const { isSessionExpired } = useConditionalAuth();
 
     const [currentPage, setCurrentPage] = useState(1);
     const [recipesPerPage, setRecipesPerPage] = useState(12); // Changed to 12 for better 3-column layout

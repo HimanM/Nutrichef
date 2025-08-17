@@ -12,7 +12,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
   const [recipeName, setRecipeName] = useState('');
   const [description, setDescription] = useState('');
   const [instructions, setInstructions] = useState('');
-  const [recipeImageFile, setRecipeImageFile] = useState(null);
+  const [_recipeImageFile, setRecipeImageFile] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState('');
   const [imageUploadError, setImageUploadError] = useState('');
   const [imageUploadSuccessMsg, setImageUploadSuccessMsg] = useState('');
@@ -194,7 +194,7 @@ function RecipeSubmissionModal({ open, onClose, userId, isLoading, setIsLoading 
         setImageUploadError(data.error || 'Image upload failed.');
         setUploadedImageUrl('');
       }
-    } catch (error) {
+    } catch {
       setImageUploadError('Network error during image upload.');
       setUploadedImageUrl('');
     } finally {

@@ -48,7 +48,7 @@ const UserRegistrationPage = () => {
                 try {
                     const errorData = await response.json();
                     errorMsg = errorData.error || errorData.message || errorMsg;
-                } catch (e) {
+                } catch {
                     errorMsg = response.statusText || errorMsg;
                 }
                 setMessage(errorMsg);

@@ -164,7 +164,7 @@ function MealPlannerPage() {
       console.error('Error fetching user nutritional targets:', error);
       showModal('alert', 'Error', 'Failed to fetch user nutritional targets. Please try again later.', {iconType: 'error'});
     }
-  }, [auth]);
+  }, [auth, showModal]);
 
   // Fetch nutritional targets when auth changes
   useEffect(() => {
@@ -189,7 +189,7 @@ function MealPlannerPage() {
       }, auth);
 
       if (response.ok) {
-        const result = await response.json();
+        const _result = await response.json();
         setUserNutritionalTargets(targets);
         showModal('alert', 'Success', 'Nutritional targets updated successfully!', {iconType: 'success'});
         
@@ -201,7 +201,7 @@ function MealPlannerPage() {
         const error = await response.json();
         showModal('alert', 'Error', error.error || 'Failed to update nutritional targets', {iconType: 'error'});
       }
-    } catch (error) {
+    } catch {
       showModal('alert', 'Error', 'Failed to save nutritional targets', {iconType: 'error'});
     }
   };
@@ -217,7 +217,7 @@ function MealPlannerPage() {
     try {
       const storedPalette = localStorage.getItem(MEAL_PLAN_PALETTE_KEY);
       setPaletteRecipes(storedPalette ? JSON.parse(storedPalette) : []);
-    } catch (err) {
+    } catch {
       setPaletteError("Could not load saved recipes palette.");
     } finally { 
       setLoadingPalette(false); 
@@ -507,7 +507,7 @@ function MealPlannerPage() {
     }
     const doc = new jsPDF(); 
     let y = 15; 
-    const lh = 7; 
+    const _lh = 7; 
     const m = 10; 
     const pw = doc.internal.pageSize.width - m * 2;
     doc.setFontSize(18); 
@@ -553,7 +553,7 @@ function MealPlannerPage() {
     setIsPaletteVisible(!isPaletteVisible);
   };
 
-  const getVisibleDates = () => {
+  const _getVisibleDates = () => {
     return viewMode === 'week' ? currentWeekDates.slice(0, 7) : currentWeekDates;
   };
 

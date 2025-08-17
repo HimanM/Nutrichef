@@ -22,7 +22,7 @@ function RecipeManagementPage() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [sortColumn, setSortColumn] = useState('RecipeID');
   const [sortDirection, setSortDirection] = useState('asc');
-  const [publicFilter, setPublicFilter] = useState('all');
+  const [publicFilter] = useState('all');
 
   const fetchRecipes = useCallback(async (currentPage, currentRowsPerPage, currentSortColumn, currentSortDirection) => {
     setLoading(true); setError(null); 

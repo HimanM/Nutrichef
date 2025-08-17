@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { HiOutlineBell, HiOutlineTrash, HiCheck, HiX } from 'react-icons/hi';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { HiOutlineBell, HiOutlineTrash, HiCheck } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import ResponsiveModal from '../ui/ResponsiveModal';
@@ -16,21 +16,7 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
   const responsiveModal = useResponsiveModal(false);
   const { showModal } = useModal();
 
-  useEffect(() => {
-    if (isAuthenticated) fetchNotifications();
-    const interval = setInterval(() => {
-      if (isAuthenticated) fetchNotifications();
-    }, 60000);
-    return () => clearInterval(interval);
-  }, [isAuthenticated, token]);
-
-  useEffect(() => {
-    const handleResize = () => setOpen(window.innerWidth >= 640);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!isAuthenticated || !token) return;
     try {
       const res = await fetch(apiUrl, {
@@ -43,10 +29,24 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
       const data = await res.json();
       setNotifications(data);
       setUnreadCount(data.filter(n => !n.IsRead).length);
-    } catch (e) {
+    } catch {
       // fail silently
     }
-  };
+  }, [isAuthenticated, token, apiUrl]);
+
+  useEffect(() => {
+    if (isAuthenticated) fetchNotifications();
+    const interval = setInterval(() => {
+      if (isAuthenticated) fetchNotifications();
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, fetchNotifications]);
+
+  useEffect(() => {
+    const handleResize = () => setOpen(window.innerWidth >= 640);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleNotificationClick = async (notif) => {
     if (!notif.IsRead && token) {
@@ -89,7 +89,7 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
       if (!res.ok) throw new Error('Failed to clear notifications');
       setNotifications([]);
       setUnreadCount(0);
-    } catch (e) {
+    } catch {
       alert('Failed to clear notifications.');
     }
   };
@@ -129,7 +129,7 @@ const NotificationDropdown = ({ apiUrl = '/api/notifications/', onNavigate }) =>
       document.removeEventListener('touchstart', handleClick);
       window.removeEventListener('openNotifications', handleOpenNotifications);
     };
-  }, [open, responsiveModal.openModal]);
+  }, [open, responsiveModal]);
 
   if (!isAuthenticated) return null;
 

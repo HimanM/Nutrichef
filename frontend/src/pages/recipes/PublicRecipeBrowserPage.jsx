@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import RecipeCard from '../../components/pages/recipe/RecipeCard.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useConditionalAuth } from '../../components/auth/AuthGuard.jsx';
@@ -9,8 +9,7 @@ import RecipeSubmissionModal from '../../components/pages/recipe/RecipeSubmissio
 import FloatingLoader from '../../components/ui/FloatingLoader.jsx';
 import { HiOutlineRefresh, HiOutlineSearch, HiOutlinePlus, HiOutlineCheck, HiOutlineEye, HiOutlineEyeOff, HiOutlineHeart, HiHeart, HiOutlineTag, HiOutlineX } from 'react-icons/hi';
 
-const AddIcon = ({ className = "w-5 h-5 mr-1" }) => <svg className={className} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd"></path></svg>;
-const CheckIcon = ({ className = "w-5 h-5 mr-1" }) => <svg className={className} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path></svg>;
+
 
 const MEAL_PLAN_PALETTE_KEY = 'mealPlanPaletteRecipes';
 
@@ -26,7 +25,7 @@ function PublicRecipeBrowserPage() {
   const [totalRecipes, setTotalRecipes] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [inputValue, setInputValue] = useState('');
-  
+
   // New state for favorites and tags
   const [currentView, setCurrentView] = useState('public'); // 'public', 'private', 'favorites'
   const [availableTags, setAvailableTags] = useState([]);
@@ -36,7 +35,7 @@ function PublicRecipeBrowserPage() {
 
   const auth = useAuth();
   const { isAuthenticated, currentUser } = auth;
-  const { canPerformAuthAction, attemptAuthAction, isSessionExpired } = useConditionalAuth();
+  const { attemptAuthAction, isSessionExpired } = useConditionalAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const location = useLocation();
 
@@ -107,16 +106,16 @@ function PublicRecipeBrowserPage() {
       if (tagIds.length > 0) {
         const data = await fetchRecipesByTags(tagIds, pageToFetch, limit, false);
         let filteredRecipes = data.recipes || [];
-        
+
         // Apply search filter if needed
         if (currentSearchTerm) {
           const searchLower = currentSearchTerm.toLowerCase();
-          filteredRecipes = filteredRecipes.filter(recipe => 
+          filteredRecipes = filteredRecipes.filter(recipe =>
             recipe.Title?.toLowerCase().includes(searchLower) ||
             recipe.Description?.toLowerCase().includes(searchLower)
           );
         }
-        
+
         setRecipes(filteredRecipes);
         setTotalRecipes(filteredRecipes.length);
         return;
@@ -133,7 +132,7 @@ function PublicRecipeBrowserPage() {
           }
           return;
         }
-        url = `/api/recipes/my-private?page=${pageToFetch}&limit=${limit}&user_id=${currentUserId}`; 
+        url = `/api/recipes/my-private?page=${pageToFetch}&limit=${limit}&user_id=${currentUserId}`;
         if (currentSearchTerm) {
           url += `&search=${encodeURIComponent(currentSearchTerm)}`;
         }
@@ -164,13 +163,29 @@ function PublicRecipeBrowserPage() {
     }
   }, [auth]);
 
+  // Favorites API functions
+  const fetchUserFavorites = useCallback(async (userId, page = 1, limit = 12, search = '') => {
+    try {
+      let url = `/api/users/${userId}/favorites?page=${page}&limit=${limit}`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+
+      const response = await authenticatedFetch(url, {}, auth);
+      if (!response.ok) throw new Error('Failed to fetch favorites');
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+      throw error;
+    }
+  }, [auth]);
+
   useEffect(() => {
     fetchRecipes(searchTerm, currentPage, recipesPerPage, currentView, effectiveUserId, selectedTags);
 
     const existingPaletteString = localStorage.getItem(MEAL_PLAN_PALETTE_KEY);
     const currentPalette = existingPaletteString ? JSON.parse(existingPaletteString) : [];
     setPaletteRecipeIds(new Set(currentPalette.map(r => r.RecipeID)));
-  }, [currentPage, recipesPerPage, searchTerm, fetchRecipes, currentView, effectiveUserId, selectedTags]);
+  }, [currentPage, recipesPerPage, searchTerm, fetchRecipes, currentView, effectiveUserId, selectedTags, fetchUserFavorites, isSessionExpired]);
 
   useEffect(() => {
     let hasBeenHiddenOrBlurred = false;
@@ -236,7 +251,7 @@ function PublicRecipeBrowserPage() {
         }
 
         const data = await response.json();
-        
+
         // Update local state
         setFavoriteRecipeIds(prev => {
           const newSet = new Set(prev);
@@ -249,8 +264,8 @@ function PublicRecipeBrowserPage() {
         });
 
         // Update recipe in current list if needed
-        setRecipes(prev => prev.map(recipe => 
-          recipe.RecipeID === recipeId 
+        setRecipes(prev => prev.map(recipe =>
+          recipe.RecipeID === recipeId
             ? { ...recipe, is_favorited: data.is_favorited }
             : recipe
         ));
@@ -265,21 +280,6 @@ function PublicRecipeBrowserPage() {
         setIsLoginModalOpen(true);
       }
     });
-  };
-
-  const fetchUserFavorites = async (userId, page = 1, limit = 12, search = '') => {
-    try {
-      let url = `/api/users/${userId}/favorites?page=${page}&limit=${limit}`;
-      if (search) url += `&search=${encodeURIComponent(search)}`;
-      
-      const response = await authenticatedFetch(url, {}, auth);
-      if (!response.ok) throw new Error('Failed to fetch favorites');
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching favorites:', error);
-      throw error;
-    }
   };
 
   // Tags API functions
@@ -302,7 +302,7 @@ function PublicRecipeBrowserPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tag_ids: tagIds, page, limit, match_all: matchAll })
       });
-      
+
       if (!response.ok) throw new Error('Failed to fetch recipes by tags');
       return await response.json();
     } catch (error) {
@@ -387,7 +387,7 @@ function PublicRecipeBrowserPage() {
   // Tag management functions
   const handleTagToggle = (tagId) => {
     setSelectedTags(prev => {
-      const newTags = prev.includes(tagId) 
+      const newTags = prev.includes(tagId)
         ? prev.filter(id => id !== tagId)
         : [...prev, tagId];
       setCurrentPage(1); // Reset to first page when filters change
@@ -405,13 +405,13 @@ function PublicRecipeBrowserPage() {
   };
 
   // Legacy support
-  const handleToggleRecipeView = () => {
-    const nextView = currentView === 'private' ? 'public' : 'private';
-    handleViewChange(nextView);
-  };
+  // const handleToggleRecipeView = () => {
+  //   const nextView = currentView === 'private' ? 'public' : 'private';
+  //   handleViewChange(nextView);
+  // };
 
-  const showPrivateRecipes = currentView === 'private'; // Legacy compatibility
-  const isToggleButtonDisabled = !isAuthenticated && currentView === 'public';
+  // const showPrivateRecipes = currentView === 'private'; // Legacy compatibility
+  // const isToggleButtonDisabled = !isAuthenticated && currentView === 'public';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
@@ -421,14 +421,14 @@ function PublicRecipeBrowserPage() {
           <div className="text-center mb-6 animate-fade-in">
             <h1 className="text-2xl md:text-3xl font-bold mb-2">
               <span className="gradient-text">
-                {currentView === 'private' ? "My Private Recipes" : 
-                 currentView === 'favorites' ? "My Favorite Recipes" : 
-                 "Browse Recipes"}
+                {currentView === 'private' ? "My Private Recipes" :
+                  currentView === 'favorites' ? "My Favorite Recipes" :
+                    "Browse Recipes"}
               </span>
             </h1>
             <p className="text-sm text-gray-600 max-w-2xl mx-auto">
               {currentView === 'favorites' ? "Your saved favorite recipes" :
-               "Discover delicious recipes and add them to your meal planning palette"}
+                "Discover delicious recipes and add them to your meal planning palette"}
             </p>
           </div>
 
@@ -446,7 +446,7 @@ function PublicRecipeBrowserPage() {
                   <HiOutlineEye className="w-3 h-3 mr-1" />
                   Public
                 </button>
-                
+
                 <button
                   type="button"
                   onClick={() => handleViewChange('private')}
@@ -457,17 +457,16 @@ function PublicRecipeBrowserPage() {
                   <HiOutlineEyeOff className="w-3 h-3 mr-1" />
                   Private
                 </button>
-                
+
                 <button
                   type="button"
                   onClick={() => handleViewChange('favorites')}
                   disabled={!isAuthenticated}
                   title={!isAuthenticated ? "Log in to view your favorite recipes" : ""}
-                  className={`inline-flex items-center justify-center font-medium text-xs py-2 px-2.5 rounded-lg transition-all duration-200 ${
-                    currentView === 'favorites' 
-                      ? 'bg-pink-100 text-pink-700 border-2 border-pink-300' 
+                  className={`inline-flex items-center justify-center font-medium text-xs py-2 px-2.5 rounded-lg transition-all duration-200 ${currentView === 'favorites'
+                      ? 'bg-pink-100 text-pink-700 border-2 border-pink-300'
                       : 'border-2 border-gray-300 text-gray-600 hover:border-pink-300 hover:text-pink-600 hover:bg-pink-50'
-                  } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <HiOutlineHeart className="w-3 h-3 mr-1" />
                   Favorites
@@ -488,7 +487,7 @@ function PublicRecipeBrowserPage() {
                     className="form-input pl-10 w-full py-2 text-sm"
                   />
                 </div>
-                
+
                 <button type="submit" className="btn-primary py-2 px-3 flex-shrink-0">
                   <HiOutlineSearch className="w-4 h-4" />
                 </button>
@@ -503,9 +502,8 @@ function PublicRecipeBrowserPage() {
                   <button
                     type="button"
                     onClick={toggleTagsFilter}
-                    className={`flex items-center text-xs font-medium transition-colors ${
-                      selectedTags.length > 0 ? 'text-emerald-700' : 'text-gray-700 hover:text-gray-600'
-                    }`}
+                    className={`flex items-center text-xs font-medium transition-colors ${selectedTags.length > 0 ? 'text-emerald-700' : 'text-gray-700 hover:text-gray-600'
+                      }`}
                   >
                     <HiOutlineTag className="w-3 h-3 mr-1" />
                     Filter by Tags
@@ -514,16 +512,16 @@ function PublicRecipeBrowserPage() {
                         {selectedTags.length}
                       </span>
                     )}
-                    <svg 
+                    <svg
                       className={`w-3 h-3 ml-1 transition-transform duration-200 ${showTagsFilter ? 'rotate-180' : ''}`}
-                      fill="none" 
-                      stroke="currentColor" 
+                      fill="none"
+                      stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
-                  
+
                   {showTagsFilter && selectedTags.length > 0 && (
                     <button
                       type="button"
@@ -535,7 +533,7 @@ function PublicRecipeBrowserPage() {
                     </button>
                   )}
                 </div>
-                
+
                 {/* Tags Filter Content */}
                 {showTagsFilter && (
                   <div className="animate-fade-in">
@@ -548,11 +546,10 @@ function PublicRecipeBrowserPage() {
                               key={tag.TagID}
                               type="button"
                               onClick={() => handleTagToggle(tag.TagID)}
-                              className={`px-2 py-0.5 text-xs rounded-full border transition-colors ${
-                                selectedTags.includes(tag.TagID)
+                              className={`px-2 py-0.5 text-xs rounded-full border transition-colors ${selectedTags.includes(tag.TagID)
                                   ? 'text-white border-transparent'
                                   : 'text-gray-600 border-gray-300 hover:border-gray-400'
-                              }`}
+                                }`}
                               style={{
                                 backgroundColor: selectedTags.includes(tag.TagID) ? tag.TagColor : 'transparent',
                                 borderColor: selectedTags.includes(tag.TagID) ? tag.TagColor : undefined
@@ -593,9 +590,9 @@ function PublicRecipeBrowserPage() {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">No recipes found</h3>
                 <p className="text-gray-600">
-                  {searchTerm ? `No ${currentView} recipes found for "${searchTerm}".` : 
-                   selectedTags.length > 0 ? "No recipes found with the selected tags." :
-                   `No ${currentView} recipes available at the moment.`}
+                  {searchTerm ? `No ${currentView} recipes found for "${searchTerm}".` :
+                    selectedTags.length > 0 ? "No recipes found with the selected tags." :
+                      `No ${currentView} recipes available at the moment.`}
                   {(currentView === 'private' || currentView === 'favorites') && !isAuthenticated && " Please log in to access this feature."}
                 </p>
               </div>
@@ -604,7 +601,7 @@ function PublicRecipeBrowserPage() {
                 {recipes.map((recipe) => {
                   const isRecipeInPalette = paletteRecipeIds.has(recipe.RecipeID);
                   const isFavorited = favoriteRecipeIds.has(recipe.RecipeID) || recipe.is_favorited;
-                  
+
                   return (
                     <RecipeCard
                       key={recipe.RecipeID}
@@ -616,11 +613,10 @@ function PublicRecipeBrowserPage() {
                             <button
                               type="button"
                               onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(currentRecipe.RecipeID); }}
-                              className={`p-3 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 ${
-                                isFavorited
+                              className={`p-3 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 ${isFavorited
                                   ? 'bg-pink-500 text-white border border-pink-500 hover:bg-pink-600 shadow-md'
                                   : 'bg-white text-pink-500 border border-pink-300 hover:border-pink-400 hover:bg-pink-50'
-                              }`}
+                                }`}
                               title={isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
                             >
                               {isFavorited ? (
@@ -630,17 +626,16 @@ function PublicRecipeBrowserPage() {
                               )}
                             </button>
                           )}
-                          
+
                           {/* Add to Palette Button */}
                           <button
                             type="button"
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToPalette(currentRecipe); }}
                             disabled={isRecipeInPalette}
-                            className={`flex-1 px-4 py-3 text-sm font-medium rounded-xl flex items-center justify-center transition-all duration-200 ${
-                              isRecipeInPalette
+                            className={`flex-1 px-4 py-3 text-sm font-medium rounded-xl flex items-center justify-center transition-all duration-200 ${isRecipeInPalette
                                 ? 'bg-emerald-100 text-emerald-700 cursor-default'
                                 : 'btn-secondary hover:scale-105'
-                            }`}
+                              }`}
                           >
                             {isRecipeInPalette ? (
                               <>
@@ -681,9 +676,9 @@ function PublicRecipeBrowserPage() {
                 <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0">
                   {/* Page Navigation */}
                   <div className="flex items-center space-x-2">
-                    <button 
-                      onClick={handlePreviousPage} 
-                      disabled={currentPage === 1} 
+                    <button
+                      onClick={handlePreviousPage}
+                      disabled={currentPage === 1}
                       className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 transition-all duration-200"
                     >
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -691,7 +686,7 @@ function PublicRecipeBrowserPage() {
                       </svg>
                       Previous
                     </button>
-                    
+
                     <div className="flex items-center space-x-1">
                       {Array.from({ length: Math.min(5, Math.ceil(totalRecipes / recipesPerPage)) }, (_, i) => {
                         const pageNum = i + 1;
@@ -700,11 +695,10 @@ function PublicRecipeBrowserPage() {
                           <button
                             key={pageNum}
                             onClick={() => setCurrentPage(pageNum)}
-                            className={`w-10 h-10 text-sm font-medium rounded-lg transition-all duration-200 ${
-                              isCurrentPage
+                            className={`w-10 h-10 text-sm font-medium rounded-lg transition-all duration-200 ${isCurrentPage
                                 ? 'bg-emerald-500 text-white shadow-md'
                                 : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:border-emerald-300'
-                            }`}
+                              }`}
                           >
                             {pageNum}
                           </button>
@@ -714,10 +708,10 @@ function PublicRecipeBrowserPage() {
                         <span className="px-2 text-gray-500">...</span>
                       )}
                     </div>
-                    
-                    <button 
-                      onClick={handleNextPage} 
-                      disabled={currentPage * recipesPerPage >= totalRecipes} 
+
+                    <button
+                      onClick={handleNextPage}
+                      disabled={currentPage * recipesPerPage >= totalRecipes}
                       className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 transition-all duration-200"
                     >
                       Next
@@ -777,7 +771,7 @@ function PublicRecipeBrowserPage() {
           sm:min-h-[60px] sm:min-w-[60px]
         "
       >
-        <HiOutlinePlus className="w-5 h-5 sm:w-6 sm:h-6"/>
+        <HiOutlinePlus className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
 
       {/* Modals */}
@@ -800,7 +794,7 @@ function PublicRecipeBrowserPage() {
           redirectState={{ from: location }}
         />
       )}
-      {isProcessingRecipeSubmission && <FloatingLoader text="Submitting recipe..."/>}
+      {isProcessingRecipeSubmission && <FloatingLoader text="Submitting recipe..." />}
     </div>
   );
 }

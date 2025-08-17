@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { HiTrash, HiInformationCircle, HiChartBar } from 'react-icons/hi2';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useModal } from '../../context/ModalContext.jsx';
@@ -96,25 +96,7 @@ const AdminLogsMonitorPage = () => {
         memory: []
     });
 
-    useEffect(() => {
-        connectToStream();
-        loadInitialData();
-        initializeChart();
-
-        return () => {
-            if (eventSourceRef.current) {
-                eventSourceRef.current.close();
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-        if (autoScroll && logContainerRef.current) {
-            logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
-        }
-    }, [logs, autoScroll]);
-
-    const connectToStream = () => {
+    const connectToStream = useCallback(() => {
         if (eventSourceRef.current) {
             eventSourceRef.current.close();
         }
@@ -142,15 +124,15 @@ const AdminLogsMonitorPage = () => {
             }
         };
 
-        eventSourceRef.current.onerror = (event) => {
+        eventSourceRef.current.onerror = () => {
             setConnectionStatus('error');
 
             // Try to reconnect after 5 seconds
             setTimeout(connectToStream, 5000);
         };
-    };
+    }, []);
 
-    const loadInitialData = async () => {
+    const loadInitialData = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -177,7 +159,27 @@ const AdminLogsMonitorPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [authContextValue]);
+
+    useEffect(() => {
+        connectToStream();
+        loadInitialData();
+        initializeChart();
+
+        return () => {
+            if (eventSourceRef.current) {
+                eventSourceRef.current.close();
+            }
+        };
+    }, [connectToStream, loadInitialData]);
+
+    useEffect(() => {
+        if (autoScroll && logContainerRef.current) {
+            logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+        }
+    }, [logs, autoScroll]);
+
+
 
     const addLogEntry = (logEntry) => {
         setLogs(prevLogs => {

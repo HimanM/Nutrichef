@@ -52,7 +52,7 @@ const NutritionalTargetsModal = ({ isOpen, onClose, onSave, currentTargets = {} 
     let hasAtLeastOneTarget = false;
 
     // Check if at least one target is set
-    Object.entries(targets).forEach(([key, value]) => {
+    Object.entries(targets).forEach(([, value]) => {
       if (value !== '' && value !== null && value > 0) {
         hasAtLeastOneTarget = true;
       }

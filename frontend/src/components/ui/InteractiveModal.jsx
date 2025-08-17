@@ -70,7 +70,7 @@ const InteractiveModal = ({
         <div className="flex items-start">
           {displayIcon}
           <div className="flex-1">
-            {message && <p className="text-gray-600 leading-relaxed">{message}</p>}
+            {message && <div className="text-gray-600 leading-relaxed">{message}</div>}
             {children}
           </div>
         </div>
