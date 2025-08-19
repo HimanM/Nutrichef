@@ -1,5 +1,8 @@
 from backend.dao import UserDAO, RecipeDAO, ClassificationResultDAO
 from backend.db import db # For db.session.commit() and db.session.rollback()
+from sqlalchemy.exc import IntegrityError
+import traceback
+from backend.models import RecipeComment, RecipeRating, RecipeIngredient, RecipeTagAssignment, UserFavoriteRecipe
 
 class AdminService:
     def __init__(self):
@@ -90,13 +93,37 @@ class AdminService:
             return None, {"error": "Recipe not found"}, 404
 
         try:
+            # Explicitly remove dependent records first to avoid FK constraint errors
+            # Delete comments
+            RecipeComment.query.filter_by(RecipeID=recipe_id).delete(synchronize_session=False)
+            # Delete ratings
+            RecipeRating.query.filter_by(RecipeID=recipe_id).delete(synchronize_session=False)
+            # Delete recipe ingredients
+            RecipeIngredient.query.filter_by(RecipeID=recipe_id).delete(synchronize_session=False)
+            # Delete tag assignments
+            RecipeTagAssignment.query.filter_by(RecipeID=recipe_id).delete(synchronize_session=False)
+            # Delete favorites
+            UserFavoriteRecipe.query.filter_by(RecipeID=recipe_id).delete(synchronize_session=False)
+
+            # Now delete the recipe itself
             db.session.delete(recipe)
             db.session.commit()
             return {"message": "Recipe deleted successfully"}, None, 200
         except Exception as e:
+            # Rollback and provide more detailed logs for debugging in Docker
             db.session.rollback()
-            print(f"AdminService - Error deleting recipe: {e}")
-            return None, {"error": "Failed to delete recipe"}, 500
+            tb = traceback.format_exc()
+            print(f"AdminService - Error deleting recipe (id={recipe_id}): {e}\n{tb}", flush=True)
+
+            # Provide an actionable message for integrity constraint failures
+            if isinstance(e, IntegrityError):
+                error_message = (
+                    "Failed to delete recipe due to database integrity constraints."
+                )
+            else:
+                error_message = f"Failed to delete recipe: {str(e)}"
+
+            return None, {"error": error_message}, 500
 
     def get_classification_scores_summary(self, page=1, per_page=20):
         """Gets a paginated summary of classification scores."""
