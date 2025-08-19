@@ -18,8 +18,8 @@ services:
     build: ./backend
     container_name: backend_container
     restart: unless-stopped
-    # ports:
-    #   - "5000:5000" # Host:Container
+    ports:
+      - "5000:5000" # Host:Container
     environment:
       # Database connection details
       DB_HOST: db
