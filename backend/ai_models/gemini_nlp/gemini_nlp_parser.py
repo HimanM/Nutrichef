@@ -159,7 +159,7 @@ class GeminiNlpParser:
 
             client = genai.Client(api_key=self.api_key)
             model_name = "gemini-1.5-flash-8b"
-            print(nutrition_prompt)
+            # print(nutrition_prompt)
             
             current_contents = [
                 types.Content(
