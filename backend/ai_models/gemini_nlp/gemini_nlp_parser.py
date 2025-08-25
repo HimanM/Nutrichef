@@ -144,7 +144,7 @@ class GeminiNlpParser:
                 "notes": "Nutritional values are estimates based on typical ingredient values"
             }}
             
-            Try to provide above information If you really cannot provide accurate nutritional information, return:
+            Try to provide above information (assume quantity if needed) worst case scenario, if you really cannot provide accurate nutritional information, return:
 
 
             {{
@@ -152,13 +152,14 @@ class GeminiNlpParser:
                 "error": "Unable to calculate nutritional information for this recipe: <reason>"
             }}
             
-            Focus on providing realistic estimates based on the ingredients listed. Include only the nutrients you can reasonably estimate.
-            replace the <reason> with the proper reason within 20 words (ex: nutritional values differ with brands)
+            Always Focus on providing realistic estimates based on the ingredients listed rather than returning the false success message.
+            if really need to return false success message replace the <reason> with the proper reason within 20 words (ex: nutritional values differ with brands)
             """
 
 
             client = genai.Client(api_key=self.api_key)
             model_name = "gemini-1.5-flash-8b"
+            print(nutrition_prompt)
             
             current_contents = [
                 types.Content(
