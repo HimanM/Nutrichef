@@ -518,7 +518,7 @@ class FoodChatbot:
         elif intent == "who_are_you":
             return {
                 "response": "I am FoodieBot, your friendly culinary assistant!\n i was made by the NutriChef Admin Himan_M to help you with food-related queries.",
-                "image_url": "https://via.placeholder.com/250/007bff/FFFFFF?Text=FoodieBot"
+                "image_url": "https://i.imgur.com/HeSQprk.png"
             }
 
         return {"response": response_text}
