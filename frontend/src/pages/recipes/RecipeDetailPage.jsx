@@ -72,7 +72,7 @@ function RecipeDetailPage() {
   const fetchRecipeDetails = useCallback(async () => {
     setLoading(true); setError(null); setRatingError('');
     try {
-      const fetchUrl = currentUser ? `/api/recipes/${recipeId}?user_id_for_rating_testing=${currentUser.UserID}` : `/api/recipes/${recipeId}`;
+      const fetchUrl = currentUser ? `/api/recipes/${recipeId}?user_id=${currentUser.UserID}` : `/api/recipes/${recipeId}`;
       const response = await fetch(fetchUrl); 
       if (!response.ok) {
         let errorData;

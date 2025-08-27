@@ -36,7 +36,7 @@ def get_public_recipes():
 @recipe_bp.route('/recipes/<recipe_id>', methods=['GET'])
 def get_recipe(recipe_id):
     """ Retrieves details for a specific recipe by its ID. """
-    current_user_id = request.args.get('user_id_for_rating_testing', type=int)
+    current_user_id = request.args.get('user_id', type=int)
 
     data, error, status = recipe_service.get_recipe_details(recipe_id=recipe_id, current_user_id=current_user_id)
     
