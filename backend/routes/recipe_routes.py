@@ -176,7 +176,7 @@ def upload_recipe_image():
 def get_my_private_recipes():
     user_id = request.args.get('user_id', type=int)
     if not user_id:
-        return jsonify({"error": "Authentication required (user_id parameter missing for testing)"}), 401
+        return jsonify({"error": "Authentication required"}), 401
 
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 12, type=int)
@@ -219,7 +219,7 @@ def rate_recipe(recipe_id):
 def get_my_rating_for_recipe(recipe_id):
     user_id = request.args.get('user_id', type=int)
     if not user_id:
-        return jsonify({"error": "Authentication required (user_id parameter missing for testing)"}), 401
+        return jsonify({"error": "Authentication required"}), 401
 
     data, error, status = recipe_rating_service.get_user_rating_for_recipe(
         recipe_id=recipe_id, user_id=user_id
