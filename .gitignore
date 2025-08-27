@@ -15,9 +15,22 @@
 /user docs
 /scripts
 /backend/.env
-/tests
 implementation.md
 Project Documentation.pdf
 docs/Manual_Test_Cases.md
 /backend/ai_models/_eda_notebooks
 /frontend.md
+/htmlcov
+/screenshots
+AI_INTEGRATION_TEST_RESULTS.md
+chapter_7_testing_and_validation.md
+demo_asserted_variables.py
+deployment.md
+requirements.txt
+run_tests_with_screenshots.py
+screenshot_naming_guide.md
+screenshot_test_runner.py
+verify_test_count.py
+run_individual_tests.py
+.coverage
+/tests/.pytest_cache
