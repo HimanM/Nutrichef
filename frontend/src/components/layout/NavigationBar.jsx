@@ -41,8 +41,24 @@ const NavigationBar = () => {
     };
   }, [isMobileMenuOpen, toolsDropdownOpen]);
 
-  if (isAdmin && location.pathname.startsWith('/admin')) {
-    return null;
+  if (isAdmin) {
+    const adminExactPaths = ['/admin'];
+    const adminPrefixes = [
+      '/admin/users',
+      '/admin/recipes',
+      '/admin/comments',
+      '/admin/classification-scores',
+      '/admin/contact-messages',
+      '/admin/logs-monitor',
+      '/admin/forum',
+    ];
+
+    const isExactAdminPath = adminExactPaths.some((p) => location.pathname === p || location.pathname === p + '/');
+    const isAdminSection = adminPrefixes.some((p) => location.pathname === p || location.pathname.startsWith(p + '/'));
+
+    if (isExactAdminPath || isAdminSection) {
+      return null;
+    }
   }
 
   if (loading) {
