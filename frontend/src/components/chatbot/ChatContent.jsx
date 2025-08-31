@@ -1,5 +1,6 @@
 import React from 'react';
-import { HiOutlineRefresh, HiOutlineClock, HiPaperAirplane, HiOutlinePhotograph } from 'react-icons/hi';
+import { HiOutlineClock, HiPaperAirplane, HiOutlinePhotograph } from 'react-icons/hi';
+import { SpinnerIcon } from '../common/LoadingComponents.jsx';
 
 const ChatContent = ({
   messages,
@@ -106,7 +107,7 @@ const ChatContent = ({
           <div className="flex justify-start animate-fade-in">
             <div className="bg-white text-gray-800 px-4 py-3 rounded-2xl border border-gray-100 shadow-md">
               <div className="flex items-center space-x-2">
-                <HiOutlineRefresh className="w-4 h-4 animate-spin text-emerald-500" />
+                <SpinnerIcon size="w-4 h-4" />
                 <span className="text-sm text-gray-600">Thinking...</span>
               </div>
             </div>

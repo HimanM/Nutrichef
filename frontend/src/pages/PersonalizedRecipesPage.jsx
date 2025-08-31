@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useConditionalAuth } from '../components/auth/AuthGuard.jsx';
 import RecipeCard from '../components/pages/recipe/RecipeCard.jsx'; // Tailwind version
 import { authenticatedFetch } from '../utils/apiUtil.js';
-import { HiOutlineRefresh } from 'react-icons/hi';
+import { SpinnerIcon } from '../components/common/LoadingComponents.jsx';
 
 function PersonalizedRecipesPage() {
     const [recipes, setRecipes] = useState([]);
@@ -76,7 +76,7 @@ function PersonalizedRecipesPage() {
         return (
             <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex items-center justify-center">
                 <div className="text-center">
-                    <HiOutlineRefresh className="animate-spin h-12 w-12 text-emerald-500 mx-auto mb-4" />
+                    <SpinnerIcon size="h-12 w-12" className="mx-auto mb-4" />
                     <p className="text-gray-600 text-lg">Loading authentication...</p>
                 </div>
             </div>
@@ -153,7 +153,7 @@ function PersonalizedRecipesPage() {
                     {/* Loading State for initial load */}
                     {isLoading && recipes.length === 0 && (
                         <div className="flex flex-col items-center justify-center min-h-[40vh]">
-                            <HiOutlineRefresh className="animate-spin h-12 w-12 text-emerald-500 mb-4" />
+                            <SpinnerIcon size="h-12 w-12" className="mb-4" />
                             <p className="text-gray-600 text-lg">Loading your personalized recipes...</p>
                         </div>
                     )}
@@ -189,7 +189,7 @@ function PersonalizedRecipesPage() {
                     {/* Loading indicator for pagination */}
                     {isLoading && recipes.length > 0 && (
                         <div className="flex justify-center items-center py-8">
-                            <HiOutlineRefresh className="animate-spin h-8 w-8 text-emerald-500" />
+                            <SpinnerIcon size="h-8 w-8" />
                         </div>
                     )}
 

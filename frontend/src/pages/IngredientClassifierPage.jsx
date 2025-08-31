@@ -4,7 +4,8 @@ import { useLocation } from 'react-router-dom';
 import { useConditionalAuth } from '../components/auth/AuthGuard.jsx';
 import RequireLoginModal from '../components/auth/RequireLoginModal';
 import { authenticatedFetch } from '../utils/apiUtil.js';
-import { HiOutlineCloudUpload, HiOutlineRefresh, HiOutlineCamera, HiOutlineCheckCircle, HiOutlineExclamation } from 'react-icons/hi';
+import { HiOutlineCloudUpload, HiOutlineCamera, HiOutlineCheckCircle, HiOutlineExclamation } from 'react-icons/hi';
+import { SpinnerIcon } from '../components/common/LoadingComponents.jsx';
 import { useCamera } from '../hooks/useCamera.js';
 import CameraModal from '../components/camera/CameraModal.jsx';
 
@@ -221,7 +222,7 @@ const IngredientClassifierPage = () => {
                                                 >
                                                     {isCameraLoading ? (
                                                         <>
-                                                            <HiOutlineRefresh className="animate-spin h-5 w-5 sm:h-6 sm:w-6 mr-2" />
+                                                            <SpinnerIcon size="h-5 w-5 sm:h-6 sm:w-6" color="text-white" className="mr-2" />
                                                             Starting Camera...
                                                         </>
                                                     ) : (
@@ -262,7 +263,7 @@ const IngredientClassifierPage = () => {
                                 >
                                     {isLoading ? (
                                         <>
-                                            <HiOutlineRefresh className="animate-spin h-5 w-5 mr-2" />
+                                            <SpinnerIcon size="h-5 w-5" color="text-white" className="mr-2" />
                                             Classifying...
                                         </>
                                     ) : (
@@ -279,7 +280,7 @@ const IngredientClassifierPage = () => {
                     {/* Loading State */}
                     {isLoading && (
                         <div className="flex flex-col items-center justify-center my-8">
-                            <HiOutlineRefresh className="animate-spin h-12 w-12 text-emerald-500 mb-4" />
+                            <SpinnerIcon size="h-12 w-12" className="mb-4" />
                             <p className="text-gray-600">Processing your image...</p>
                         </div>
                     )}
