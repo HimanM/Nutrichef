@@ -1,5 +1,6 @@
 import React from 'react';
-import { HiOutlineCheckCircle, HiOutlineExclamation, HiOutlineX, HiOutlineRefresh } from 'react-icons/hi';
+import { HiOutlineCheckCircle, HiOutlineExclamation, HiOutlineX } from 'react-icons/hi';
+import { SpinnerIcon } from '../common/LoadingComponents.jsx';
 import ResponsiveModal from './ResponsiveModal';
 
 const InteractiveModal = ({
@@ -93,7 +94,7 @@ const InteractiveModal = ({
                 disabled={isLoading}
                 className="btn-primary text-sm disabled:opacity-75 disabled:cursor-not-allowed touch-manipulation"
               >
-                {isLoading && <HiOutlineRefresh className="animate-spin h-4 w-4 mr-2" />}
+                {isLoading && <SpinnerIcon size="h-4 w-4" color="text-white" className="mr-2" />}
                 {isLoading ? 'Processing...' : confirmText}
               </button>
             </>

@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 // import { useConditionalAuth } from '../../components/auth/AuthGuard.jsx';
 import RecipeCard from '../../components/pages/recipe/RecipeCard.jsx';
 import { authenticatedFetch } from '../../utils/apiUtil.js';
-import { HiOutlineRefresh } from 'react-icons/hi';
+import { SpinnerIcon } from '../../components/common/LoadingComponents.jsx';
 
 function RecipeSuggestionsPage() {
     const [apiResponse, setApiResponse] = useState({ recipes: [], message: '' });
@@ -93,7 +93,7 @@ function RecipeSuggestionsPage() {
     if (authLoading) {
         return (
             <div className="max-w-6xl mx-auto py-8 px-4 text-center">
-                <HiOutlineRefresh className="animate-spin h-10 w-10 text-blue-400 mx-auto" /> <p className="mt-2 text-gray-400">Loading authentication...</p>
+                <SpinnerIcon size="h-10 w-10" color="text-blue-400" className="mx-auto" /> <p className="mt-2 text-gray-400">Loading authentication...</p>
             </div>
         );
     }
@@ -139,14 +139,14 @@ function RecipeSuggestionsPage() {
                                     disabled={isLoading}
                                     className={`btn-primary ${commonButtonClassNameBase} flex items-center justify-center min-w-[80px] disabled:opacity-75`}
                                 >
-                                    {isLoading ? <HiOutlineRefresh className="animate-spin h-5 w-5 text-white" /> : 'Apply'}
+                                    {isLoading ? <SpinnerIcon size="h-5 w-5" color="text-white" /> : 'Apply'}
                                 </button>
                             </div>
                         </div>
 
                         {isLoading && apiResponse.recipes.length === 0 && (
                             <div className="flex flex-col items-center justify-center my-10">
-                                <HiOutlineRefresh className="animate-spin h-10 w-10 text-blue-400" />
+                                <SpinnerIcon size="h-10 w-10" color="text-blue-400" />
                                 <p className="mt-2 text-gray-400">Loading suggestions...</p>
                             </div>
                         )}
@@ -162,7 +162,7 @@ function RecipeSuggestionsPage() {
                         )}
 
                         {isLoading && apiResponse.recipes.length > 0 && (
-                            <div className="flex justify-center items-center py-8"><HiOutlineRefresh className="animate-spin h-8 w-8 text-blue-400" /></div>
+                            <div className="flex justify-center items-center py-8"><SpinnerIcon size="h-8 w-8" color="text-blue-400" /></div>
                         )}
 
                         {!isLoading && apiResponse.recipes.length === 0 && (
