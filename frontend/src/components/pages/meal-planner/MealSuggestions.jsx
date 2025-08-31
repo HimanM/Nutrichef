@@ -6,9 +6,9 @@ import { useAuth } from '../../../context/AuthContext.jsx';
 import { format } from 'date-fns';
 import MobileModal from '../../ui/MobileModal.jsx';
 
-const MealSuggestions = ({ 
-  selectedDate, 
-  existingMeals = [], 
+const MealSuggestions = ({
+  selectedDate,
+  existingMeals = [],
   userNutritionalTargets = {},
   onAddSuggestion,
   isVisible = false,
@@ -20,14 +20,15 @@ const MealSuggestions = ({
   const [error, setError] = useState('');
   const [remainingTargets, setRemainingTargets] = useState({});
   const [_expandedCard, _setExpandedCard] = useState(null);
+  const [excludeAllergies, setExcludeAllergies] = useState(true);
   const auth = useAuth();
 
   const fetchSuggestions = useCallback(async () => {
     if (!selectedDate || !auth.token) return;
-    
+
     setIsLoading(true);
     setError('');
-    
+
     try {
       const response = await authenticatedFetch('/api/meal-planner/suggest-meals', {
         method: 'POST',
@@ -36,7 +37,8 @@ const MealSuggestions = ({
         },
         body: JSON.stringify({
           target_date: format(selectedDate, 'yyyy-MM-dd'),
-          existing_meals: existingMeals
+          existing_meals: existingMeals,
+          exclude_allergies: excludeAllergies
         })
       }, auth);
 
@@ -54,13 +56,13 @@ const MealSuggestions = ({
     } finally {
       setIsLoading(false);
     }
-  }, [selectedDate, auth, existingMeals]);
+  }, [selectedDate, auth, existingMeals, excludeAllergies]);
 
   useEffect(() => {
     if (isVisible && selectedDate) {
       fetchSuggestions();
     }
-  }, [isVisible, selectedDate, existingMeals, fetchSuggestions]);
+  }, [isVisible, selectedDate, existingMeals, excludeAllergies, fetchSuggestions]);
 
   const handleAddSuggestion = (recipe) => {
     if (onAddSuggestion) {
@@ -83,7 +85,7 @@ const MealSuggestions = ({
             <h3 className="font-medium text-amber-800 text-sm md:text-base">Set Nutritional Targets</h3>
           </div>
           <p className="text-xs md:text-sm text-amber-700">
-            {isMobile ? 
+            {isMobile ?
               "Set your daily nutritional targets to get personalized meal suggestions." :
               "To get personalized meal suggestions, please set your daily nutritional targets in the meal planner settings."
             }
@@ -124,6 +126,25 @@ const MealSuggestions = ({
         </div>
       )}
 
+      {/* Allergy Filter Toggle */}
+      <div className="flex items-center justify-between">
+        <span className="text-sm md:text-base text-gray-700 font-medium">
+          {isMobile ? "Filter Allergens" : "Exclude My Allergens"}
+        </span>
+        <button
+          onClick={() => setExcludeAllergies(!excludeAllergies)}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${excludeAllergies ? 'bg-emerald-600' : 'bg-gray-200'
+            }`}
+          role="switch"
+          aria-checked={excludeAllergies}
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${excludeAllergies ? 'translate-x-6' : 'translate-x-1'
+              }`}
+          />
+        </button>
+      </div>
+
       {/* Error State */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3 md:p-4">
@@ -149,9 +170,8 @@ const MealSuggestions = ({
           {suggestions.map((recipe) => (
             <div
               key={recipe.RecipeID}
-              className={`bg-white border border-gray-200 rounded-lg overflow-hidden ${
-                isMobile ? "shadow-sm" : "hover:shadow-md min-h-[280px]"
-              } transition-shadow`}
+              className={`bg-white border border-gray-200 rounded-lg overflow-hidden ${isMobile ? "shadow-sm" : "hover:shadow-md min-h-[280px]"
+                } transition-shadow`}
             >
               {isMobile ? (
                 // Mobile card layout
@@ -182,9 +202,9 @@ const MealSuggestions = ({
                       <h4 className="font-medium text-gray-800 text-sm line-clamp-2 mb-1">
                         {recipe.Title}
                       </h4>
-                      
+
                       {recipe.nutrition_fit && (
-                        <div 
+                        <div
                           className="text-xs text-emerald-600 mb-2 bg-emerald-50 px-2 py-1 rounded leading-relaxed break-words"
                           title={recipe.nutrition_fit}
                           style={{ wordBreak: 'break-word' }}
@@ -237,11 +257,11 @@ const MealSuggestions = ({
                         {recipe.Title}
                       </h4>
                     </div>
-                    
+
                     {/* Nutrition fit info with improved height */}
                     <div className="mb-3">
                       {recipe.nutrition_fit && (
-                        <div 
+                        <div
                           className="text-xs text-emerald-600 bg-emerald-50 px-2 py-1.5 rounded leading-relaxed break-words hyphens-auto"
                           title={recipe.nutrition_fit}
                           style={{ wordBreak: 'break-word' }}
@@ -283,7 +303,7 @@ const MealSuggestions = ({
           </div>
           <h3 className="text-base md:text-lg font-medium text-gray-800 mb-2">No Suggestions Available</h3>
           <p className="text-gray-600 text-sm md:text-base px-4 md:max-w-md md:mx-auto">
-            {isMobile ? 
+            {isMobile ?
               "We couldn't find suitable meal suggestions based on your current targets." :
               "We couldn't find suitable meal suggestions based on your current nutritional targets and existing meals. Try adjusting your targets or removing some planned meals."
             }

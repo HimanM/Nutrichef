@@ -77,6 +77,7 @@ def suggest_meals():
         data = request.get_json()
         target_date = data.get('target_date')
         existing_meals = data.get('existing_meals', [])
+        exclude_allergies = data.get('exclude_allergies', True)
         
         ## Debug logging for mobile issue
         # user_agent = request.headers.get('User-Agent', '')
@@ -90,7 +91,7 @@ def suggest_meals():
             return jsonify({"error": "target_date is required"}), 400
         
         suggestions = meal_suggestion_service.suggest_meals_for_day(
-            user_id, target_date, existing_meals
+            user_id, target_date, existing_meals, exclude_allergies
         )
         
         if suggestions.get('error'):
