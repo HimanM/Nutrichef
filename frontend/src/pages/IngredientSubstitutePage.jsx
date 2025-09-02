@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
-import { HiOutlineSearch, HiOutlineRefresh, HiOutlineExclamation, HiOutlineCheckCircle } from 'react-icons/hi';
+import { HiOutlineSearch, HiOutlineExclamation, HiOutlineCheckCircle } from 'react-icons/hi';
+import { SpinnerIcon } from '../components/common/LoadingComponents.jsx';
 
 const NUTRITION_WARNING_MESSAGES = [
     'Detailed nutritional data not available or incomplete.',
@@ -147,7 +148,7 @@ const IngredientSubstitutePage = () => {
                   className="btn-primary w-full sm:w-auto min-h-[44px] touch-manipulation disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
-                    <HiOutlineRefresh className="animate-spin h-5 w-5" />
+                    <SpinnerIcon size="h-5 w-5" color="text-white" />
                   ) : (
                     <>
                       <HiOutlineSearch className="w-5 h-5 mr-2" />
@@ -202,7 +203,7 @@ const IngredientSubstitutePage = () => {
 
                   {substitute.isLoadingNutrition && (
                     <div className="flex items-center justify-center my-4 p-4 bg-gray-50 rounded-lg">
-                      <HiOutlineRefresh className="animate-spin h-5 w-5 text-emerald-500 mr-2" />
+                      <SpinnerIcon size="h-5 w-5" className="mr-2" />
                       <p className="text-sm text-gray-600">Loading nutritional data...</p>
                     </div>
                   )}

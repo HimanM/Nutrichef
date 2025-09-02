@@ -7,7 +7,8 @@ import { authenticatedFetch } from '../../utils/apiUtil.js';
 import RequireLoginModal from '../../components/auth/RequireLoginModal.jsx';
 import RecipeSubmissionModal from '../../components/pages/recipe/RecipeSubmissionModal.jsx';
 import FloatingLoader from '../../components/ui/FloatingLoader.jsx';
-import { HiOutlineRefresh, HiOutlineSearch, HiOutlinePlus, HiOutlineCheck, HiOutlineEye, HiOutlineEyeOff, HiOutlineHeart, HiHeart, HiOutlineTag, HiOutlineX } from 'react-icons/hi';
+import { HiOutlineSearch, HiOutlinePlus, HiOutlineCheck, HiOutlineEye, HiOutlineEyeOff, HiOutlineHeart, HiHeart, HiOutlineTag, HiOutlineX } from 'react-icons/hi';
+import { SpinnerIcon } from '../../components/common/LoadingComponents.jsx';
 
 
 
@@ -338,7 +339,7 @@ function PublicRecipeBrowserPage() {
         <div className="container-modern">
           <div className="flex justify-center items-center min-h-[50vh]">
             <div className="text-center">
-              <HiOutlineRefresh className="animate-spin h-12 w-12 text-emerald-500 mx-auto mb-4" />
+              <SpinnerIcon size="h-12 w-12" className="mx-auto mb-4" />
               <p className="text-gray-600">Loading recipes...</p>
             </div>
           </div>
@@ -577,7 +578,7 @@ function PublicRecipeBrowserPage() {
           {/* Loading State */}
           {loading && recipes.length > 0 && (
             <div className="flex justify-center items-center py-8">
-              <HiOutlineRefresh className="animate-spin h-8 w-8 text-emerald-500" />
+              <SpinnerIcon size="h-8 w-8" />
             </div>
           )}
 

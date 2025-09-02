@@ -1,4 +1,4 @@
-export { default as LoadingComponents } from './LoadingComponents.jsx';
+export { default as LoadingComponents, SpinnerIcon } from './LoadingComponents.jsx';
 export { 
   AdminErrorDisplay, 
   AdminFullPageError, 

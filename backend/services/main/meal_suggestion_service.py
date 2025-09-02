@@ -1,6 +1,8 @@
 from backend.dao.recipe_dao import RecipeDAO
 from backend.dao.user_dao import UserDAO
-from backend.models import Recipe
+from backend.models import Recipe, UserAllergy, AllergyIntolerance
+from backend.dao.ingredient_dao import IngredientDAO
+from backend.db import db
 import random
 from typing import List, Dict, Any
 
@@ -8,8 +10,9 @@ class MealSuggestionService:
     def __init__(self):
         self.recipe_dao = RecipeDAO()
         self.user_dao = UserDAO()
+        self.ingredient_dao = IngredientDAO()
     
-    def suggest_meals_for_day(self, user_id: int, target_date: str, existing_meals: List[Dict] = None) -> Dict[str, Any]:
+    def suggest_meals_for_day(self, user_id: int, target_date: str, existing_meals: List[Dict] = None, exclude_allergies: bool = True) -> Dict[str, Any]:
         """
         Suggest meals for a specific day based on user's nutritional targets
         """
@@ -34,6 +37,10 @@ class MealSuggestionService:
             
             # Get all available recipes with nutrition info
             all_recipes = self.recipe_dao.get_all_recipes_with_nutrition()
+            
+            # Filter out recipes with user allergies if requested
+            if exclude_allergies:
+                all_recipes = self._filter_recipes_by_allergies(all_recipes, user_id)
             
             # Filter and score recipes based on nutritional fit
             suggested_meals = self._suggest_optimal_meals(all_recipes, remaining_targets)
@@ -214,3 +221,38 @@ class MealSuggestionService:
                 fits.append(f"High protein ({int(protein_percent)}% of daily target)")
         
         return "; ".join(fits) if fits else "Balanced nutrition"
+    
+    def _filter_recipes_by_allergies(self, recipes: List, user_id: int) -> List:
+        """Filter out recipes that contain ingredients the user is allergic to"""
+        try:
+            # Get user's allergies
+            user_allergies = UserAllergy.query.filter_by(UserID=user_id).all()
+            if not user_allergies:
+                return recipes  # No allergies, return all recipes
+            
+            user_allergy_ids = [ua.AllergyID for ua in user_allergies]
+            
+            filtered_recipes = []
+            for recipe in recipes:
+                # Get all ingredients for this recipe
+                recipe_ingredients = self.recipe_dao.get_ingredients_for_recipe(recipe.RecipeID)
+                
+                # Check if any ingredient has an allergy that matches user's allergies
+                has_allergen = False
+                for ingredient in recipe_ingredients:
+                    ingredient_allergies = self.ingredient_dao.get_allergies_for_ingredient(ingredient.IngredientID)
+                    if ingredient_allergies:
+                        ingredient_allergy_ids = [allergy.id for allergy in ingredient_allergies]
+                        if any(allergy_id in user_allergy_ids for allergy_id in ingredient_allergy_ids):
+                            has_allergen = True
+                            break
+                
+                if not has_allergen:
+                    filtered_recipes.append(recipe)
+            
+            return filtered_recipes
+            
+        except Exception as e:
+            print(f"Error filtering recipes by allergies: {e}")
+            # If there's an error, return all recipes to avoid breaking the suggestion system
+            return recipes

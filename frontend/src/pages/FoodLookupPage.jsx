@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { authenticatedFetch } from '../utils/apiUtil.js';
-import { HiOutlineSearch, HiOutlineRefresh, HiOutlineX } from 'react-icons/hi';
+import { HiOutlineSearch, HiOutlineX } from 'react-icons/hi';
+import { SpinnerIcon } from '../components/common/LoadingComponents.jsx';
 
 function toTitleCase(str) {
   if (!str) return '';
@@ -133,7 +134,7 @@ function FoodLookupPage() {
                   className="btn-primary flex-1 sm:flex-none min-h-[44px] touch-manipulation disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   {isLoading && !foodData ? (
-                    <HiOutlineRefresh className="animate-spin h-5 w-5" />
+                    <SpinnerIcon size="h-5 w-5" color="text-white" />
                   ) : (
                     <>
                       <HiOutlineSearch className="w-5 h-5 mr-2" />
@@ -157,7 +158,7 @@ function FoodLookupPage() {
           {isLoading && !error && (
             <div className="flex justify-center my-8">
               <div className="text-center">
-                <HiOutlineRefresh className="animate-spin h-12 w-12 text-emerald-500 mx-auto mb-4" />
+                <SpinnerIcon size="h-12 w-12" className="mx-auto mb-4" />
                 <p className="text-gray-600">Searching for nutritional data...</p>
               </div>
             </div>
