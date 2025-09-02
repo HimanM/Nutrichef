@@ -1,5 +1,7 @@
 # NutriChef: Your Intelligent Recipe and Nutrition Companion
 
+[![Deploy to VPS on push](https://github.com/HimanM/Nutrichef/actions/workflows/main.yml/badge.svg)](https://github.com/HimanM/Nutrichef/actions/workflows/main.yml)
+
 NutriChef is a comprehensive web application designed to help users manage recipes, understand nutritional information, cater to dietary restrictions and allergies, and discover new culinary ideas. It leverages AI for advanced features like food classification from images, natural language processing of recipes, and personalized recommendations.
 
 <p align="center">
