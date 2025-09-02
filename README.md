@@ -12,7 +12,7 @@ NutriChef combines modern web technologies with AI-powered features to provide a
 
 | Feature | Desktop Screenshot | Mobile Screenshot |
 |---------|-------------------|------------------|
-| **Home Page** | ![NutriChef Home Page](./docs/images/homepage_screenshot.png) | *[Mobile screenshot placeholder]* |
+| **Home Page** | ![NutriChef Home Page](./docs/images/homepage_screenshot.png) | ![Home Page Mobile](./docs/images/home_page_mobile.png) |
 
 ## ✨ Core Features
 
@@ -22,7 +22,7 @@ NutriChef combines modern web technologies with AI-powered features to provide a
 
 | Feature | Desktop Screenshot | Mobile Screenshot |
 |---------|-------------------|------------------|
-| **Login & Registration** | ![User Login Page](./docs/images/user_login_screenshot.png) | *[Mobile screenshot placeholder]* |
+| **Login & Registration** | ![User Login Page](./docs/images/user_login_screenshot.png) | ![User Login Mobile](./docs/images/user_login_screenshot_mobile.png) |
 
 #### 🍳 Recipe Management
 - **Browse & Search** public recipe collection with advanced filters
@@ -87,11 +87,11 @@ NutriChef combines modern web technologies with AI-powered features to provide a
 | Feature | Screenshot |
 |---------|------------|
 | **Contact Us** | ![Contact Us Page](./docs/images/contact_us_screenshot.png) |
-| **Forum Discussions** | *[Screenshot placeholder - Forum page]* |
-| **Recipe Suggestions** | *[Screenshot placeholder - Recipe suggestions page]* |
-| **Shopping Basket** | *[Screenshot placeholder - Shopping basket interface]* |
-| **Nutritional Tracking** | *[Screenshot placeholder - Nutritional tracking dashboard]* |
-| **User Favorites** | *[Screenshot placeholder - User favorites page]* |
+| **Forum Discussions** | ![Forum Management](./docs/images/forum_management.png) |
+| **Recipe Suggestions** | ![Recipe Suggestions Page](./docs/images/recipe_suggestions_page.png) |
+| **Shopping Basket** | ![Shopping Basket Interface](./docs/images/shopping_basket_interface.png) |
+| **Nutritional Tracking** | ![Nutritional Tracking Dashboard](./docs/images/nutritional_tracking_dashboard.png) |
+| **User Favorites** | ![User Favorites Page](./docs/images/user_favorites.png) |
 
 ### 🛡️ Administrator Features
 
@@ -105,9 +105,6 @@ NutriChef combines modern web technologies with AI-powered features to provide a
 |---------|------------|
 | **Admin Dashboard** | ![Admin Dashboard Page](./docs/images/admin_dashboard_screenshot.png) |
 
-| Feature | Desktop Screenshot | Mobile Screenshot |
-|---------|-------------------|------------------|
-| **Admin Dashboard** | ![Admin Dashboard Page](./docs/images/admin_dashboard_screenshot.png) | *[Mobile screenshot placeholder]* |
 
 #### 👥 User & Content Management
 - **User Management** with role assignment and account control
@@ -123,34 +120,10 @@ NutriChef combines modern web technologies with AI-powered features to provide a
 | Feature | Screenshot |
 |---------|------------|
 | **Message Management** | ![Admin Reply Messages Page](./docs/images/admin_messages_screenshot_2.png) |
-| **System Logs Monitor** | *[Screenshot placeholder - Admin logs monitoring interface]* |
-| **User Management** | *[Screenshot placeholder - User management interface]* |
-| **Recipe Management** | *[Screenshot placeholder - Recipe moderation interface]* |
-| **Forum Management** | *[Screenshot placeholder - Forum administration interface]* |
-
-| Feature | Desktop Screenshot | Mobile Screenshot |
-|---------|-------------------|------------------|
-| **Message Management** | ![Admin Reply Messages Page](./docs/images/admin_messages_screenshot_2.png) | *[Mobile screenshot placeholder]* |
-| **System Logs Monitor** | *[Screenshot placeholder - Admin logs monitoring interface]* | *[Mobile screenshot placeholder]* |
-| **User Management** | *[Screenshot placeholder - User management interface]* | *[Mobile screenshot placeholder]* |
-| **Recipe Management** | *[Screenshot placeholder - Recipe moderation interface]* | *[Mobile screenshot placeholder]* |
-| **Forum Management** | *[Screenshot placeholder - Forum administration interface]* | *[Mobile screenshot placeholder]* |
-
-> [!NOTE]
-> Admin features require elevated permissions and are protected by role-based access control.
-
----
-
-> [!WARNING]
-> **Missing Features:** Some features are planned but not yet implemented, including:
-> - Mobile-optimized views for all pages
-> - Push notifications for mobile devices
-> - Advanced analytics dashboards
-> - Real-time chat in forums
-> - Multi-language support
-> - Recipe import from external sources
-> - More AI-powered suggestions
-> These features will be added in future releases. Track progress in the [GitHub Issues](https://github.com/HimanM/nutrichef/issues) page.
+| **System Logs Monitor** | ![System Logs Monitor](./docs/images/system_logs_monitor.png) |
+| **User Management** | ![User Management Interface](./docs/images/user_management.png) |
+| **Recipe Management** | ![Recipe Management Interface](./docs/images/recipe_management.png) |
+| **Forum Management** | ![Forum Administration Interface](./docs/images/forum_management.png) |
 
 ---
 
