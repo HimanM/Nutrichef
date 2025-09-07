@@ -112,8 +112,8 @@ jobs:
     needs: [build-backend, test-backend, build-lint-frontend]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test')
     environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'Nutrichef VPS' || 'Nutrichef Test VPS' }}
-      url: ${{ github.ref == 'refs/heads/main' && 'https://nutrichef.himanmanduja.fun' || 'https://test.nutrichef.himanmanduja.fun' }} 
+      name: Nutrichef VPS
+      url: https://nutrichef.himanmanduja.fun 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
