@@ -30,15 +30,13 @@ jobs:
 
       - name: Install backend dependencies
         run: |
-          cd backend
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r backend/requirements.txt
 
       - name: Build backend (syntax check)
         run: |
-          cd backend
-          python -m py_compile app.py
-          python -c "import app; print('Backend build successful')"
+          python -m py_compile backend/app.py
+          python -c "import backend.app; print('Backend build successful')"
 
   # Stage 2: Test Backend
   test-backend:
@@ -64,14 +62,12 @@ jobs:
 
       - name: Install backend dependencies
         run: |
-          cd backend
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r backend/requirements.txt
 
       - name: Run backend tests
         run: |
-          cd tests
-          python -m pytest -v --tb=short
+          python -m pytest tests/ -v --tb=short
 
   # Stage 3: Build and Lint Frontend
   build-lint-frontend:
