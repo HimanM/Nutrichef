@@ -1,7 +1,7 @@
 services:
   db:
     image: mysql:8.0
-    container_name: mysql_db_container  # Your original container name
+    container_name: nutrichef_mysql_db_container  # Your original container name
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: nutrichef      # Your desired root password
@@ -16,7 +16,7 @@ services:
 
   backend:
     build: ./backend
-    container_name: backend_container
+    container_name: nutrichef_backend_container
     restart: unless-stopped
     # ports:
     #   - "5000:5000" # Host:Container
@@ -46,7 +46,7 @@ services:
 
   frontend:
     build: ./frontend
-    container_name: frontend_container
+    container_name: nutrichef_frontend_container
     restart: unless-stopped
     ports:
       - "3000:80" # Host:Container - Nginx in container runs on 80, access via localhost:3000
